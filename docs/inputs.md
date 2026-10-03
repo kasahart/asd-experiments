@@ -1,8 +1,8 @@
 # 読者が取得する入力
 
-1. [Additional Training](https://zenodo.org/records/20151556)の5機種train ZIPと[Evaluation](https://zenodo.org/records/20437238)の5機種test ZIPを取得し、同じ `eval_data/raw` に展開します。このパスを `--input` に指定します。
-2. [Microsoft BEATs公式README](https://github.com/microsoft/unilm/tree/master/beats)の **Pre-Trained Model / Iter3** を取得し、`--checkpoint` に指定します。
-3. 再採点には[公式評価器](https://github.com/nttcslab/dcase2026_task2_evaluator)と付属正解を取得し、`--evaluator` に指定します。評価器は `f6a94a2b5e614a9626c9d1ccff6df0705e6aaa75` にcheckoutし、変更のない状態で使います。
+1. [DCASE 2026 Challenge Task 2 Additional Training Dataset](https://zenodo.org/records/20151556)の5機種train ZIPと[DCASE 2026 Challenge Task 2 Evaluation Dataset](https://zenodo.org/records/20437238)の5機種test ZIPを取得し、同じ `eval_data/raw` に展開します。このパスを `--input` に指定します。
+2. [BEATs README](https://github.com/microsoft/unilm/blob/master/beats/README.md)の **Pre-Trained Model / Iter3** を取得し、`--checkpoint` に指定します。
+3. 再採点には[dcase2026_task2_evaluator](https://github.com/nttcslab/dcase2026_task2_evaluator)と付属正解を取得し、`--evaluator` に指定します。評価器は `f6a94a2b5e614a9626c9d1ccff6df0705e6aaa75` にcheckoutし、変更のない状態で使います。
 
 ```text
 <INPUT>/BlowerDustCollector/{train,test}/*.wav
@@ -36,8 +36,8 @@ CLIが使用するBEATs_iter3.ptのSHA-256は `8d1b234032a9ccff353612dc6c2098234
 
 ## 容量と計算資源
 
-Zenodo表示のダウンロード容量はtrain約2.8 GB、test 558.7 MB。ZIPと展開音声を同時保持するなら両方の空き容量が必要です。元の報告のWAV header件数から、PCM16 stereoの音声payloadは合計約3.99 GB（3600×10秒、1200×6秒、1200×16秒、16kHz×2ch×2bytes）と算出できます。Python環境・重み・生成物の容量は別途必要です。
+Zenodo表示のダウンロード容量はtrain約2.8 GB、test 558.7 MB。ZIPと展開音声を同時保持するなら両方の空き容量が必要です。WAV headerの件数・長さから、PCM16 stereoの音声payloadは合計約3.99 GB（3600×10秒、1200×6秒、1200×16秒、16kHz×2ch×2bytes）と算出できます。Python環境・重み・生成物の容量は別途必要です。
 
-重みは約345 MiB。CLIは機種・条件ごとの特徴をメモリに保持します。RAM/VRAMの必要最小値は未測定です。CPUまたはGPUで実行でき、GPU PyTorchの導入は[公式手順](https://pytorch.org/get-started/locally/)を参照してください。
+重みは約345 MiB。CLIは機種・条件ごとの特徴をメモリに保持します。RAM/VRAMの必要最小値は未測定です。CPUまたはGPUで実行でき、GPU PyTorchの導入は[PyTorch Get Started](https://pytorch.org/get-started/locally/)を参照してください。
 
-使用機器と実測時間は[検証記録](../VALIDATION.md)に記載しています。まず `--machine ToothBrush --limit 5` で小規模に実行できます。
+使用機器と実測時間は[検証範囲](../VALIDATION.md)に記載しています。まず `--machine ToothBrush --limit 5` で小規模に実行できます。

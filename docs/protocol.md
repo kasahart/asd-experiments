@@ -14,4 +14,4 @@ Evaluationの5機種。正常参照はAdditional Trainingの各1000正常音（s
 
 ## 公式指標の対象
 
-固定evaluatorのsource AUCはsourceの正常音と**両domainすべての異常音**で計算し、target AUCはtargetの正常音と両domainすべての異常音で計算します。domain内だけの異常音に限定したAUCではありません。pAUCは機種ごとの全200テスト音、max_fpr=0.1の標準化pAUCです。公式総合値は5機種のsource AUC・target AUC・pAUCの15値（epsilon clamp）の調和平均。再採点は[公式評価器](inputs.md)を使います。
+評価器のsource AUCはsourceの正常音と**両domainすべての異常音**で計算し、target AUCはtargetの正常音と両domainすべての異常音で計算します。domain内だけの異常音に限定したAUCではありません。pAUCは機種ごとの全200テスト音、max_fpr=0.1の標準化pAUCです。公式総合値は5機種のsource AUC・target AUC・pAUCの15値（epsilon clamp）の調和平均。再採点は[入力取得](inputs.md)を使います。

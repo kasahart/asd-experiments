@@ -1,6 +1,6 @@
-# 今回の自前実装と、既存手法の対応
+# 実装と既存手法の対応
 
-Notebookで見た4条件は、波形を選ぶ・加工する部分だけを変え、その後の検知器をそろえています。ここでは公開コードで実際に呼ばれる処理を説明します。BEATsはMicrosoftの既存モデル、RDP・BEAM・VarMinは論文由来の手法です。公開コードは、ASDKit由来の基盤にkasahartが追加した再実装・抽出拡張と、記事の比較に必要なDSP・実行処理を選んだものです。
+Notebookで見た4条件は、波形を選ぶ・加工する部分だけを変え、その後の検知器をそろえています。ここでは公開コードで実際に呼ばれる処理を説明します。BEATsはMicrosoftの既存モデル、RDP・BEAM・VarMinは論文由来の手法です。公開コードは、ASDKit基盤と各手法の再実装・特徴抽出拡張、波形処理・実行処理で構成されています。
 
 ## 処理の全体像と由来
 
@@ -17,14 +17,14 @@ Notebookで見た4条件は、波形を選ぶ・加工する部分だけを変�
 
 `T`は時間パッチ数、`F`は周波数パッチ数、`D`は特徴ベクトルの次元です。`F`はSTFTの1 Hzごとの成分ではなく、BEATsの入力の周波数方向のパッチ位置です。最終特徴はTransformerで文脈化されています。
 
-| 処理 | 由来・今回の実装 | 公開コード |
+| 処理 | 由来・実装内容 | 公開コード |
 |---|---|---|
-| BEATs | Microsoftの既存モデル。kasahartが研究側でグリッド形状の返却を追加 | [BEATs.py](beats/BEATs.py)、[runner.py](runner.py) |
-| RDP | 論文手法のkasahart追加実装。hash固定poolingを選択移植 | [pooling.py](pooling.py) |
-| BEAM＋VarMin | 論文手法のkasahart追加再実装。詳細APIも含む | [beam.py](beam.py) |
-| W1 | kasahart追加の複素LS研究実装から、必要関数を移植 | [waveform.py](waveform.py)の`w1()` |
-| SS | Qian技術報告の式1を、この公開用コピーで実装 | [waveform.py](waveform.py)の`ss_spectrum()`と`ss()` |
-| 条件比較の実行 | 記事用の新規companion。参照再構築・出力・入力確認を共通化 | [runner.py](runner.py)、[cli.py](cli.py) |
+| BEATs | 既存モデルの特徴列とグリッド形状を取得 | [BEATs.py](beats/BEATs.py)、[runner.py](runner.py) |
+| RDP | [NA-SSL論文](https://arxiv.org/html/2608.00447v1)を参考にした時間集約 | [pooling.py](pooling.py) |
+| BEAM＋VarMin | [BEAM論文](https://arxiv.org/html/2603.13749)・[VarMin論文](https://dcase.community/documents/workshop2025/proceedings/DCASE2025Workshop_Matsumoto_12.pdf)を参考にした参照比較と補正 | [beam.py](beam.py) |
+| W1 | 録音全体の複素最小二乗で共通音を減算 | [waveform.py](waveform.py)の`w1()` |
+| SS | Chu・Qian技術報告の式1による大きさの減算 | [waveform.py](waveform.py)の`ss_spectrum()`と`ss()` |
+| 条件比較の実行 | 参照再構築・出力・入力確認を共通化 | [runner.py](runner.py)、[cli.py](cli.py) |
 
 ## モジュールの隣にある解説
 
@@ -38,4 +38,4 @@ Notebookで見た4条件は、波形を選ぶ・加工する部分だけを変�
 
 ## 出典
 
-選択元のhashは[import-manifest.json](../../docs/import-manifest.json)、著作権表示とライセンスは[第三者通知](../../THIRD_PARTY_NOTICES.md)と[権利文書](../../docs/rights.md)にまとめています。BEAMは選択snapshotの詳細API拡張を含み、runnerは`anomaly_score()`の`main`を使います。
+選択元のhashは[import-manifest](../../docs/import-manifest.json)、著作権表示とライセンスは[第三者通知](../../THIRD_PARTY_NOTICES.md)と[出典と利用条件](../../docs/rights.md)にまとめています。runnerは`anomaly_score()`の`main`を使います。

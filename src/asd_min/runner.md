@@ -9,7 +9,7 @@
 BEATs重みのSHA-256、train/test件数と匿名テスト名を確認し、既存出力を上書きしません。入力hash・時間・正常trainスコア・閾値をローカルに記録します。Notebookの波形計算は同じ`condition_audio()`を呼び、Wandasは可視化と手動試聴を担います。
 
 
-入力計画は`plan()`、特徴抽出は`Encoder.extract()`、全体実行は`run()`です。CLIの`results`は保存表の閲覧、`infer`は生音声からの再推論、`evaluate`は読者取得の固定公式評価器による保存異常度の採点です。
+入力計画は`plan()`、特徴抽出は`Encoder.extract()`、全体実行は`run()`です。CLIの`results`は保存表の閲覧、`infer`は生音声からの再推論、`evaluate`は読者取得の固定評価器による保存異常度の採点です。
 
 [公開コード：runner.py](runner.py) / [cli.py](cli.py) / [読者向けREADME](../../README.md)
 

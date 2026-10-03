@@ -1,6 +1,6 @@
 # beam.py — 正常参照との比較とVarMin補正
 
-BEAM/VarMinはASDKit基盤にkasahartが追加した再実装です。
+BEAMで正常参照と比較し、VarMinでスコアを補正します。
 
 ## BEAM — 周波数ごとに、似た正常音を選ぶ
 
@@ -12,9 +12,9 @@ raw_band[f] = min_i D(q[f], y[i,f])
 raw_score = 周波数方向の一様平均(raw_band)
 ```
 
-**直感：** 低い帯域は正常録音A、高い帯域は正常録音Bと似ている場合があります。一つの正常録音に全帯域が同時に似ていることを要求せず、帯域ごとに参照を選びます。正常な成分の組み合わせが変わっただけで距離が大きくなる問題を抑える、という[BEAMの考え方](https://arxiv.org/html/2603.13749)に対応します。
+**直感：** 低い帯域は正常録音A、高い帯域は正常録音Bと似ている場合があります。一つの正常録音に全帯域が同時に似ていることを要求せず、帯域ごとに参照を選びます。正常な成分の組み合わせが変わっただけで距離が大きくなる問題を抑える、という[BEAM論文](https://arxiv.org/html/2603.13749)の設計に基づきます。
 
-今回の正常メモリは、source990件とtarget10件を一緒に使います。domain別に二つのメモリを作る方法や、帯域の音量による重み付けは使いません。B0/B1/W1/SSでメモリを共有せず、各条件で加工した正常音から構築します。
+正常メモリは、source990件とtarget10件を一緒に使います。domain別に二つのメモリを作る方法や、帯域の音量による重み付けは使いません。B0/B1/W1/SSでメモリを共有せず、各条件で加工した正常音から構築します。
 
 CSVの異常度には、次節のVarMin補正後の`main`を使います。
 
@@ -36,7 +36,7 @@ main_score = 周波数方向の一様平均(main_band)
 
 正常train全件を一つずつ仮の検証音にするのが`train_all`、自己を比較相手から外すのがleave-one-out、帯域ごとに係数を求めるのが`per_band`です。`alpha`の分母が`eps=1e-12`以下なら0とし、係数や最終スコアを0以上にclipしません。したがって異常度は負になることもあります。補正後に全参照から最小値を選び直します。
 
-係数の分散最小化は[MatsumotoらのVarMin手法](https://dcase.community/documents/workshop2025/proceedings/DCASE2025Workshop_Matsumoto_12.pdf)に由来します。近傍4件は[組み合わせ手法の比較設定](https://arxiv.org/html/2608.00447v1)に合わせています。この実装では、共有正常メモリ・train_all・per_bandを使い、帯域平均の前に補正します。
+係数の分散最小化は[VarMin論文](https://dcase.community/documents/workshop2025/proceedings/DCASE2025Workshop_Matsumoto_12.pdf)に由来します。近傍4件は[NA-SSL論文](https://arxiv.org/html/2608.00447v1)に合わせています。この実装では、共有正常メモリ・train_all・per_bandを使い、帯域平均の前に補正します。
 
 4条件で同じ検知器を使います。
 
