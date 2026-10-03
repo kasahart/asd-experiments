@@ -8,7 +8,7 @@
 
 **直感と役割：** すべてのパッチを一つに平均すると、低い音と高い音の違いが失われます。実際の畳み込み出力からグリッドを取り出すことで、その後に周波数ごとの集約・参照比較ができます。`F`を決め打ちせず、同じforwardで形状を返します。
 
-モデルの事前学習・重みは[Microsoft BEATs](https://github.com/microsoft/unilm/tree/master/beats)由来です。`extract_features_with_grid()`は研究側の抽出API拡張で、特徴や音声を新たに学習する処理ではありません。今回、BEATsの追加学習やNA-BEATs化は行っていません。[BEATs原論文](https://proceedings.mlr.press/v202/chen23ag.html)
+モデルの事前学習・重みは[Microsoft BEATs](https://github.com/microsoft/unilm/tree/master/beats)由来です。`extract_features_with_grid()`はkasahartが研究側で追加した抽出API拡張で、特徴や音声を新たに学習する処理ではありません。今回、BEATsの追加学習やNA-BEATs化は行っていません。[BEATs原論文](https://proceedings.mlr.press/v202/chen23ag.html)
 
 
 [公開コード](BEATs.py) / [抽出を呼ぶrunner](../runner.py) / [次：RDP](../pooling.md)

@@ -1,6 +1,6 @@
 # 今回の自前実装と、既存手法の対応
 
-Notebookで見た4条件は、波形を選ぶ・加工する部分だけを変え、その後の検知器をそろえています。ここでは公開コードで実際に呼ばれる処理を説明します。**自前で実装したことと、手法そのものを新しく提案したことは分けます。** BEATsはMicrosoftの既存モデル、RDP・BEAM・VarMinは論文由来の手法です。公開コードは、それらの研究再実装・抽出拡張と、記事の比較に必要なDSP・実行処理を選んだものです。
+Notebookで見た4条件は、波形を選ぶ・加工する部分だけを変え、その後の検知器をそろえています。ここでは公開コードで実際に呼ばれる処理を説明します。**自前で実装したことと、手法そのものを新しく提案したことは分けます。** BEATsはMicrosoftの既存モデル、RDP・BEAM・VarMinは論文由来の手法です。公開コードは、ASDKit由来の基盤にkasahartが追加した再実装・抽出拡張と、記事の比較に必要なDSP・実行処理を選んだものです。基盤のMIT表示を継承していることと、追加コードの実装由来は分けます。
 
 ## 処理の全体像と由来
 
@@ -19,10 +19,10 @@ Notebookで見た4条件は、波形を選ぶ・加工する部分だけを変�
 
 | 処理 | 由来・今回の実装 | 公開コード |
 |---|---|---|
-| BEATs | Microsoftの既存モデル。研究側がグリッド形状の返却を追加 | [BEATs.py](beats/BEATs.py)、[runner.py](runner.py) |
-| RDP | 論文手法の研究実装。beam-tf-attributionのpoolingを選択移植 | [pooling.py](pooling.py) |
-| BEAM＋VarMin | 論文手法の研究再実装。参照・補正係数などを返す詳細APIも含む | [beam.py](beam.py) |
-| W1 | 既存の複素最小二乗に基づく研究実装から、必要関数を移植 | [waveform.py](waveform.py)の`w1()` |
+| BEATs | Microsoftの既存モデル。kasahartが研究側でグリッド形状の返却を追加 | [BEATs.py](beats/BEATs.py)、[runner.py](runner.py) |
+| RDP | 論文手法のkasahart追加実装。hash固定poolingを選択移植 | [pooling.py](pooling.py) |
+| BEAM＋VarMin | 論文手法のkasahart追加再実装。詳細APIも含む | [beam.py](beam.py) |
+| W1 | kasahart追加の複素LS研究実装から、必要関数を移植 | [waveform.py](waveform.py)の`w1()` |
 | SS | Qian技術報告の式1を、この公開用コピーで実装 | [waveform.py](waveform.py)の`ss_spectrum()`と`ss()` |
 | 条件比較の実行 | 記事用の新規companion。参照再構築・出力・入力確認を共通化 | [runner.py](runner.py)、[cli.py](cli.py) |
 
@@ -38,10 +38,12 @@ Notebookで見た4条件は、波形を選ぶ・加工する部分だけを変�
 
 ## 出典をどこまで確認したか
 
-2026-10-03にユーザー指定の[dcase-asd-toolkit-research](https://github.com/kasahart/dcase-asd-toolkit-research)と[beam-tf-attribution](https://github.com/kasahart/beam-tf-attribution)のREADME・使用部分の実装・MIT表示を認証readで確認しました。両repoはその時点でprivateです。読者がアクセスできなくても、上の説明とこのrepoの公開コードで計算を確認できます。無関係な研究資料・実験結果は転載していません。
+公開上流[ASDKit](https://github.com/TakuyaFujimura/dcase-asd-toolkit)からの基盤とMIT原文、private研究repoの対象追加実装の履歴を確認しました。読者がprivate原本へアクセスできなくても、この説明と公開コードで使用処理を確認できます。元LICENSE/NOTICEは保持し、Git authorの記録だけで法的な権利の帰属を断定しません。
 
-- 研究側の説明：[beam_rdp_varmin.md（固定revision）](https://github.com/kasahart/dcase-asd-toolkit-research/blob/122e56afbf4a21f3803b223e13d0b8bff4de55ea/docs/methods/beam_rdp_varmin.md)。最新mainでも当該説明を確認しました。
-- RDP：[pooling.py（確認時revision）](https://github.com/kasahart/beam-tf-attribution/blob/cc5e941a3cc3c8fed01d50b85e0b925c69b14499/src/beam_tfattr/pooling.py)。公開コピーとbyte-identicalでした。この一致は寄与マップの利用を意味しません。
+- 研究側の内部記録は固定revision `122e56afbf4a21f3803b223e13d0b8bff4de55ea`の`docs/methods/beam_rdp_varmin.md`です。今回使う処理は公開の[BEAM＋VarMin](beam.md)・[RDP](pooling.md)で説明しているため、private原本へのアクセスは不要です。
+- RDPは選択元pooling.pyとbyte-identicalです。使用する[RDPの解説](pooling.md)は公開コピーに置いています。
 - BEATsのgrid拡張とW1の選択元は研究固定revisionと一致。BEAMの公開コピーは記事原本に保存されたhash固定snapshotと一致しますが、研究の固定Git revisionそのものとはbyte-identicalではなく、参照index・参照embedding・係数などを返す詳細APIの拡張があります。今回runnerは`anomaly_score()`の`main`を使い、寄与マップは生成しません。
 
 各ファイルのhashは[import-manifest.json](../../docs/import-manifest.json)、権利の区分は[rights.md](../../docs/rights.md)と[第三者通知](../../THIRD_PARTY_NOTICES.md)を参照してください。手法の由来、実装の著作権、重みやデータの条件は別々です。今回の説明追加で、コード・固定条件・保存成績は変更していません。
+
+追加実装の履歴はBEAM/VarMin `25c7d813`、grid抽出・RDP `9a739900`（いずれも2026-08-08）、W1 `de3a8206`（2026-08-12）です。`base.py`のASDKit基盤とは分けて記録します。継承・受領した各MIT原文のcopyright行を、各追加実装の作者と混同しないよう、[第三者通知](../../THIRD_PARTY_NOTICES.md)で区分しています。

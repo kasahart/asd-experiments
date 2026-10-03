@@ -13,7 +13,7 @@ Y[f,t] = C[f,t] - H[f] F[f,t]
 
 **直感：** `H`は複素数なので、大きさの倍率と位相のずれを同時に調整します。調整後の遠方成分を近接から引いた二乗残差が小さくなるよう、各周波数に一つの係数を求めます。学習済みの分離モデルを追加せずに、入力の変更だけを比較できる処理として使っています。
 
-式は既存の複素最小二乗に基づき、同じ形の減算は[Ozeki技術報告](https://dcase.community/documents/challenge2026/technical_reports/DCASE2026_Ozeki_101_t2.pdf)にもあります。そのシステム全体の再現ではありません。今回の実装はMIT研究snapshotの`complex_least_squares_cancel()`を必要範囲だけ移したものです。
+式は既存の複素最小二乗に基づき、同じ形の減算は[Ozeki技術報告](https://dcase.community/documents/challenge2026/technical_reports/DCASE2026_Ozeki_101_t2.pdf)にもあります。そのシステム全体の再現ではありません。今回のW1は、kasahartが研究repoへ追加した`complex_least_squares_cancel()`の必要範囲を、MIT表示を保持して移したものです。選択元は固定revision `122e56afbf4a21f3803b223e13d0b8bff4de55ea`の`special/sounddiffsep/legacy_diagnostic_conditions.py`で、現mainの配置とは分けます。
 
 共同peakを0.9へ正規化、Torch periodic Hann、STFT1,024/hop512、center=True/reflect、全フレームで係数推定、元長で逆変換してscaleを復元します。説明用合成図で端のフレームを除く処理は実測に持ち込みません。遠方にも機械音があるため、残したい異常の手掛かりを削る可能性があります。録音中に伝わり方が変わっても係数は更新しません。
 

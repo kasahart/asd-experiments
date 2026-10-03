@@ -2,8 +2,9 @@
 
 | 対象 | 出典・条件 | このコピーの扱い |
 |---|---|---|
-| BEAM/baseとW1選択処理 | kasahart/dcase-asd-toolkit-research `122e56afbf4a21f3803b223e13d0b8bff4de55ea`、MIT、Copyright 2025 Takuya Fujimura | BEAM/baseは記事原本のhash固定snapshotとbyte-identical。BEAMは固定Git revisionに詳細API拡張を含むため、同revision自体とのbyte一致ではない。W1は必要関数を移植。licenses/research-MIT.txtを保持 |
-| RDP pooling | private repo vendor/beam_tfattrのハッシュ固定snapshot、MIT | pooling.pyをbyte-identicalで移す。licenses/beam-tfattr-MIT.txt |
+| ASDKit基盤 `base.py` | [公開上流ASDKit](https://github.com/TakuyaFujimura/dcase-asd-toolkit)由来。研究repoのMIT原文は[上流LICENSE](https://github.com/TakuyaFujimura/dcase-asd-toolkit/blob/main/LICENSE)と一致 | licenses/research-MIT.txtのCopyright 2025 Takuya Fujimuraを原文のまま保持 |
+| BEAM/VarMin `beam.py`・W1選択処理 | ASDKit基盤とMIT表示を継承する研究repoに、kasahartが追加した再現・比較実装 | BEAMは記事原本のhash固定snapshotと一致し、研究固定Git revisionへの詳細API拡張を含む。W1は固定revision `122e56afbf4a21f3803b223e13d0b8bff4de55ea`から必要関数を移植。受領したresearch-MIT原文を保持。上流基盤作者の実装と一括帰属しない |
+| RDP pooling | kasahart追加の論文手法実装から選択したhash固定snapshot | pooling.pyは選択元とbyte-identical。licenses/beam-tfattr-MIT.txtの受領原文を保持し、そのcopyright行をRDP個別実装者の表示とは扱わない |
 | BEATs.py/backbone.py/modules.py | 上記研究snapshot内のMicrosoft unilm/beats由来、MIT、Microsoft/fairseq由来ヘッダー | 必要3ファイルのみ。研究のgrid抽出拡張を含む。LICENSEとNOTICE.md（Apache由来情報）を保持。Tokenizer/quantizer/LoRA等は除外 |
 | BEATs重み | [Microsoft公式案内](https://github.com/microsoft/unilm/tree/master/beats)のPre-Trained Iter3 | 同梱なし。公式READMEはimplementationとpretrained modelsを案内し、projectへ公式root MITを適用。独立したcheckpoint文言がないことだけをローカル推論の禁止根拠にしない。checkpoint内部の固有文言・再配布時の追加確認は未実施 |
 | 音声 | [Zenodo 20151556](https://zenodo.org/records/20151556)、[20437238](https://zenodo.org/records/20437238)、CC BY-NC-SA 4.0 | 同梱なし。非商用・表示・継承条件を確認。処理済み音声の第三者配布も本コピーでは行わない |
@@ -21,9 +22,9 @@
 
 ### 新規部分のライセンス
 
-新規CLI・runner・Notebook・説明文は、自動的な継承ではなく、今回の所有者の明示回答「mitでいい。」によりMITを適用しました。root LICENSEの権利者表記は、元private commit author・既存Wandas LICENSEで確認できる`kasahart`を使っています。既存privateの権利留保を一括MITと解釈したものではありません。
+新規CLI・runner・Notebook・説明文は、自動的な継承ではなく、今回の所有者の明示回答「mitでいい。」によりMITを適用しました。root LICENSEの`kasahart`表記と所有者が選択したMITを保持しています。Git履歴は実装の出典を確認する記録であり、commit authorだけで法的権利を断定しません。既存privateの権利留保を一括MITと解釈したものではありません。
 
-継承するのは選択元でMITと明記された範囲です。`base.py`/`beam.py`、`pooling.py`、BEATsの3ファイルは既存MIT許諾と保持した著作権表示・LICENSE/NOTICEが対象です。`waveform.py`のW1移植部分も選択元MITの表示を保持します。第三者の著作権表示は付け替えません。新規部分へのMIT選択は、checkpointやdataset/evaluatorへの許諾を与えるものではありません。
+継承するのは選択元でMITと明記された範囲です。`base.py`/`beam.py`、`pooling.py`、BEATsの3ファイルは既存MIT許諾と保持した著作権表示・LICENSE/NOTICEが対象です。`waveform.py`のW1移植部分も選択元MITの表示を保持します。研究repoにはASDKit由来の基盤とkasahartの追加実装が混在します。受領したTakuya FujimuraのMIT表示を、追加実装すべての作者表示へ読み替えません。第三者の著作権表示は付け替えません。新規部分へのMIT選択は、checkpointやdataset/evaluatorへの許諾を与えるものではありません。
 
 ### 外部checkpointとevaluator
 
