@@ -2,6 +2,14 @@
 
 [第1回](https://zenn.dev/kasahart/articles/kasahart-20260919-dcase2026-asd-01)と[第2回草稿 PR #9](https://github.com/kasahart/zenn/pull/9)の読者向けの実験コードです。今回の対象は B0（近接）、B1（遠方）、W1（複素線形減算）、SS（式1のスペクトル減算）です。
 
+## GitHubで読むだけ
+
+まず[第2回Notebook](notebooks/02_b0_b1_w1_ss.ipynb)を開いてください。保存済みの表と図を、**4条件の紹介 → 結果の読み方 → 合成図の見どころ**の順に読めます。インストールや音声・重みの取得は不要です。試聴・再実行はNotebook後半の任意操作です。GitHubでは静的な表と図を読む構成です。
+
+記事の既存報告は **B0 62.841 / B1 58.362 / W1 66.835**。これらは元の既存報告値です。このコピーの全件GPU再推論では保存異常度と最大差4.85e-8、順位・判定一致を確認し、固定公式evaluatorのローカル再採点でも主要指標が一致しました。今回新たに測定した **SSは62.325（B0比−0.516ポイント）** で、総合改善はありません。[4条件の保存表](results/summary-with-ss.csv)と[SS実験記録](docs/ss-validation.md)を参照してください。外部の独立追試とは主張しません。
+
+## 自分で実行する
+
 | やりたいこと | 入口 | 必要なもの |
 |---|---|---|
 | 保存結果を読む | `python -m asd_min.cli results` / Notebookの表 | 音声・重み不要 |
@@ -9,11 +17,7 @@
 | 保存異常度を公式再採点 | `evaluate`、[権利条件](docs/rights.md) | 読者取得のevaluator・正解、使用条件の確認が前提 |
 | 生音声から再推論 | `infer`、[入力取得](docs/inputs.md) | 公式音声とBEATs_iter3を読者が取得 |
 
-記事の既存報告は **B0 62.841 / B1 58.362 / W1 66.835**。これらは元の既存報告値です。このコピーの全件GPU再推論では保存異常度と最大差4.85e-8、順位・判定一致を確認し、固定公式evaluatorのローカル再採点でも主要指標が一致しました。今回新たに測定した **SSは62.325（B0比−0.516ポイント）** で、総合改善はありません。[4条件の保存表](results/summary-with-ss.csv)と[SS実験記録](docs/ss-validation.md)を参照してください。外部の独立追試とは主張しません。
-
-## 環境と最初の実行
-
-Linux / Python 3.12 CPUで小規模検証しました。以下をコピーのルートで実行します。
+Linux / Python 3.12 CPUで小規模検証しました。リポジトリをcloneまたはZIP取得してから、以下をそのルートで実行します。
 
 ```bash
 python3 -m venv .venv
@@ -21,6 +25,8 @@ source .venv/bin/activate
 python -m pip install torch==2.7.1 torchaudio==2.7.1 --index-url https://download.pytorch.org/whl/cpu
 python -m pip install -e '.[notebook]'
 python -m asd_min.cli results
+# Notebookを実行するには、別途JupyterLabまたはVS CodeのJupyter機能を使用。
+# この.venvのPython kernelを選択する。
 # Jupyterで notebooks/02_b0_b1_w1_ss.ipynb を開く（自動再生なし）
 ```
 
