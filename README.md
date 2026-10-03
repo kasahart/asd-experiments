@@ -25,9 +25,9 @@ Zennの異常音検知（ASD）連載に対応する実験コードとNotebook�
 
 [固定条件](docs/02-protocol.md) · [入力取得](docs/02-inputs.md) · [総合値](results/02-summary.csv)
 
-![DCASE 2026 Evaluation / BEATs_iter3。本実験: W1（振幅と位相を合わせて減算）66.835、B0（近接マイク）62.841、SS（振幅スペクトル減算）62.325、B1（遠方マイク）58.362。大会参考値（異なるモデル構成）: DCASE2026_baseline_task2_MSE 59.803、Fujimura_MERL_task2_3（参考） 70.241](figures/scores-ec7ab031e849.svg)
+![DCASE 2026 Evaluation / BEATs_iter3。本実験: W1（振幅と位相を合わせて減算）66.835、B0（近接マイク）62.841、SS（振幅スペクトル減算）62.325、B1（遠方マイク）58.362。公式ベースライン・参考システム: DCASE2026_baseline_task2_MSE（公式ベースライン）59.803、Fujimura_MERL_task2_3（一部処理の参考元）70.241。下段は大会で報告された公式ベースラインと参考システムの値です。Fujimura_MERL_task2_3はNA-BEATsを使います。本実験はBEATs_iter3を使い、同システムのRDPなど一部の処理を参考にしています（NA-BEATs未使用）。](figures/scores-ec7ab031e849.svg)
 
-大会参考値は異なるモデル構成です。Fujimura_MERL_task2_3はRDPなど一部の処理の参考元で、本実験はBEATs_iter3を使用しています（NA-BEATs未使用）。
+下段は大会で報告された公式ベースラインと参考システムの値です。Fujimura_MERL_task2_3はNA-BEATsを使います。本実験はBEATs_iter3を使い、同システムのRDPなど一部の処理を参考にしています（NA-BEATs未使用）。
 
 出典: [DCASE 2026 Task 2 Results](https://dcase.community/challenge2026/task-first-shot-unsupervised-anomalous-sound-detection-for-machine-condition-monitoring-results) · [システム名・参考値](results/02-challenge-references.json)
 手法の参考: [NA-SSL論文](https://arxiv.org/html/2608.00447v1)

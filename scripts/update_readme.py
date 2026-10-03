@@ -29,8 +29,8 @@ def chart(group, ordered, scores, references, descriptions):
     ref_rows = references.get('systems', [])
     count = len(ordered)
     positions = list(range(count))
-    ref_positions = list(range(count + 1, count + 1 + len(ref_rows)))
-    fig, ax = plt.subplots(figsize=(6.4, 2.1 + .95 * (count + len(ref_rows))))
+    ref_positions = [count + 2 + 1.4 * i for i in range(len(ref_rows))]
+    fig, ax = plt.subplots(figsize=(6.4, 2.8 + 1.05 * (count + len(ref_rows))))
     fig.patch.set_facecolor('white')
     ax.set_facecolor('white')
     ax.barh(positions, [float(scores[c]) for c in ordered], height=.62, color='#2458a6')
@@ -38,7 +38,7 @@ def chart(group, ordered, scores, references, descriptions):
         ax.barh(ref_positions, [float(r['score']) for r in ref_rows], height=.62,
                 color='#b8bec7', edgecolor='#5a6470', linewidth=.8)
         ax.axhline(count - .15, color='#b8bec7', linewidth=.8)
-        ax.text(0, count + .36, '大会参考値（別構成）', fontsize=17,
+        ax.text(-75, count + .36, references['group_label'], fontsize=18,
                 color='#475569', va='center')
     labels = []
     for condition in ordered:
@@ -48,7 +48,7 @@ def chart(group, ordered, scores, references, descriptions):
         else:
             feature = textwrap.fill(feature, width=9)
         labels.append(condition.upper() + '\n' + feature)
-    labels += [r['label'].replace('_baseline_', '_\nbaseline_')
+    labels += [r['role_label'] + '\n' + r['label'].replace('_baseline_', '_\nbaseline_')
                .replace('_task2_', '_\ntask2_') for r in ref_rows]
     ax.set_yticks(positions + ref_positions, labels, fontsize=18)
     for position, value in zip(positions + ref_positions,
@@ -78,8 +78,9 @@ def chart(group, ordered, scores, references, descriptions):
     plt.close(fig)
     alt = group + '。本実験: ' + '、'.join(f'{c.upper()}（{descriptions[c]}）{scores[c]:.3f}' for c in ordered)
     if ref_rows:
-        alt += '。大会参考値（異なるモデル構成）: ' + '、'.join(
-            f"{r['label']} {Decimal(r['score']):.3f}" for r in ref_rows)
+        alt += '。' + references['group_label'] + ': ' + '、'.join(
+            f"{r['label']}（{r['role_label']}）{Decimal(r['score']):.3f}" for r in ref_rows)
+        alt += '。' + references['note']
     svg = stream.getvalue().decode()
     svg = svg.replace('<svg ', '<svg role="img" ', 1)
     at = svg.index('>', svg.index('<svg ')) + 1
