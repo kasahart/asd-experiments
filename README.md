@@ -42,6 +42,7 @@ config:
     xyChart:
         width: 480
         height: 380
+        showDataLabel: true
     themeVariables:
         xyChart:
             plotColorPalette: "#2458a6"
