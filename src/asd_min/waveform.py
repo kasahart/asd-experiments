@@ -54,15 +54,15 @@ def condition_audio(wave, condition):
 
 SYNTHETIC_PARAMETERS = {
     'sample_rate': 16000, 'duration': 1.0,
-    'noise': {'frequency': 1000, 'amplitude': 1.0,
-              'near_gain': .7, 'near_phase': .65, 'far_gain': .45, 'far_phase': 0.0},
-    'machine': {'frequency': 1900, 'amplitude': .2,
-                'near_gain': 1.0, 'near_phase': 0.0, 'far_gain': .35, 'far_phase': .9},
+    'noise': {'frequency': 1000, 'amplitude': .6,
+              'near_gain': .25, 'near_delay_ms': .8, 'far_gain': .75, 'far_delay_ms': 0.0},
+    'machine': {'frequency': 1900, 'amplitude': .6,
+                'near_gain': 1.0, 'near_delay_ms': 0.0, 'far_gain': .3, 'far_delay_ms': .8},
 }
 
 
 def synthetic_components():
-    """Two sources enter both microphones with distinct fixed gains and phases."""
+    """Two sources enter both microphones with distinct fixed gains and relative delays."""
     p = SYNTHETIC_PARAMETERS
     t = np.arange(int(p['sample_rate'] * p['duration']), dtype=np.float64) / p['sample_rate']
     parts = {}
@@ -72,7 +72,8 @@ def synthetic_components():
         parts[role] = source['amplitude'] * np.sin(angle)
         for microphone in ('near', 'far'):
             parts[microphone + '_' + role] = (source['amplitude'] * source[microphone + '_gain']
-                                             * np.sin(angle + source[microphone + '_phase']))
+                                             * np.sin(angle - 2 * np.pi * source['frequency']
+                                                      * source[microphone + '_delay_ms'] / 1000))
     parts['common'] = parts['noise']
     return parts
 
