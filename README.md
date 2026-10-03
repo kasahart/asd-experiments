@@ -39,7 +39,7 @@ Zennの異常音検知（ASD）連載に対応する実験コードとNotebook�
 | コードの由来と利用条件 | [出典と利用条件](docs/rights.md)・[第三者通知](THIRD_PARTY_NOTICES.md) |
 | 確認した範囲 | [検証範囲](VALIDATION.md) |
 
-データ・重み・評価器・正解CSVは同梱せず、読者が配布元から取得してパスを指定します。ライセンスと出典は[出典と利用条件](docs/rights.md)を参照してください。
+データ・重み・評価器・正解CSVは同梱していません。配布元から取得し、そのパスを指定します。ライセンスと出典は[出典と利用条件](docs/rights.md)を参照してください。
 
 表の更新: [手法一覧](configs/readme-methods.csv)に行を追加し、保存結果CSVと固定条件・入力取得・Notebookを指定して `python scripts/update_readme.py` を実行します。同じ比較範囲では同じ結果CSV・固定条件・入力取得を指定し、結果CSVにもスコア行を追加します。異なる比較条件には別の `comparison` を付けます。
 手法のコードと解説は同じ階層に置き、[実装案内](src/asd_min/README.md)へ行を追加します。各回の設定・結果・Notebookはその回の資料として保持し、検証記録は[検証範囲](VALIDATION.md)へ追加します。

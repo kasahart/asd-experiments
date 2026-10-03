@@ -1,6 +1,6 @@
 # runner.py / cli.py — 条件比較の実行
 
-**入出力：** 読者が取得した音声root、固定checkpoint、出力先、条件と機種を受け取り、条件別の異常度・判定CSVとローカル実行記録を作ります。
+**入出力：** 音声のルートディレクトリ、固定チェックポイント、出力先、条件、機種を受け取り、条件別の異常度・判定CSVと実行記録を生成します。
 
 ## 共通runner — 条件の比較を同じ手順に保つ
 
@@ -9,9 +9,9 @@
 BEATs重みのSHA-256、train/test件数と匿名テスト名を確認し、既存出力を上書きしません。入力hash・時間・正常trainスコア・閾値をローカルに記録します。Notebookの波形計算は同じ`condition_audio()`を呼び、Wandasは可視化と手動試聴を担います。
 
 
-入力計画は`plan()`、特徴抽出は`Encoder.extract()`、全体実行は`run()`です。CLIの`results`は保存表の閲覧、`infer`は生音声からの再推論、`evaluate`は読者取得の固定評価器による保存異常度の採点です。
+入力計画は`plan()`、特徴抽出は`Encoder.extract()`、全体実行は`run()`です。CLIの`results`は保存表の閲覧、`infer`は生音声からの再推論、`evaluate`は指定した固定版の評価器による保存異常度の採点です。
 
-[公開コード：runner.py](runner.py) / [cli.py](cli.py) / [読者向けREADME](../../README.md)
+[公開コード：runner.py](runner.py) / [cli.py](cli.py) / [README](../../README.md)
 
 ## CLIを使う
 
@@ -30,10 +30,10 @@ python -m asd_min.cli results
 # Jupyterで notebooks/02_b0_b1_w1_ss.ipynb を開く（自動再生なし）
 ```
 
-Notebookの既定実行は保存表と合成デモだけです。音声再生ボタンは `ENABLE_AUDIO=True` で生成し、読者が手動で押します。実データの推論・再採点には、以下のCLIを使います。
+Notebookの既定実行は保存表と合成デモだけです。音声再生ボタンは `ENABLE_AUDIO=True` で生成し、手動で再生できます。実データの推論・再採点には、以下のCLIを使います。
 
 ```bash
-# パスは読者の取得先へ置き換える。dry-runは件数確認で重みをロードしない。
+# パスは取得先に置き換える。dry-runは件数確認で重みをロードしない。
 python -m asd_min.cli infer --input /path/to/eval_data/raw \
   --checkpoint /path/to/BEATs_iter3.pt --output outputs/part02 --dry-run
 # 1機種各5件のsmoke（記事スコアにはならない）
