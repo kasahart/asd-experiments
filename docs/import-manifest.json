@@ -50,5 +50,6 @@
     "src/asd_min/beats/LICENSE": "b5cb7ff7859e7d282d98fc43ab081b0dda5dc659dc3385cf65740c759a7e6a6c",
     "src/asd_min/beats/backbone.py": "15b2d621d4a47e937d2a12ce6c3f4626b68fe04e027b8616ad3efb054bc39d41",
     "src/asd_min/beats/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-  }
+  },
+  "research_revision_scope_note": "Revision identifies research baseline; exact imported_sha256 identifies selected article snapshots. BEAM includes selected-reference detail API extensions relative to fixed research Git revision, not a byte-identical copy of that commit."
 }

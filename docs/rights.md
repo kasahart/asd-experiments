@@ -2,7 +2,7 @@
 
 | 対象 | 出典・条件 | このコピーの扱い |
 |---|---|---|
-| BEAM/baseとW1選択処理 | kasahart/dcase-asd-toolkit-research `122e56afbf4a21f3803b223e13d0b8bff4de55ea`、MIT、Copyright 2025 Takuya Fujimura | BEAM/baseはbyte-identical、W1は必要関数を移植。licenses/research-MIT.txtを保持 |
+| BEAM/baseとW1選択処理 | kasahart/dcase-asd-toolkit-research `122e56afbf4a21f3803b223e13d0b8bff4de55ea`、MIT、Copyright 2025 Takuya Fujimura | BEAM/baseは記事原本のhash固定snapshotとbyte-identical。BEAMは固定Git revisionに詳細API拡張を含むため、同revision自体とのbyte一致ではない。W1は必要関数を移植。licenses/research-MIT.txtを保持 |
 | RDP pooling | private repo vendor/beam_tfattrのハッシュ固定snapshot、MIT | pooling.pyをbyte-identicalで移す。licenses/beam-tfattr-MIT.txt |
 | BEATs.py/backbone.py/modules.py | 上記研究snapshot内のMicrosoft unilm/beats由来、MIT、Microsoft/fairseq由来ヘッダー | 必要3ファイルのみ。研究のgrid抽出拡張を含む。LICENSEとNOTICE.md（Apache由来情報）を保持。Tokenizer/quantizer/LoRA等は除外 |
 | BEATs重み | [Microsoft公式案内](https://github.com/microsoft/unilm/tree/master/beats)のPre-Trained Iter3 | 同梱なし。公式READMEはimplementationとpretrained modelsを案内し、projectへ公式root MITを適用。独立したcheckpoint文言がないことだけをローカル推論の禁止根拠にしない。checkpoint内部の固有文言・再配布時の追加確認は未実施 |
