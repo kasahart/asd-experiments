@@ -52,10 +52,20 @@ def condition_audio(wave, condition):
     raise ValueError(condition)
 
 
-def synthetic():
+def synthetic_components():
+    """Original common tone and its two microphone components (before mixing)."""
     t = np.arange(16000, dtype=np.float64) / 16000
-    return np.stack([.8*np.sin(2*np.pi*1000*t+.65)+.12*np.sin(2*np.pi*1900*t),
-                     .4*np.sin(2*np.pi*1000*t)]).astype(np.float32)
+    return {
+        'common': np.sin(2*np.pi*1000*t),
+        'near_common': .8*np.sin(2*np.pi*1000*t+.65),
+        'near_only': .12*np.sin(2*np.pi*1900*t),
+    }
+
+
+def synthetic():
+    parts = synthetic_components()
+    return np.stack([parts['near_common']+parts['near_only'],
+                     .4*parts['common']]).astype(np.float32)
 
 
 SS_PARAMETERS = {

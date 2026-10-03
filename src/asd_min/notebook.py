@@ -3,7 +3,7 @@
 """Public Wandas 0.8.0 presentation. Computation comes from waveform/runner."""
 import numpy as np
 import wandas as wd
-from .waveform import condition_audio,synthetic,load_audio
+from .waveform import condition_audio,synthetic,synthetic_components,load_audio
 
 
 def frames(wave=None,path=None):
@@ -12,6 +12,12 @@ def frames(wave=None,path=None):
     if wave is None: wave=synthetic()
     return {c:wd.from_numpy(condition_audio(wave,c),sampling_rate=16000,
                             ch_labels=[c.upper()],ch_units='amplitude') for c in ('b0','b1','w1','ss')}
+
+
+def common_frame():
+    """The unit-amplitude 1 kHz source, before microphone gain/phase and mixing."""
+    return wd.from_numpy(synthetic_components()['common'].astype(np.float32),
+                         sampling_rate=16000,ch_labels=['Common source'],ch_units='amplitude')
 
 
 def show(frame,audio=False):

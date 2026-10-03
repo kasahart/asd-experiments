@@ -1,7 +1,7 @@
 # 読者が取得する入力
 
 1. [Additional Training](https://zenodo.org/records/20151556)の5機種train zipと、[Evaluation](https://zenodo.org/records/20437238)の5機種test zipを取得。配布条件CC BY-NC-SA 4.0を確認してください。ZIP展開後の`eval_data/raw`を`--input`へ指定します。全5機種のtrain/testを同じrootへ揃え、匿名test名を変更しません。
-2. [Microsoft BEATs公式README](https://github.com/microsoft/unilm/tree/master/beats)の **Pre-Trained Model / Iter3** を取得。Fine-tuned、Iter3+、Tokenizerは対象外です。公式project MIT案内とcheckpoint再配布時の確認の区別は[rights.md](rights.md)へ。
+2. [Microsoft BEATs公式README](https://github.com/microsoft/unilm/tree/master/beats)の **Pre-Trained Model / Iter3** を取得。Fine-tuned、Iter3+、Tokenizerは対象外です。公式project MIT案内とcheckpoint再配布時の確認は[rights.md](rights.md)へ。
 3. 採点は[公式evaluator](https://github.com/nttcslab/dcase2026_task2_evaluator)と付属正解を別途取得する必要があります。取得前にLICENSEv2.1.pdfの用途条件を確認し、必要な許諾を解決してください。本コピーには入りません。
 
 ```text
@@ -40,4 +40,4 @@ Zenodo表示のダウンロード容量はtrain約2.8 GB、test 558.7 MB。ZIP�
 
 ローカルのcheckpointは約345 MiB。CPU依存・Notebook環境にも別途容量が必要です。CLIは音声出力・全件中間特徴をディスク保存せず、機種・条件ごとの特徴をメモリ保持します。RAM/VRAMの必要最小値は未測定。GPUは必須ではありませんが、CUDA12.8/PyTorch2.7.1とRTX PRO6000で全件検証済みです。他のGPU構成は未検証です。GPU PyTorchを使う場合はPyTorch公式の機器対応手順で導入してください。
 
-[VALIDATION.md](../VALIDATION.md)に小規模CPU実測を記載。全5機種の6000音×3条件のGPU実測は約229秒（初期化除く）でした。SS単条件6000音は追加で約94.94秒でした。どちらもcheckpoint初期化・入力hash確認を除きます。機器条件とメモリ指標はVALIDATION.mdを参照。別機器・CPU全件の時間は未測定で、単純に保証できません。先に`--machine ToothBrush --limit 5`で自分の環境の時間・メモリを確認してください。
+実測時間と機器は[検証記録](../VALIDATION.md)から参照できます。別機器・CPU全件の時間は未測定です。先に `--machine ToothBrush --limit 5` で自分の環境を確認してください。

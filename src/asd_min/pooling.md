@@ -1,6 +1,6 @@
 # pooling.py — 周波数を残すRDP集約
 
-各モジュールの役割と由来は[実装案内](README.md)にまとめています。このRDPは既存論文手法をkasahartが実装した処理です。受領した[MIT原文](../../licenses/beam-tfattr-MIT.txt)は保持し、copyright行を個別実装者の表示とは読み替えません。表示と実装の区分は[第三者通知](../../THIRD_PARTY_NOTICES.md)へ。ここでは対応する公開コードだけを説明します。自前の実装と、手法の独自提案は区別します。
+各モジュールの役割と由来は[実装案内](README.md)にまとめています。このRDPは既存論文手法をkasahartが実装した処理です。受領した[MIT原文](../../licenses/beam-tfattr-MIT.txt)は保持し、copyright行を個別実装者の表示とは読み替えません。表示と実装の詳細は[第三者通知](../../THIRD_PARTY_NOTICES.md)へ。ここでは対応する公開コードだけを説明します。
 
 ## RDP — 平均から離れた短い区間を重くする
 

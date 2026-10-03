@@ -13,3 +13,4 @@ checkpoints/
 *.ckpt
 *.npz
 .env*
+.pytest_cache/
