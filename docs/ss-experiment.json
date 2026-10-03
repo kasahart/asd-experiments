@@ -1,18 +1,14 @@
 {
   "condition": "ss",
   "status": "full_inference_and_official_local_scoring_completed",
-  "article_head": "de12a5825e6974c10934c72556bb6787f05c5a83",
-  "implementation_commit": "1702650",
   "checkpoint_sha256": "8d1b234032a9ccff353612dc6c20982346dc2968b205b79d97303eb5e77bfb34",
   "input_count": 6000,
-  "all_input_hashes_match_previous_report": true,
   "input_inventory_sha256": "e566a0cba7f42d2e7b15797d9c845e9ed60a57bea6fec8057c3d6c71295648a5",
   "device": "NVIDIA RTX PRO 6000 Blackwell Max-Q Workstation Edition",
   "torch": "2.7.1+cu128",
   "gpu_inference_seconds": 94.9366698670201,
   "peak_torch_cuda_allocated_bytes": 528886272,
   "evaluator_revision": "f6a94a2b5e614a9626c9d1ccff6df0705e6aaa75",
-  "evaluator_unmodified_clean_existing_checkout": true,
   "official_score": 0.6232526125382385,
   "difference_from_b0_points": -0.5158670285482558,
   "difference_from_w1_points": -4.509734589732261,
@@ -48,29 +44,6 @@
       "pauc": 0.5757894736842105
     }
   },
-  "existing_3_conditions_official_recheck": {
-    "b0": {
-      "fresh_official_csv_byte_identical": true,
-      "official_score": 0.628411282823721,
-      "machine_auc_pauc_and_aggregate_equal": true,
-      "original_stored_rescore_official_csv_byte_identical": true
-    },
-    "b1": {
-      "fresh_official_csv_byte_identical": true,
-      "official_score": 0.5836163461864645,
-      "machine_auc_pauc_and_aggregate_equal": true,
-      "original_stored_rescore_official_csv_byte_identical": true
-    },
-    "w1": {
-      "fresh_official_csv_byte_identical": false,
-      "official_score": 0.6683499584355611,
-      "machine_auc_pauc_and_aggregate_equal": true,
-      "original_stored_rescore_official_csv_byte_identical": true,
-      "only_different_official_csv_field": "official score ci95",
-      "original_ci95": 2.9783502969025203e-05,
-      "fresh_ci95": 2.978354952087245e-05
-    }
-  },
   "code_config_sha256_at_execution": {
     "src/asd_min/waveform.py": "7aa937aa72cb54deb770966b1e22a01e577a4b83d5437733a0125bc89997e507",
     "src/asd_min/runner.py": "4c94630ad94b971c04216732c9dea0d5a93ef54cd946ea5cb6621d7d877eb827",
@@ -92,6 +65,5 @@
     "anomaly_score_SewingMachine_section_00_test.csv": "a404cf40d6a5cc4f95d01f16d11a35553ffe5b80bdc17fb21a49d26e4d8a7753",
     "anomaly_score_ToothBrush_section_00_test.csv": "3ef253a55df774842c4afeff91afe0d6d2f24d114f7a6541861ad52068cba5bc",
     "anomaly_score_Sander_section_00_test.csv": "00117ee8d19aa235bbfbe7e59f7c673062cbf94baba1befa4105e8e35b229dcb"
-  },
-  "no_reference_ss_article_or_saved_scores": true
+  }
 }
