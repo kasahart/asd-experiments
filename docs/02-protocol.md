@@ -12,6 +12,6 @@ Evaluationの5機種。正常参照はAdditional Trainingの各1000正常音（s
 
 近接/遠方の**大きさ**をbeta1で減算し、`near_abs > far_abs`なら差、それ以外はgamma0.1×near_absを使い、近接位相で復元します。Hann512/hop256。periodic Hann・center=True・reflect・入力正規化なしは、報告が未指定の詳細を固定したローカル選択です。[SS config](../configs/02_ss.json)。正常参照はSS処理した音から再構築します。
 
-## 公式指標の対象
+## 評価指標
 
-評価器のsource AUCはsourceの正常音と**両domainすべての異常音**で計算し、target AUCはtargetの正常音と両domainすべての異常音で計算します。domain内だけの異常音に限定したAUCではありません。pAUCは機種ごとの全200テスト音、max_fpr=0.1の標準化pAUCです。公式総合値は5機種のsource AUC・target AUC・pAUCの15値（epsilon clamp）の調和平均。評価器の準備は[入力取得](02-inputs.md)を参照してください。
+スコアはDCASE 2026 Task 2の公式評価指標に従って算出しています。詳細は[dcase2026_task2_evaluator README](https://github.com/nttcslab/dcase2026_task2_evaluator/blob/f6a94a2b5e614a9626c9d1ccff6df0705e6aaa75/README.md)を参照してください。
