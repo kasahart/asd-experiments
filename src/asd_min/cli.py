@@ -10,7 +10,7 @@ def main():
     parser=argparse.ArgumentParser(description='ASD experiments: article 2 B0/B1/W1/SS')
     sub=parser.add_subparsers(dest='command',required=True)
     view=sub.add_parser('results',help='View saved experiment results; no inference or rescoring')
-    view.add_argument('--file',type=Path,default=Path('results/summary-with-ss.csv'))
+    view.add_argument('--file',type=Path,default=Path('results/02-summary.csv'))
     infer=sub.add_parser('infer',help='New features and normal references per condition')
     infer.add_argument('--input',type=Path,required=True)
     infer.add_argument('--checkpoint',type=Path,required=True)

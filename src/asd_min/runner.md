@@ -1,4 +1,4 @@
-# runner.py / cli.py — 4条件を同じ手順で比較する
+# runner.py / cli.py — 条件比較の実行
 
 **入出力：** 読者が取得した音声root、固定checkpoint、出力先、条件と機種を受け取り、条件別の異常度・判定CSVとローカル実行記録を作ります。
 
@@ -14,6 +14,8 @@ BEATs重みのSHA-256、train/test件数と匿名テスト名を確認し、既�
 [公開コード：runner.py](runner.py) / [cli.py](cli.py) / [読者向けREADME](../../README.md)
 
 ## CLIを使う
+
+以下は第2回の実行例です。
 
 リポジトリのルートで、Python 3.12の環境を準備します。
 

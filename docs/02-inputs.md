@@ -1,8 +1,8 @@
-# 読者が取得する入力
+# 第2回の入力取得（DCASE 2026 Task 2）
 
 1. [DCASE 2026 Challenge Task 2 Additional Training Dataset](https://zenodo.org/records/20151556)の5機種train ZIPと[DCASE 2026 Challenge Task 2 Evaluation Dataset](https://zenodo.org/records/20437238)の5機種test ZIPを取得し、同じ `eval_data/raw` に展開します。このパスを `--input` に指定します。
 2. [BEATs README](https://github.com/microsoft/unilm/blob/master/beats/README.md)の **Pre-Trained Model / Iter3** を取得し、`--checkpoint` に指定します。
-3. 再採点には[dcase2026_task2_evaluator](https://github.com/nttcslab/dcase2026_task2_evaluator)と付属正解を取得し、`--evaluator` に指定します。評価器は `f6a94a2b5e614a9626c9d1ccff6df0705e6aaa75` にcheckoutし、変更のない状態で使います。
+3. 採点には[dcase2026_task2_evaluator](https://github.com/nttcslab/dcase2026_task2_evaluator)と付属正解を使用しました。再採点時は取得先を `--evaluator` に指定します。評価器は `f6a94a2b5e614a9626c9d1ccff6df0705e6aaa75` にcheckoutし、変更のない状態で使います。依存関係と使い方は[dcase2026_task2_evaluator README](https://github.com/nttcslab/dcase2026_task2_evaluator/blob/f6a94a2b5e614a9626c9d1ccff6df0705e6aaa75/README.md)を参照してください。
 
 ```text
 <INPUT>/BlowerDustCollector/{train,test}/*.wav
@@ -40,4 +40,4 @@ Zenodo表示のダウンロード容量はtrain約2.8 GB、test 558.7 MB。ZIP�
 
 重みは約345 MiB。CLIは機種・条件ごとの特徴をメモリに保持します。RAM/VRAMの必要最小値は未測定です。CPUまたはGPUで実行でき、GPU PyTorchの導入は[PyTorch Get Started](https://pytorch.org/get-started/locally/)を参照してください。
 
-使用機器と実測時間は[検証範囲](../VALIDATION.md)に記載しています。まず `--machine ToothBrush --limit 5` で小規模に実行できます。
+使用機器と実測時間は[第2回の検証範囲](02-validation.md)に記載しています。まず `--machine ToothBrush --limit 5` で小規模に実行できます。
