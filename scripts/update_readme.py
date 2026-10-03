@@ -16,15 +16,20 @@ def rows(path):
         return list(csv.DictReader(stream))
 
 
-def chart(labels, values):
+def chart(labels, values, reference_count=0):
     categories = ', '.join(json.dumps(label, ensure_ascii=False) for label in labels)
-    bars = ', '.join(f'{value:.3f}' for value in values)
-    return '\n'.join(['```mermaid', '---', 'config:', '    xyChart:',
-                      '        width: 480', f'        height: {80 + 50 * len(labels)}',
-                      '---', 'xychart-beta horizontal',
-                      f'    x-axis [{categories}]',
-                      '    y-axis "Official score" 0 --> 100',
-                      f'    bar [{bars}]', '```'])
+    lines = ['```mermaid', '---', 'config:', '    xyChart:',
+             '        width: 480', f'        height: {80 + 50 * len(labels)}',
+             '    themeVariables:', '        xyChart:',
+             '            plotColorPalette: "#2458a6"']
+    if reference_count:
+        first_reference = len(labels) - reference_count + 1
+        lines += [f'    themeCSS: ".bar-plot-0 rect:nth-child(n+{first_reference}) {{ fill: #9099a5; }}"']
+    lines += ['---', 'xychart-beta horizontal',
+              f'    x-axis [{categories}]',
+              '    y-axis "Official score" 0 --> 100',
+              '    bar [' + ', '.join(f'{value:.3f}' for value in values) + ']', '```']
+    return '\n'.join(lines)
 
 
 def references_for(root, entries):
@@ -88,17 +93,18 @@ def render(root):
             raise ValueError(f'{group}: duplicate method')
         references = references_for(root, entries)
         ordered = sorted(conditions, key=lambda condition: (-scores[condition], condition))
+        systems = references.get('systems', [])
+        symbols = [system['symbol'] for system in systems]
+        if len(set(symbols)) != len(symbols) or set(symbols) & {c.upper() for c in conditions}:
+            raise ValueError(f'{group}: duplicate chart symbol')
+        labels = [c.upper() for c in ordered] + symbols
+        values = [scores[c] for c in ordered] + [Decimal(system['score']) for system in systems]
         lines += ['', f'### {group}', '',
                   f'[固定条件]({protocol_path}) · [入力取得]({inputs_path}) · [総合値]({summary_path})', '',
-                  '#### 本実験', '', chart([c.upper() for c in ordered], [scores[c] for c in ordered])]
+                  '青：本実験' + ('／灰：公式・参考値（異なるモデル）。' if systems else '。'), '',
+                  chart(labels, values, len(systems))]
         if references:
-            systems = references['systems']
-            symbols = [system['symbol'] for system in systems]
-            if len(set(symbols)) != len(symbols) or set(symbols) & {c.upper() for c in conditions}:
-                raise ValueError(f'{group}: duplicate chart symbol')
-            lines += ['', '#### ' + references['group_label'], '',
-                      chart(symbols, [Decimal(system['score']) for system in systems]), '',
-                      f"出典: [DCASE 2026 Task 2 Results]({references['source_url']}) · "
+            lines += ['', f"出典: [DCASE 2026 Task 2 Results]({references['source_url']}) · "
                       f'[システム名・参考値]({references_path})']
     return '\n'.join(lines)
 

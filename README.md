@@ -34,34 +34,23 @@ Zennの異常音検知（ASD）連載に対応する実験コードとNotebook�
 
 [固定条件](docs/02-protocol.md) · [入力取得](docs/02-inputs.md) · [総合値](results/02-summary.csv)
 
-#### 本実験
+青：本実験／灰：公式・参考値（異なるモデル）。
 
 ```mermaid
 ---
 config:
     xyChart:
         width: 480
-        height: 280
+        height: 380
+    themeVariables:
+        xyChart:
+            plotColorPalette: "#2458a6"
+    themeCSS: ".bar-plot-0 rect:nth-child(n+5) { fill: #9099a5; }"
 ---
 xychart-beta horizontal
-    x-axis ["W1", "B0", "SS", "B1"]
+    x-axis ["W1", "B0", "SS", "B1", "BASE", "REF"]
     y-axis "Official score" 0 --> 100
-    bar [66.835, 62.841, 62.325, 58.362]
-```
-
-#### 公式ベースライン・参考システム
-
-```mermaid
----
-config:
-    xyChart:
-        width: 480
-        height: 180
----
-xychart-beta horizontal
-    x-axis ["BASE", "REF"]
-    y-axis "Official score" 0 --> 100
-    bar [59.803, 70.241]
+    bar [66.835, 62.841, 62.325, 58.362, 59.803, 70.241]
 ```
 
 出典: [DCASE 2026 Task 2 Results](https://dcase.community/challenge2026/task-first-shot-unsupervised-anomalous-sound-detection-for-machine-condition-monitoring-results) · [システム名・参考値](results/02-challenge-references.json)
