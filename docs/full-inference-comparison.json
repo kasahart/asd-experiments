@@ -1,0 +1,227 @@
+{
+  "status": "full_inference_completed",
+  "csv_comparisons": [
+    {
+      "rank_identical": true,
+      "condition": "b0",
+      "file": "anomaly_score_BlowerDustCollector_section_00_test.csv",
+      "byte_identical": false,
+      "max_abs_delta": 6.673336015727838e-10
+    },
+    {
+      "rank_identical": true,
+      "condition": "b0",
+      "file": "anomaly_score_Sander_section_00_test.csv",
+      "byte_identical": false,
+      "max_abs_delta": 9.503173803437903e-10
+    },
+    {
+      "rank_identical": true,
+      "condition": "b0",
+      "file": "anomaly_score_SewingMachine_section_00_test.csv",
+      "byte_identical": false,
+      "max_abs_delta": 6.633186361293397e-10
+    },
+    {
+      "rank_identical": true,
+      "condition": "b0",
+      "file": "anomaly_score_ToothBrush_section_00_test.csv",
+      "byte_identical": false,
+      "max_abs_delta": 3.687353131165416e-10
+    },
+    {
+      "rank_identical": true,
+      "condition": "b0",
+      "file": "anomaly_score_ToyDrone_section_00_test.csv",
+      "byte_identical": false,
+      "max_abs_delta": 1.7206430464461464e-10
+    },
+    {
+      "rank_identical": true,
+      "condition": "b0",
+      "file": "decision_result_BlowerDustCollector_section_00_test.csv",
+      "byte_identical": true,
+      "max_abs_delta": 0.0
+    },
+    {
+      "rank_identical": true,
+      "condition": "b0",
+      "file": "decision_result_Sander_section_00_test.csv",
+      "byte_identical": true,
+      "max_abs_delta": 0.0
+    },
+    {
+      "rank_identical": true,
+      "condition": "b0",
+      "file": "decision_result_SewingMachine_section_00_test.csv",
+      "byte_identical": true,
+      "max_abs_delta": 0.0
+    },
+    {
+      "rank_identical": true,
+      "condition": "b0",
+      "file": "decision_result_ToothBrush_section_00_test.csv",
+      "byte_identical": true,
+      "max_abs_delta": 0.0
+    },
+    {
+      "rank_identical": true,
+      "condition": "b0",
+      "file": "decision_result_ToyDrone_section_00_test.csv",
+      "byte_identical": true,
+      "max_abs_delta": 0.0
+    },
+    {
+      "rank_identical": true,
+      "condition": "b1",
+      "file": "anomaly_score_BlowerDustCollector_section_00_test.csv",
+      "byte_identical": false,
+      "max_abs_delta": 2.998604767268098e-10
+    },
+    {
+      "rank_identical": true,
+      "condition": "b1",
+      "file": "anomaly_score_Sander_section_00_test.csv",
+      "byte_identical": false,
+      "max_abs_delta": 4.609928133669783e-10
+    },
+    {
+      "rank_identical": true,
+      "condition": "b1",
+      "file": "anomaly_score_SewingMachine_section_00_test.csv",
+      "byte_identical": false,
+      "max_abs_delta": 3.8695001543243013e-10
+    },
+    {
+      "rank_identical": true,
+      "condition": "b1",
+      "file": "anomaly_score_ToothBrush_section_00_test.csv",
+      "byte_identical": false,
+      "max_abs_delta": 1.1059641830818423e-10
+    },
+    {
+      "rank_identical": true,
+      "condition": "b1",
+      "file": "anomaly_score_ToyDrone_section_00_test.csv",
+      "byte_identical": false,
+      "max_abs_delta": 3.670358652424488e-10
+    },
+    {
+      "rank_identical": true,
+      "condition": "b1",
+      "file": "decision_result_BlowerDustCollector_section_00_test.csv",
+      "byte_identical": true,
+      "max_abs_delta": 0.0
+    },
+    {
+      "rank_identical": true,
+      "condition": "b1",
+      "file": "decision_result_Sander_section_00_test.csv",
+      "byte_identical": true,
+      "max_abs_delta": 0.0
+    },
+    {
+      "rank_identical": true,
+      "condition": "b1",
+      "file": "decision_result_SewingMachine_section_00_test.csv",
+      "byte_identical": true,
+      "max_abs_delta": 0.0
+    },
+    {
+      "rank_identical": true,
+      "condition": "b1",
+      "file": "decision_result_ToothBrush_section_00_test.csv",
+      "byte_identical": true,
+      "max_abs_delta": 0.0
+    },
+    {
+      "rank_identical": true,
+      "condition": "b1",
+      "file": "decision_result_ToyDrone_section_00_test.csv",
+      "byte_identical": true,
+      "max_abs_delta": 0.0
+    },
+    {
+      "rank_identical": true,
+      "condition": "w1",
+      "file": "anomaly_score_BlowerDustCollector_section_00_test.csv",
+      "byte_identical": false,
+      "max_abs_delta": 2.8344069480379375e-08
+    },
+    {
+      "rank_identical": true,
+      "condition": "w1",
+      "file": "anomaly_score_Sander_section_00_test.csv",
+      "byte_identical": false,
+      "max_abs_delta": 1.774917316420266e-08
+    },
+    {
+      "rank_identical": true,
+      "condition": "w1",
+      "file": "anomaly_score_SewingMachine_section_00_test.csv",
+      "byte_identical": false,
+      "max_abs_delta": 4.8487236030097104e-08
+    },
+    {
+      "rank_identical": true,
+      "condition": "w1",
+      "file": "anomaly_score_ToothBrush_section_00_test.csv",
+      "byte_identical": false,
+      "max_abs_delta": 4.23691682779892e-09
+    },
+    {
+      "rank_identical": true,
+      "condition": "w1",
+      "file": "anomaly_score_ToyDrone_section_00_test.csv",
+      "byte_identical": false,
+      "max_abs_delta": 2.88246448515439e-08
+    },
+    {
+      "rank_identical": true,
+      "condition": "w1",
+      "file": "decision_result_BlowerDustCollector_section_00_test.csv",
+      "byte_identical": true,
+      "max_abs_delta": 0.0
+    },
+    {
+      "rank_identical": true,
+      "condition": "w1",
+      "file": "decision_result_Sander_section_00_test.csv",
+      "byte_identical": true,
+      "max_abs_delta": 0.0
+    },
+    {
+      "rank_identical": true,
+      "condition": "w1",
+      "file": "decision_result_SewingMachine_section_00_test.csv",
+      "byte_identical": true,
+      "max_abs_delta": 0.0
+    },
+    {
+      "rank_identical": true,
+      "condition": "w1",
+      "file": "decision_result_ToothBrush_section_00_test.csv",
+      "byte_identical": true,
+      "max_abs_delta": 0.0
+    },
+    {
+      "rank_identical": true,
+      "condition": "w1",
+      "file": "decision_result_ToyDrone_section_00_test.csv",
+      "byte_identical": true,
+      "max_abs_delta": 0.0
+    }
+  ],
+  "max_abs_delta_scores": 4.8487236030097104e-08,
+  "decision_differences": 0,
+  "score_rank_identical": true,
+  "official_evaluator_run": false,
+  "timings_seconds": {
+    "b0": 73.72675269597676,
+    "b1": 70.88456563302316,
+    "w1": 84.27663643698907
+  },
+  "elapsed_seconds": 228.88796050200472,
+  "peak_cuda_allocated_bytes": 528886272,
+  "all_6000_input_hashes_match_original_report": true
+}

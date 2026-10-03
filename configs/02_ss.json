@@ -1,0 +1,29 @@
+{
+  "condition": "ss",
+  "article_head": "de12a5825e6974c10934c72556bb6787f05c5a83",
+  "parameters": {
+    "sample_rate": 16000,
+    "n_fft": 512,
+    "win_length": 512,
+    "hop_length": 256,
+    "window": "torch_hann_periodic",
+    "center": true,
+    "pad_mode": "reflect",
+    "normalized": false,
+    "onesided": true,
+    "beta": 1.0,
+    "gamma": 0.1,
+    "phase": "near",
+    "input_normalization": "none"
+  },
+  "implementation_choices_not_specified_by_report": [
+    "periodic=True",
+    "center=True",
+    "pad_mode=reflect",
+    "no input normalization"
+  ],
+  "detector": "frozen BEATs_iter3 / frequency RDP gamma4 / BEAM VarMin4 train_all per_band",
+  "reference": "new normal train memory for SS, never B0/B1/W1 memory",
+  "status": "full_inference_and_official_local_scoring_completed; see docs/ss-experiment.json",
+  "configuration_role": "exported fixed protocol, not a runtime override"
+}

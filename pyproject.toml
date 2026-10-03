@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+[project]
+name = "asd-experiments"
+version = "0.1.0"
+license = "MIT"
+license-files = ["LICENSE", "licenses/*.txt", "src/asd_min/beats/LICENSE", "src/asd_min/beats/NOTICE.md"]
+requires-python = ">=3.10"
+dependencies = ["numpy>=1.26,<3", "soundfile>=0.12", "torch==2.7.1", "torchaudio==2.7.1"]
+[project.optional-dependencies]
+notebook = ["wandas==0.8.0", "nbformat", "nbclient", "ipykernel", "matplotlib", "pandas"]
+[project.scripts]
+asd-article = "asd_min.cli:main"
+[tool.setuptools.packages.find]
+where = ["src"]
+[tool.setuptools.package-data]
+"asd_min.beats" = ["LICENSE", "NOTICE.md"]

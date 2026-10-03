@@ -1,0 +1,15 @@
+.venv/
+__pycache__/
+*.egg-info/
+.ipynb_checkpoints/
+outputs/
+data/
+checkpoints/
+*.wav
+*.flac
+*.mp3
+*.pt
+*.pth
+*.ckpt
+*.npz
+.env*
