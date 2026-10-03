@@ -14,7 +14,8 @@
       "label": "DCASE2026_baseline_task2_MSE",
       "submission_code": "DCASE2026_baseline_task2_MSE",
       "score": "59.80289616592438",
-      "role_label": "公式ベースライン"
+      "role_label": "公式ベースライン",
+      "symbol": "BASE"
     },
     {
       "role": "partial_method_reference",
@@ -24,9 +25,10 @@
       "relation": "RDPなど集約・採点の一部を参考にしたシステム",
       "method_source_url": "https://arxiv.org/html/2608.00447v1",
       "method_source_name": "NA-SSL論文",
-      "role_label": "一部処理の参考元"
+      "role_label": "一部処理の参考元",
+      "symbol": "REF"
     }
   ],
-  "note": "下段は大会で報告された公式ベースラインと参考システムの値です。Fujimura_MERL_task2_3はNA-BEATsを使います。本実験はBEATs_iter3を使い、同システムのRDPなど一部の処理を参考にしています（NA-BEATs未使用）。",
+  "note": "本実験はBEATs_iter3を使用。REFはNA-BEATsを使うシステムで、RDPなど一部の処理を参考にしています。",
   "group_label": "公式ベースライン・参考システム"
 }
