@@ -20,6 +20,7 @@ def chart(labels, values, reference_count=0):
     categories = ', '.join(json.dumps(label, ensure_ascii=False) for label in labels)
     lines = ['```mermaid', '---', 'config:', '    xyChart:',
              '        width: 480', f'        height: {80 + 50 * len(labels)}',
+             '        showDataLabel: true',
              '    themeVariables:', '        xyChart:',
              '            plotColorPalette: "#2458a6"']
     if reference_count:
