@@ -30,4 +30,11 @@ beta=1、gamma=0.1。位相は近接側。
 実験用はHann512/hop256。報告が未指定のperiodic Hann・center=True/reflect・入力正規化なしはローカル実装で固定しています。[SS config](../../configs/02_ss.json)、[第2回の検証範囲](../../docs/02-validation.md)
 
 
+## 合成デモ — 両マイクに機械音と環境ノイズが入る
+
+`SYNTHETIC_PARAMETERS`を正本として、2つの定常トーンにマイクごとの倍率と位相差を付けます。`synthetic_components()`が混合前の成分、`synthetic()`が近接・遠方とも機械音と環境ノイズを足した2ch波形を返します。W1・SSは実音と同じ`condition_audio()`を使います。
+
+表示は`notebook.py`の`show_sources()`と`show()`がWandas 0.8.0で作ります。機械音を青、環境ノイズを橙で示し、各混合・減算後の波形に近接で残したい機械音を重ねます。反射や伝達経路の時間変化を扱う部屋のシミュレーションではありません。
+
+
 [前：BEAM＋VarMin](beam.md) / [公開コード](waveform.py) / [次：共通runner](runner.md)

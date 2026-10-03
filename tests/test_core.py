@@ -66,3 +66,26 @@ def test_ss_waveform_contract():
     assert len(ss(x))==x.shape[1]
     np.testing.assert_allclose(ss(x*2),ss(x)*2,atol=5e-7,rtol=3e-6)
     assert np.isfinite(ss(x)).all()
+
+
+def test_synthetic_crosstalk_and_machine_loss():
+    from asd_min.waveform import synthetic_components
+    parts = synthetic_components()
+    wave = synthetic()
+    # Independent tone projection verifies that both sources reach both microphones.
+    t = np.arange(wave.shape[1]) / 16000
+    basis = np.column_stack([np.sin(2*np.pi*f*t) for f in (1000,1900)] +
+                            [np.cos(2*np.pi*f*t) for f in (1000,1900)])
+    def amplitudes(signal, selection=slice(None)):
+        coef = np.linalg.lstsq(basis[selection], signal[selection], rcond=None)[0]
+        return np.hypot(coef[:2], coef[2:])
+    np.testing.assert_allclose(amplitudes(wave[0]), [.7,.2], atol=1e-7)
+    np.testing.assert_allclose(amplitudes(wave[1]), [.45,.07], atol=1e-7)
+    np.testing.assert_allclose(wave[0], parts['near_noise']+parts['near_machine'], atol=6e-8)
+    np.testing.assert_allclose(wave[1], parts['far_noise']+parts['far_machine'], atol=6e-8)
+    np.testing.assert_allclose(parts['near_machine'], parts['machine'], atol=1e-12)
+    for condition in ('w1','ss'):
+        residual = condition_audio(wave, condition)
+        assert np.isfinite(residual).all() and residual.shape == wave[0].shape
+        # This stationary crosstalk example attenuates desired machine sound as well as noise.
+        assert (amplitudes(residual, slice(1600,-1600)) < amplitudes(wave[0])).all()
