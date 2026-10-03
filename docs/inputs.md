@@ -1,8 +1,8 @@
 # 読者が取得する入力
 
-1. [Additional Training](https://zenodo.org/records/20151556)の5機種train zipと、[Evaluation](https://zenodo.org/records/20437238)の5機種test zipを取得。配布条件CC BY-NC-SA 4.0を確認してください。ZIP展開後の`eval_data/raw`を`--input`へ指定します。全5機種のtrain/testを同じrootへ揃え、匿名test名を変更しません。
-2. [Microsoft BEATs公式README](https://github.com/microsoft/unilm/tree/master/beats)の **Pre-Trained Model / Iter3** を取得。Fine-tuned、Iter3+、Tokenizerは対象外です。公式project MIT案内とcheckpoint再配布時の確認は[rights.md](rights.md)へ。
-3. 採点は[公式evaluator](https://github.com/nttcslab/dcase2026_task2_evaluator)と付属正解を別途取得する必要があります。取得前にLICENSEv2.1.pdfの用途条件を確認し、必要な許諾を解決してください。本コピーには入りません。
+1. [Additional Training](https://zenodo.org/records/20151556)の5機種train ZIPと[Evaluation](https://zenodo.org/records/20437238)の5機種test ZIPを取得し、同じ `eval_data/raw` に展開します。このパスを `--input` に指定します。
+2. [Microsoft BEATs公式README](https://github.com/microsoft/unilm/tree/master/beats)の **Pre-Trained Model / Iter3** を取得し、`--checkpoint` に指定します。
+3. 再採点には[公式評価器](https://github.com/nttcslab/dcase2026_task2_evaluator)と付属正解を取得し、`--evaluator` に指定します。評価器は `f6a94a2b5e614a9626c9d1ccff6df0705e6aaa75` にcheckoutし、変更のない状態で使います。
 
 ```text
 <INPUT>/BlowerDustCollector/{train,test}/*.wav
@@ -32,12 +32,12 @@ ch0近接/ch1遠方、16 kHz stereo。各機種train1000/test200。正常参照�
 | eval_data_ToyDrone_test.zip | b36102371c188b630d201d443a00bab2 |
 
 例: `md5sum eval_data_ToothBrush_test.zip`。重みは`sha256sum BEATs_iter3.pt`で確認します。
-記事で使われたファイルのSHA-256は `8d1b234032a9ccff353612dc6c20982346dc2968b205b79d97303eb5e77bfb34`（既存報告の記録。本コピーでもローカル実物で一致確認）。これはMicrosoftが発行したchecksumと主張していません。CLIはこの重みを固定し、別の重みを拒否します。
+CLIが使用するBEATs_iter3.ptのSHA-256は `8d1b234032a9ccff353612dc6c20982346dc2968b205b79d97303eb5e77bfb34`です。
 
 ## 容量と計算資源
 
-Zenodo表示のダウンロード容量はtrain約2.8 GB、test 558.7 MB。ZIPと展開音声を同時保持するなら両方の空き容量が必要です。元の報告のWAV header件数から、PCM16 stereoの音声payloadは合計約3.99 GB（3600×10秒、1200×6秒、1200×16秒、16kHz×2ch×2bytes）と算出できます。これは圧縮ZIPやPython環境、メモリ、生成物の容量を含む最小payloadの見積りであり、必要ディスク容量全体の保証ではありません。
+Zenodo表示のダウンロード容量はtrain約2.8 GB、test 558.7 MB。ZIPと展開音声を同時保持するなら両方の空き容量が必要です。元の報告のWAV header件数から、PCM16 stereoの音声payloadは合計約3.99 GB（3600×10秒、1200×6秒、1200×16秒、16kHz×2ch×2bytes）と算出できます。Python環境・重み・生成物の容量は別途必要です。
 
-ローカルのcheckpointは約345 MiB。CPU依存・Notebook環境にも別途容量が必要です。CLIは音声出力・全件中間特徴をディスク保存せず、機種・条件ごとの特徴をメモリ保持します。RAM/VRAMの必要最小値は未測定。GPUは必須ではありませんが、CUDA12.8/PyTorch2.7.1とRTX PRO6000で全件検証済みです。他のGPU構成は未検証です。GPU PyTorchを使う場合はPyTorch公式の機器対応手順で導入してください。
+重みは約345 MiB。CLIは機種・条件ごとの特徴をメモリに保持します。RAM/VRAMの必要最小値は未測定です。CPUまたはGPUで実行でき、GPU PyTorchの導入は[公式手順](https://pytorch.org/get-started/locally/)を参照してください。
 
-実測時間と機器は[検証記録](../VALIDATION.md)から参照できます。別機器・CPU全件の時間は未測定です。先に `--machine ToothBrush --limit 5` で自分の環境を確認してください。
+使用機器と実測時間は[検証記録](../VALIDATION.md)に記載しています。まず `--machine ToothBrush --limit 5` で小規模に実行できます。

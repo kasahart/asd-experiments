@@ -13,7 +13,6 @@
   "peak_torch_cuda_allocated_bytes": 528886272,
   "evaluator_revision": "f6a94a2b5e614a9626c9d1ccff6df0705e6aaa75",
   "evaluator_unmodified_clean_existing_checkout": true,
-  "evaluator_usage_scope": "user existing internal noncommercial DCASE research; no new agreement, modifications or redistribution",
   "official_score": 0.6232526125382385,
   "difference_from_b0_points": -0.5158670285482558,
   "difference_from_w1_points": -4.509734589732261,

@@ -13,6 +13,6 @@
 | コードの由来と利用条件 | [権利文書](docs/rights.md)・[第三者通知](THIRD_PARTY_NOTICES.md) |
 | 確認した範囲 | [検証範囲](VALIDATION.md) |
 
-結果は[総合値](results/summary-with-ss.csv)と[機種別](results/by_machine-with-ss.csv)が正本です。B0/B1/W1は記事の既存報告、SSは追加実験です。外部の独立追試の成績とは主張しません。
+結果は[総合値](results/summary-with-ss.csv)と[機種別](results/by_machine-with-ss.csv)が正本です。B0/B1/W1は記事の既存報告、SSは追加実験です。
 
-データ・重み・公式評価器・正解CSVは同梱せず、読者が公式から取得してパスを指定します。新規コード・Notebook・説明は[MIT](LICENSE)。第三者のLICENSE/NOTICEと外部資産の条件は個別に保持しています。
+データ・重み・公式評価器・正解CSVは同梱せず、読者が公式から取得してパスを指定します。ライセンスと出典は[利用条件](docs/rights.md)を参照してください。
