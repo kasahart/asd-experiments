@@ -15,7 +15,7 @@ def frames(wave=None, path=None, excerpt_s=None):
     if wave is None:
         wave = synthetic()
     selection = slice(None) if excerpt_s is None else slice(*(int(t*16000) for t in excerpt_s))
-    # Fit/process the entire recording BEFORE selecting the display/listening interval.
+    # Fit/process the entire recording BEFORE selecting the display interval.
     return {c: wd.from_numpy(condition_audio(wave, c)[selection], sampling_rate=16000,
                              ch_labels=[c.upper()], ch_units='amplitude')
             for c in ('b0', 'b1', 'w1', 'ss')}
@@ -25,13 +25,17 @@ def recording_frames(data_root, example):
     path = Path(data_root) / example['path']
     if hashlib.sha256(path.read_bytes()).hexdigest() != example['sha256']:
         raise ValueError('Recording checksum differs from the documented example')
-    return frames(path=path, excerpt_s=example['excerpt_s'])
+    return frames(path=path)
 
 
-def show(frame, audio=False):
+def show(frame, audio=False, excerpt_s=None):
     # Manual controls only; preserve the recording level, without individual normalization.
     if audio:
         return frame.describe(normalize=False, is_close=True, fmax=8000)
+    if excerpt_s is not None:
+        start, stop = (int(t*16000) for t in excerpt_s)
+        frame = wd.from_numpy(frame.data[..., start:stop], sampling_rate=16000,
+                              ch_labels=frame.labels, ch_units='amplitude')
     import matplotlib.pyplot as plt
     fig, axes = plt.subplots(1, 2, figsize=(11, 3.5), layout='constrained')
     frame.plot(ax=axes[0], title=frame.labels[0] + ' waveform',

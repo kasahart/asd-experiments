@@ -89,3 +89,18 @@ def test_notebook_common_display_scale():
         assert fig.axes[0].get_ylim() == (-.5,.5)
         assert fig.axes[1].collections[0].get_clim() == (-100,0)
         plt.close(fig)
+
+def test_recording_frames_keep_full_audio(tmp_path):
+    import hashlib
+    import soundfile as sf
+    from asd_min.notebook import recording_frames
+    from asd_min.waveform import load_audio
+    wave = np.random.default_rng(23).normal(0,.1,(2,96000)).astype(np.float32)
+    path = tmp_path / 'recording.wav'
+    sf.write(path, wave.T, 16000, subtype='FLOAT')
+    example = {'path': path.name, 'sha256': hashlib.sha256(path.read_bytes()).hexdigest(),
+               'excerpt_s': [2,3]}
+    loaded = load_audio(path)
+    for condition, frame in recording_frames(tmp_path, example).items():
+        assert frame.data.size == 96000
+        np.testing.assert_allclose(frame.data.ravel(), condition_audio(loaded,condition))
