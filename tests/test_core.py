@@ -68,50 +68,24 @@ def test_ss_waveform_contract():
     assert np.isfinite(ss(x)).all()
 
 
-def test_synthetic_crosstalk_and_machine_loss():
-    from asd_min.waveform import synthetic_components
-    parts = synthetic_components()
-    wave = synthetic()
-    # Independent tone projection verifies that both sources reach both microphones.
-    t = np.arange(wave.shape[1]) / 16000
-    basis = np.column_stack([np.sin(2*np.pi*f*t) for f in (1000,1900)] +
-                            [np.cos(2*np.pi*f*t) for f in (1000,1900)])
-    def amplitudes(signal, selection=slice(None)):
-        coef = np.linalg.lstsq(basis[selection], signal[selection], rcond=None)[0]
-        return np.hypot(coef[:2], coef[2:])
-    np.testing.assert_allclose(amplitudes(wave[0]), [.15,.6], atol=1e-7)
-    np.testing.assert_allclose(amplitudes(wave[1]), [.45,.18], atol=1e-7)
-    coef = np.linalg.lstsq(basis, wave.T, rcond=None)[0]
-    response = coef[:2] + 1j*coef[2:]
-    np.testing.assert_allclose(response[1,1]/response[1,0], .3*np.exp(-2j*np.pi*1900*.0008), atol=2e-7)
-    np.testing.assert_allclose(response[0,0]/response[0,1], (1/3)*np.exp(-2j*np.pi*1000*.0008), atol=2e-7)
-    np.testing.assert_allclose(wave[0], parts['near_noise']+parts['near_machine'], atol=6e-8)
-    np.testing.assert_allclose(wave[1], parts['far_noise']+parts['far_machine'], atol=6e-8)
-    np.testing.assert_allclose(parts['near_machine'], parts['machine'], atol=1e-12)
-    for condition in ('w1','ss'):
-        residual = condition_audio(wave, condition)
-        assert np.isfinite(residual).all() and residual.shape == wave[0].shape
-        # This stationary crosstalk example attenuates desired machine sound as well as noise.
-        assert (amplitudes(residual, slice(1600,-1600)) < amplitudes(wave[0])).all()
+def test_notebook_processes_full_recording_before_crop(tmp_path):
+    import soundfile as sf
+    from asd_min.notebook import frames
+    from asd_min.waveform import load_audio
+    wave = np.random.default_rng(19).normal(0,.1,(2,32000)).astype(np.float32)
+    path = tmp_path / 'recording.wav'
+    sf.write(path, wave.T, 16000, subtype='FLOAT')
+    loaded = load_audio(path)
+    for condition, frame in frames(path=path, excerpt_s=(.5,1.5)).items():
+        np.testing.assert_allclose(frame.data.ravel(), condition_audio(loaded,condition)[8000:24000])
+    assert not np.allclose(condition_audio(loaded,'w1')[8000:24000], condition_audio(loaded[:,8000:24000],'w1'))
 
 
-def test_demo_near_machine_far_noise_and_common_scale():
+def test_notebook_common_display_scale():
     import matplotlib.pyplot as plt
-    from asd_min.notebook import frames, source_frames, microphone_components, show, demo_levels
-    from asd_min.waveform import SYNTHETIC_PARAMETERS
-    levels = demo_levels()
-    assert levels[0]['machine_rms'] > levels[1]['machine_rms'] > 0
-    assert levels[1]['noise_rms'] > levels[0]['noise_rms'] > 0
-    assert levels[0]['machine_rms'] > levels[0]['noise_rms']
-    assert levels[1]['noise_rms'] > levels[1]['machine_rms']
-    assert SYNTHETIC_PARAMETERS['machine']['far_delay_ms'] > SYNTHETIC_PARAMETERS['machine']['near_delay_ms']
-    assert SYNTHETIC_PARAMETERS['noise']['near_delay_ms'] > SYNTHETIC_PARAMETERS['noise']['far_delay_ms']
-    components = microphone_components()
-    for condition, frame in frames().items():
-        fig = show(frame, target=source_frames()['machine'], components=components.get(condition))
-        assert fig.axes[0].get_ylim() == (-1, 1)
-        assert fig.axes[1].collections[0].get_clim() == (-100, 0)
-        if condition in components:
-            # The displayed machine contribution is the actual signal at THIS mic.
-            np.testing.assert_allclose(fig.axes[0].lines[1].get_ydata(), components[condition]['machine'].data)
+    from asd_min.notebook import frames, show
+    for frame in frames().values():
+        fig = show(frame)
+        assert fig.axes[0].get_ylim() == (-.5,.5)
+        assert fig.axes[1].collections[0].get_clim() == (-100,0)
         plt.close(fig)

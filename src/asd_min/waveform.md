@@ -30,11 +30,10 @@ beta=1、gamma=0.1。位相は近接側。
 実験用はHann512/hop256。報告が未指定のperiodic Hann・center=True/reflect・入力正規化なしはローカル実装で固定しています。[SS config](../../configs/02_ss.json)、[第2回の検証範囲](../../docs/02-validation.md)
 
 
-## 合成デモ — 両マイクに機械音と環境ノイズが入る
+## 実録音の表示
 
-`SYNTHETIC_PARAMETERS`を正本として、2つの定常トーンにマイクごとの倍率と相対遅延を付けます。機械―近接マイク―遠方マイク―ノイズ源の配置を仮定し、機械音は近接が強く、ノイズは遠方が強い設定です。各音源の早い到着側を遅延0とし、距離から倍率や遅延を推定してはいません。`synthetic_components()`が混合前の成分、`synthetic()`が近接・遠方とも機械音と環境ノイズを足した2ch波形を返します。W1・SSは実音と同じ`condition_audio()`を使います。
+NotebookはToothBrushの正常録音0000を全6秒処理してから、2〜3秒を切り出します。`notebook.recording_frames()`は設定ファイルのSHA-256を確認し、実験と同じ`condition_audio()`を使います。W1の係数を表示区間だけで推定し直しません。Wandas 0.8.0で4条件の軸と色範囲を揃え、手動試聴も個別正規化なしで表示します。機械音だけの正解波形はないため、保持率は算出しません。[図の出典・利用条件](../../notebooks/DATA_ATTRIBUTION.md)
 
-表示は`notebook.py`の`show_sources()`と`show()`がWandas 0.8.0で作ります。機械音を青、環境ノイズを橙で示し、B0・B1にはそれぞれのマイクで受けた成分、W1・SSには近接で残したい機械音を重ねます。軸と色範囲は共通で、個別に正規化しません。反射や伝達経路の時間変化を扱う部屋のシミュレーションではありません。
-
+`synthetic()`は波形処理の単体テスト用入力です。
 
 [前：BEAM＋VarMin](beam.md) / [公開コード](waveform.py) / [次：共通runner](runner.md)
