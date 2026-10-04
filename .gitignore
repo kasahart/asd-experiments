@@ -23,3 +23,6 @@ checkpoints/
 !/audio/02-toothbrush/b1.wav
 !/audio/02-toothbrush/w1.wav
 !/audio/02-toothbrush/ss.wav
+
+# Generated marimo sessions and HTML exports
+__marimo__/
