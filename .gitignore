@@ -14,3 +14,6 @@ checkpoints/
 *.npz
 .env*
 .pytest_cache/
+
+# Reader-downloaded DCASE data (never commit)
+/eval_data/
