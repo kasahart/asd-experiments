@@ -1,6 +1,6 @@
 # pooling.py — 周波数を残すRDP集約
 
-RDPは[NA-SSL論文](https://arxiv.org/html/2608.00447v1)の手法を参考にしています。
+RDPの原論文は[Temporal Pooling Strategies論文](https://arxiv.org/html/2603.04605v3)（Section III-E）です。採用した`gamma=4`とbackendの組み合わせは[NA-SSL論文](https://arxiv.org/html/2608.00447v1)を参照しています。
 
 ## RDP — 平均から離れた短い区間を重くする
 

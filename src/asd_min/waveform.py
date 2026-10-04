@@ -69,12 +69,10 @@ def synthetic_components():
     for role in ('noise', 'machine'):
         source = p[role]
         angle = 2 * np.pi * source['frequency'] * t
-        parts[role] = source['amplitude'] * np.sin(angle)
         for microphone in ('near', 'far'):
             parts[microphone + '_' + role] = (source['amplitude'] * source[microphone + '_gain']
                                              * np.sin(angle - 2 * np.pi * source['frequency']
                                                       * source[microphone + '_delay_ms'] / 1000))
-    parts['common'] = parts['noise']
     return parts
 
 
