@@ -15,7 +15,7 @@ python3 -m venv .venv-app
 
 ## Pages用HTMLを更新する
 
-トップページはアプリ一覧、各アプリは`apps/<slug>/`で配信します。既存のトップURLから第2回へ進めるほか、個別URLを直接共有できます。各アプリ上部の「アプリ一覧」から戻れます。
+トップページはアプリ一覧、各アプリは`apps/<slug>/`で配信します。トップの一覧から各アプリへ進めるほか、個別URLを直接共有できます。各アプリ上部の「アプリ一覧」から戻れます。
 
 ```bash
 .venv-app/bin/python scripts/build_site.py --check
@@ -24,7 +24,7 @@ python3 -m venv .venv-app
 
 [marimoの静的HTML export](https://docs.marimo.io/guides/exporting/static_html/)を使います。結果表は正本CSVから読み、PNGとPCM16音声はHTMLに埋め込みます。公開ページではPythonの再実行は行いません。音声はブラウザーの手動コントロールで再生します。表示用JavaScriptとCSSはmarimoのCDNから読み込むため、初回閲覧にはネット接続が必要です。WASM・Pyodideは使いません。
 
-`assets/02`の図は、従来の第2回Notebookで実行済みの出力をバイト単位で保存したものです。実録音の図を再描画する手順は[波形処理](../src/asd_min/waveform.md)を参照してください。機種別図は[正本CSV](../results/02-by-machine.csv)に対応します。旧NotebookはGitの履歴から取得できます。
+`assets/02`の図は、従来の第2回Notebookで実行済みの出力をバイト単位で保存したものです。機種別図は[正本CSV](../results/02-by-machine.csv)に対応します。旧NotebookはGitの履歴から取得できます。
 
 コード・説明文は[MIT](../LICENSE)、実録音由来の図・音声は[帰属情報](../docs/DATA_ATTRIBUTION.md)の条件に従います。第三者の元LICENSE・NOTICEは保持しています。
 
