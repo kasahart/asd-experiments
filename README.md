@@ -62,11 +62,9 @@ xychart-beta horizontal
 
 | 調べたいこと | 入口 |
 |---|---|
-| 4条件の音を聞き比べる | [試聴用WAV](audio/02-toothbrush/README.md) |
 | 計算の仕組み | [実装案内](src/asd_min/README.md) |
 | CLIの実行・再採点 | [runner解説](src/asd_min/runner.md#cliを使う) |
 | コードの由来と利用条件 | [出典と利用条件](docs/rights.md)・[第三者通知](THIRD_PARTY_NOTICES.md) |
-| 確認した範囲 | [第2回の検証範囲](docs/02-validation.md) |
 
 リポジトリに含まれる音声データ（marimoアプリ内の埋め込み音声を含む）の出典・利用条件は、[帰属情報](docs/DATA_ATTRIBUTION.md)を参照してください。データセット全体・重み・評価器・正解CSVは同梱していません。
 
