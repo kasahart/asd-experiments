@@ -1,6 +1,6 @@
 # ASD experiments — Zenn連載の実験入口
 
-Zennの異常音検知（ASD）連載に対応する実験コードとmarimoアプリです。[ブラウザーで結果・図・音声を読む](https://kasahart.github.io/asd-experiments/)。インストールやデータ取得は不要です。手法・結果・解説を以下の表から参照できます。
+Zennの異常音検知（ASD）連載に対応する実験コードとmarimoアプリです。[アプリ一覧を開く](https://kasahart.github.io/asd-experiments/)。インストールやデータ取得は不要です。手法・結果・解説を以下の表から参照できます。
 
 <!-- experiments:start -->
 
