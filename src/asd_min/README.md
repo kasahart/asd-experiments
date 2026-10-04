@@ -10,4 +10,4 @@
 | 波形処理 | [waveform.md](waveform.md) | [waveform.py](waveform.py) |
 | 条件比較の実行 | [runner.md](runner.md) | [runner.py](runner.py)・[cli.py](cli.py) |
 
-出典は[第三者通知](../../THIRD_PARTY_NOTICES.md)、ファイルhashは[import-manifest](../../docs/import-manifest.json)を参照してください。
+出典は[第三者通知](../../THIRD_PARTY_NOTICES.md)を参照してください。

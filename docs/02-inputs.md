@@ -40,4 +40,4 @@ Zenodo表示のダウンロード容量はtrain約2.8 GB、test 558.7 MB。ZIP�
 
 重みは約345 MiB。CLIは機種・条件ごとの特徴をメモリに保持します。RAM/VRAMの必要最小値は未測定です。CPUまたはGPUで実行でき、GPU PyTorchの導入は[PyTorch Get Started](https://pytorch.org/get-started/locally/)を参照してください。
 
-使用機器と実測時間は[第2回の検証範囲](02-validation.md)に記載しています。まず `--machine ToothBrush --limit 5` で小規模に実行できます。
+まず `--machine ToothBrush --limit 5` で小規模に実行できます。

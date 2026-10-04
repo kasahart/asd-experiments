@@ -1,6 +1,6 @@
 # Third-party notices
 
-Selected source snapshots and modifications are listed in [出典と利用条件](docs/rights.md) and [import-manifest](docs/import-manifest.json).
+Source attribution and modifications are listed below; see [出典と利用条件](docs/rights.md) for usage terms.
 
 The code combines the ASDKit foundation with implementations of BEAM/VarMin, RDP, and W1.
 

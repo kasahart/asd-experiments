@@ -69,4 +69,4 @@ xychart-beta horizontal
 リポジトリに含まれる音声データ（marimoアプリ内の埋め込み音声を含む）の出典・利用条件は、[帰属情報](docs/DATA_ATTRIBUTION.md)を参照してください。データセット全体・重み・評価器・正解CSVは同梱していません。
 
 一覧とグラフの更新: [手法一覧](configs/readme-methods.csv)に特徴抽出モデル・モデルの追加学習を含む行を追加し、保存結果CSVと固定条件・入力取得・marimoアプリを指定して `python scripts/update_readme.py` を実行します。同じ比較範囲では同じ結果CSV・固定条件・入力取得を指定し、結果CSVにもスコア行を追加します。異なる比較条件には別の `comparison` を付けます。
-手法のコードと解説は同じ階層に置き、[実装案内](src/asd_min/README.md)へ行を追加します。各回の設定・結果・marimoアプリはその回の資料として保持し、検証記録も回ごとに`docs/`へ配置します。
+手法のコードと解説は同じ階層に置き、[実装案内](src/asd_min/README.md)へ行を追加します。各回の設定・結果・marimoアプリはその回の資料として保持します。

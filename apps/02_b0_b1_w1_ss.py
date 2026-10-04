@@ -135,7 +135,7 @@ def _(ASSETS, mo):
 
 @app.cell
 def _(mo):
-    mo.md('## 4. 図と検知スコアの読み分け\n\nこの録音には機械音だけの正解波形がありません。振幅や帯域の変化は観察できますが、機械音の保持率や雑音除去の成功率には換算できません。上の検知スコアはデータ集合全体の評価で、この1録音の見た目や聞こえ方の順位ではありません。\n\n表示用STFTは可視化ライブラリWandasの処理です。W1・SSの計算用STFTは実験実装に固定してあり、表示から再計算しません。\n\n[波形処理の説明](https://github.com/kasahart/asd-experiments/blob/c7dbe58739621a518ae5e045bee50d93745bb508/src/asd_min/waveform.md) / [必要入力](https://github.com/kasahart/asd-experiments/blob/c7dbe58739621a518ae5e045bee50d93745bb508/docs/02-inputs.md) / [検証範囲](https://github.com/kasahart/asd-experiments/blob/c7dbe58739621a518ae5e045bee50d93745bb508/docs/02-validation.md)\n')
+    mo.md('## 4. 図と検知スコアの読み分け\n\nこの録音には機械音だけの正解波形がありません。振幅や帯域の変化は観察できますが、機械音の保持率や雑音除去の成功率には換算できません。上の検知スコアはデータ集合全体の評価で、この1録音の見た目や聞こえ方の順位ではありません。\n\n表示用STFTは可視化ライブラリWandasの処理です。W1・SSの計算用STFTは実験実装に固定してあり、表示から再計算しません。\n\n[波形処理の説明](https://github.com/kasahart/asd-experiments/blob/c7dbe58739621a518ae5e045bee50d93745bb508/src/asd_min/waveform.md) / [必要入力](https://github.com/kasahart/asd-experiments/blob/c7dbe58739621a518ae5e045bee50d93745bb508/docs/02-inputs.md)\n')
     return
 
 @app.cell
