@@ -84,9 +84,11 @@ def test_notebook_processes_full_recording_before_crop(tmp_path):
 def test_notebook_common_display_scale():
     import matplotlib.pyplot as plt
     from asd_min.notebook import frames, show
-    for frame in frames().values():
+    for frame in frames(wave=np.zeros((2,96000),dtype=np.float32)).values():
         fig = show(frame)
         assert fig.axes[0].get_ylim() == (-.5,.5)
+        assert fig.axes[0].get_xlim() == (0,6)
+        assert fig.axes[1].get_xlim() == (0,6)
         assert fig.axes[1].collections[0].get_clim() == (-100,0)
         plt.close(fig)
 

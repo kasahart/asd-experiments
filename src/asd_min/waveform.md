@@ -32,7 +32,7 @@ beta=1、gamma=0.1。位相は近接側。
 
 ## 実録音の表示
 
-NotebookはToothBrushの正常録音0000を全6秒処理してから、図の表示用に2〜3秒を切り出します。手動試聴には切り出し前の全長6秒を渡します。`notebook.recording_frames()`は設定ファイルのSHA-256を確認し、実験と同じ`condition_audio()`を使います。W1の係数を表示区間だけで推定し直しません。Wandasで4条件の軸と色範囲を揃え、手動試聴も個別正規化なしで表示します。機械音だけの正解波形はないため、保持率は算出しません。[図の出典・利用条件](../../notebooks/DATA_ATTRIBUTION.md)
+NotebookはToothBrushの正常録音0000を全6秒処理し、図と手動試聴に全長6秒を渡します。`notebook.recording_frames()`は設定ファイルのSHA-256を確認し、実験と同じ`condition_audio()`を使います。W1の係数を表示区間だけで推定し直しません。Wandasの`describe`で4条件の軸と色範囲を揃え、手動試聴も個別正規化なしで表示します。機械音だけの正解波形はないため、保持率は算出しません。[図の出典・利用条件](../../notebooks/DATA_ATTRIBUTION.md)
 
 `synthetic()`は波形処理の単体テスト用入力です。
 

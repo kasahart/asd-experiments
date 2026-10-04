@@ -28,22 +28,15 @@ def recording_frames(data_root, example):
     return frames(path=path)
 
 
-def show(frame, audio=False, excerpt_s=None):
-    # Manual controls only; preserve the recording level, without individual normalization.
+def show(frame, audio=False):
+    # is_close=False returns figures without creating audio output.
+    figures = frame.describe(
+        normalize=False, is_close=audio, xlim=(0, 6),
+        fmax=8000, ylim=(0, 8000), vmin=-100, vmax=0,
+        waveform={'ylim': (-.5, .5)}, spectral={'xlim': (-100, 0)})
     if audio:
-        return frame.describe(normalize=False, is_close=True, fmax=8000)
-    if excerpt_s is not None:
-        start, stop = (int(t*16000) for t in excerpt_s)
-        frame = wd.from_numpy(frame.data[..., start:stop], sampling_rate=16000,
-                              ch_labels=frame.labels, ch_units='amplitude')
-    import matplotlib.pyplot as plt
-    fig, axes = plt.subplots(1, 2, figsize=(11, 3.5), layout='constrained')
-    frame.plot(ax=axes[0], title=frame.labels[0] + ' waveform',
-               xlim=(.45, .47), ylim=(-.5, .5), color='#2458a6')
-    frame.stft(n_fft=1024, hop_length=512).plot(
-        ax=axes[1], title='Wandas display STFT', fmax=8000, vmin=-100, vmax=0)
-    fig.supxlabel('Excerpt: 2–3 s; waveform zoom: 2.45–2.47 s. Same scales for all conditions.')
-    fig.suptitle('ToothBrush / section_00_source_train_normal_0000_noAttribute.wav', fontsize=10)
-    fig.text(.5, -.04, 'Nishida et al. · doi:10.5281/zenodo.20151556 · CC BY-NC-SA 4.0',
+        return None
+    fig = figures[0]
+    fig.text(.5, -.02, 'Nishida et al. · doi:10.5281/zenodo.20151556 · CC BY-NC-SA 4.0',
              ha='center', fontsize=8)
     return fig
