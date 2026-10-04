@@ -30,7 +30,7 @@ python -m asd_min.cli results
 # Jupyterで notebooks/02_b0_b1_w1_ss.ipynb を開く（自動再生なし）
 ```
 
-Notebookの既定実行は保存表と合成デモだけです。音声再生ボタンは `ENABLE_AUDIO=True` で生成し、手動で再生できます。実データの推論・再採点には、以下のCLIを使います。
+Notebookは保存表と実録音の比較を表示します。既定の`ENABLE_AUDIO=True`で全長6秒の手動再生コントロールを生成します。実データの推論・再採点には、以下のCLIを使います。
 
 ```bash
 # パスは取得先に置き換える。dry-runは件数確認で重みをロードしない。
