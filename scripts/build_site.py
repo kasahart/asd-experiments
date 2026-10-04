@@ -28,7 +28,7 @@ NAV_STYLE = """
 :root{--asd-nav-height:60px}
 #root{position:relative;height:calc(100vh - var(--asd-nav-height))!important;height:calc(100dvh - var(--asd-nav-height))!important}
 .site-nav{height:var(--asd-nav-height);box-sizing:border-box;max-width:1100px;margin:0 auto;padding:16px 24px;display:flex;gap:8px 24px;flex-wrap:wrap;align-content:center;align-items:center;border-bottom:1px solid #e1e5eb;font:16px/1.6 system-ui,sans-serif;background:white}
-@media(max-width:640px){:root{--asd-nav-height:96px}.site-nav{padding:12px 18px}}
+@media(max-width:380px){:root{--asd-nav-height:96px}.site-nav{padding:12px 18px}}
 .site-nav a{color:#1759a5;text-underline-offset:3px}.site-nav a:focus-visible{outline:3px solid #e89e27;outline-offset:4px}
 """
 
