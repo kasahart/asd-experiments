@@ -3,8 +3,6 @@
   "research_revision": "122e56afbf4a21f3803b223e13d0b8bff4de55ea",
   "article2_head": "de12a5825e6974c10934c72556bb6787f05c5a83",
   "imported_sha256": {
-    "results/summary.csv": "aa354c03052d12d89b3bc53911a182f7e0b915fa5afe483f0b0b846b079935d7",
-    "results/by_machine.csv": "802e0bd921181c1f26b31279db64f32eabe3282c846ce514a8ea41e5a904f525",
     "licenses/research-MIT.txt": "48b5bacb6c8e0b30b8a1b11d915fba99a715f4764eb3b05165816b829d047041",
     "licenses/beam-tfattr-MIT.txt": "4c8f86b27e449ba3ae8e7b265a3f857b9fa9ddaa7f0fb16c0e5889f776f083b3",
     "results/b0/decision_result_ToothBrush_section_00_test.csv": "4a989eeefb2d49838bc699ea6202151c0467a4da180206ba1a0858e852100fb9",
