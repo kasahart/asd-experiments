@@ -6,9 +6,10 @@
     "source": "apps/02_b0_b1_w1_ss.py",
     "related_articles": [
       {
-        "label": "連載の導入（第1回）",
+        "label": "連載の導入（Zenn第1回）",
         "url": "https://zenn.dev/kasahart/articles/kasahart-20260919-dcase2026-asd-01"
       }
-    ]
+    ],
+    "article_url": "https://zenn.dev/kasahart/articles/kasahart-20260919-dcase2026-asd-02"
   }
 ]

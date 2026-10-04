@@ -31,7 +31,7 @@ python3 -m venv .venv-app
 ## アプリを追加する
 
 1. `apps/`にmarimoのPythonファイルを追加します。図・音声などの保存ファイルと必要な帰属情報も用意します。
-2. [一覧設定](../configs/apps.json)に1件追加します。`slug`（公開URL）、`title`、`description`、`source`（Pythonファイル）、任意の`related_articles`（`label`と`url`）を指定します。関連記事は公開済みのものを登録します。公開後の`slug`は変えないでください。
+2. [一覧設定](../configs/apps.json)に1件追加します。`slug`（公開URL）、`title`、`description`、`source`（Pythonファイル）、`article_url`（その回のZenn URL）、任意の`related_articles`（`label`と`url`）を指定します。各カードと個別アプリには、その回の「記事を読む（Zenn）」リンクが付きます。未公開記事のURLも表示します。関連記事は公開済みのものを登録します。公開後の`slug`は変えないでください。
 3. 上のコマンドで一覧と全アプリを生成し、表示・リンク・手動再生を確認します。`--check`はslugの重複・不正な形式・アプリファイルの欠落を検出します。export中にセルエラーがあれば生成は失敗します。
 
 公開は生成した`outputs/site`の内容を、既存の`gh-pages`ブランチのルートへ反映してpushします。Pythonソースやデータ取得先を配信用ブランチへ移す必要はありません。静的HTML export後に共通の戻るリンクを付けるため、アプリごとにサイト用ナビゲーションを実装する必要もありません。

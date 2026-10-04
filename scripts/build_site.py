@@ -20,12 +20,15 @@ header nav{display:flex;gap:24px;flex-wrap:wrap}header h1{font-size:clamp(2rem,6
 article{background:white;border:1px solid #d9e1ea;border-radius:16px;padding:28px}
 article h2{font-size:1.5rem;line-height:1.5;margin:0 0 12px}article p{margin:12px 0}
 .open{display:inline-block;background:#1759a5;color:white;text-decoration:none;padding:10px 20px;border-radius:8px;font-weight:600;margin:8px 0}
+.article-link{display:inline-block;margin:8px 0 8px 16px;font-weight:600}
 .related{font-size:.95rem}.related a{display:inline-block}footer{border-top:1px solid #d9e1ea;margin-top:40px;padding-top:20px;font-size:.95rem}
-@media(max-width:480px){main{padding:24px 18px 40px}article{padding:20px}article h2{font-size:1.3rem}}
+@media(max-width:480px){.article-link{display:block;margin:8px 0}main{padding:24px 18px 40px}article{padding:20px}article h2{font-size:1.3rem}}
 """
 NAV_STYLE = """
-#root{position:relative;height:calc(100vh - 60px)!important;height:calc(100dvh - 60px)!important}
-.site-nav{height:60px;box-sizing:border-box;max-width:1100px;margin:0 auto;padding:16px 24px;display:flex;gap:24px;align-items:center;border-bottom:1px solid #e1e5eb;font:16px/1.6 system-ui,sans-serif;background:white}
+:root{--asd-nav-height:60px}
+#root{position:relative;height:calc(100vh - var(--asd-nav-height))!important;height:calc(100dvh - var(--asd-nav-height))!important}
+.site-nav{height:var(--asd-nav-height);box-sizing:border-box;max-width:1100px;margin:0 auto;padding:16px 24px;display:flex;gap:8px 24px;flex-wrap:wrap;align-content:center;align-items:center;border-bottom:1px solid #e1e5eb;font:16px/1.6 system-ui,sans-serif;background:white}
+@media(max-width:640px){:root{--asd-nav-height:96px}.site-nav{padding:12px 18px}}
 .site-nav a{color:#1759a5;text-underline-offset:3px}.site-nav a:focus-visible{outline:3px solid #e89e27;outline-offset:4px}
 """
 
@@ -46,6 +49,9 @@ def load_apps(path):
         for key in ("title", "description"):
             if not isinstance(app[key], str) or not app[key].strip():
                 raise ValueError(f"Missing {key}: {slug}")
+        article_url = urlparse(app["article_url"])
+        if article_url.scheme != "https" or not article_url.netloc:
+            raise ValueError(f"Invalid article URL: {slug}")
         for article in app.get("related_articles", []):
             url = urlparse(article["url"])
             if url.scheme != "https" or not url.netloc or not article["label"].strip():
@@ -64,6 +70,7 @@ def render_index(apps):
 <h2>{escape(app["title"])}</h2>
 <p>{escape(app["description"])}</p>
 <a class="open" href="apps/{app["slug"]}/">アプリを開く →</a>
+<a class="article-link" href="{escape(app["article_url"], quote=True)}">記事を読む（Zenn）</a>
 {f'<p class="related">関連記事：{related}</p>' if related else ''}
 </article>''')
     return f'''<!doctype html>
@@ -80,11 +87,11 @@ def render_index(apps):
 </main></body></html>'''
 
 
-def add_navigation(html):
+def add_navigation(html, app):
     if '<body>' not in html or '</head>' not in html:
         raise ValueError("Unexpected marimo HTML structure")
     html = html.replace('</head>', f'<style>{NAV_STYLE}</style></head>', 1)
-    nav = f'<nav class="site-nav" aria-label="アプリの移動"><a href="../../">← アプリ一覧</a><a href="{REPO}">GitHub</a></nav>'
+    nav = f'<nav class="site-nav" aria-label="アプリの移動"><a href="../../">← アプリ一覧</a><a href="{escape(app["article_url"], quote=True)}">記事を読む（Zenn）</a><a href="{REPO}">GitHub</a></nav>'
     return html.replace('<body>', '<body>' + nav, 1)
 
 
@@ -97,7 +104,7 @@ def build(apps, output, source_ref):
         target = folder / "index.html"
         subprocess.run([sys.executable, "-m", "marimo", "export", "html", "--no-include-code",
                         str(ROOT / app["source"]), "-o", str(target), "-f"], check=True, cwd=ROOT)
-        target.write_text(add_navigation(target.read_text()))
+        target.write_text(add_navigation(target.read_text(), app))
     (output / "index.html").write_text(render_index(apps))
     (output / ".nojekyll").write_text("")
     shutil.copyfile(ROOT / "LICENSE", output / "LICENSE")
