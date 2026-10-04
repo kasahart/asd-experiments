@@ -4,10 +4,12 @@ Notebook第3節と同じ正常録音のB0・B1・W1・SSです。各WAVは全長
 
 | 条件 | 音声 |
 |---|---|
-| B0：近接マイク | [b0.wav](b0.wav) |
-| B1：遠方マイク | [b1.wav](b1.wav) |
-| W1：複素減算 | [w1.wav](w1.wav) |
-| SS：スペクトル減算 | [ss.wav](ss.wav) |
+| B0：近接マイク | [再生・ダウンロード](https://raw.githubusercontent.com/kasahart/asd-experiments/1595743c32c1695ea112cc215065d62a8695f51e/audio/02-toothbrush/b0.wav) · [ファイル](b0.wav) |
+| B1：遠方マイク | [再生・ダウンロード](https://raw.githubusercontent.com/kasahart/asd-experiments/1595743c32c1695ea112cc215065d62a8695f51e/audio/02-toothbrush/b1.wav) · [ファイル](b1.wav) |
+| W1：複素減算 | [再生・ダウンロード](https://raw.githubusercontent.com/kasahart/asd-experiments/1595743c32c1695ea112cc215065d62a8695f51e/audio/02-toothbrush/w1.wav) · [ファイル](w1.wav) |
+| SS：スペクトル減算 | [再生・ダウンロード](https://raw.githubusercontent.com/kasahart/asd-experiments/1595743c32c1695ea112cc215065d62a8695f51e/audio/02-toothbrush/ss.wav) · [ファイル](ss.wav) |
+
+「再生・ダウンロード」からWAVを開き、ブラウザーで再生するか、保存して音声アプリで聞き比べてください。
 
 ## 出典と利用条件
 
