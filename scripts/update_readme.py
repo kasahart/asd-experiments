@@ -55,13 +55,13 @@ def render(root):
         models = {(m['feature_model'], m['model_training']) for m in entries}
         if len(models) != 1:
             raise ValueError(f'{group}: use separate comparison groups for different feature models or model training')
-        notebooks = {m['notebook_path'] for m in entries}
-        common_notebook = len(notebooks) == 1
+        apps = {m['app_path'] for m in entries}
+        common_app = len(apps) == 1
         lines += ['', f'### {group}', '']
-        if common_notebook:
-            lines += [f'[Notebook]({next(iter(notebooks))})', '']
-        lines += ['| 手法 | 特徴 | 特徴抽出モデル | モデルの追加学習 | 参考文献 |' + ('' if common_notebook else ' Notebook |'),
-                  '|---|---|---|---|---|' + ('' if common_notebook else '---|')]
+        if common_app:
+            lines += [f'[marimoアプリ]({next(iter(apps))})', '']
+        lines += ['| 手法 | 特徴 | 特徴抽出モデル | モデルの追加学習 | 参考文献 |' + ('' if common_app else ' marimoアプリ |'),
+                  '|---|---|---|---|---|' + ('' if common_app else '---|')]
         for method in entries:
             feature = method['description'].replace('|', r'\|')
             reference = '—'
@@ -70,8 +70,8 @@ def render(root):
                 if method.get('reference_note'):
                     reference += f"（{method['reference_note']}）"
             row = f"| {method['condition'].upper()} | {feature} | {method['feature_model']} | {method['model_training']} | {reference} |"
-            if not common_notebook:
-                row += f" [Notebook]({method['notebook_path']}) |"
+            if not common_app:
+                row += f" [marimoアプリ]({method['app_path']}) |"
             lines.append(row)
         references = references_for(root, entries)
         if references:

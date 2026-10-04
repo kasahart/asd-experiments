@@ -67,13 +67,9 @@ def test_ss_waveform_contract():
     np.testing.assert_allclose(ss(x*2),ss(x)*2,atol=5e-7,rtol=3e-6)
     assert np.isfinite(ss(x)).all()
 
-def test_notebook_rejects_wrong_recording_before_read(tmp_path):
+def test_render_rejects_wrong_recording_before_read(tmp_path):
     import json
     import hashlib
-    source = json.loads((Path(__file__).resolve().parents[1] /
-                         'notebooks/02_b0_b1_w1_ss.ipynb').read_text())
-    cell = next(c for c in source['cells'] if c['cell_type']=='code' and
-                'example = json.loads' in ''.join(c['source']))
     (tmp_path / 'configs').mkdir()
     (tmp_path / 'configs/02-recording-example.json').write_text(
         json.dumps({'path': 'same-name.wav', 'sha256': '0'*64}))
@@ -84,16 +80,9 @@ def test_notebook_rejects_wrong_recording_before_read(tmp_path):
             raise AssertionError('Must reject before loading')
     import os
     from unittest.mock import patch
+    script = (Path(__file__).resolve().parents[1] / 'scripts/render_recording.py').read_text()
+    block = script[script.index('example = json.loads'):script.index('audio = wd.read') + len('audio = wd.read(path)')]
     with patch.dict(os.environ, {}, clear=True):
         with pytest.raises(ValueError, match='SHA-256'):
-            exec(''.join(cell['source']), {'ROOT': tmp_path, 'Path': Path,
-                 'json': json, 'hashlib': hashlib, 'os': os, 'wd': UnexpectedRead()})
-
-
-def test_notebook_license_metadata_scopes_embedded_outputs():
-    import json
-    n = json.loads((Path(__file__).resolve().parents[1] /
-                    'notebooks/02_b0_b1_w1_ss.ipynb').read_text())
-    assert 'license' not in n['metadata']
-    assert n['metadata']['licenses']['code_and_text'] == 'MIT'
-    assert n['metadata']['licenses']['section_3_data_figures_and_embedded_audio'] == 'CC-BY-NC-SA-4.0'
+            exec(block, {'ROOT': tmp_path, 'Path': Path, 'json': json,
+                        'hashlib': hashlib, 'os': os, 'wd': UnexpectedRead()})

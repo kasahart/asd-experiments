@@ -1,9 +1,9 @@
 # 出典と利用条件
 
-新規コード・Notebookのコードと説明文は[MIT](../LICENSE)です。第三者コードの出典とLICENSE/NOTICEは[第三者通知](../THIRD_PARTY_NOTICES.md)にまとめています。
+新規コード・marimoアプリのコードと説明文は[MIT](../LICENSE)です。第三者コードの出典とLICENSE/NOTICEは[第三者通知](../THIRD_PARTY_NOTICES.md)にまとめています。
 
 各手法の再現に必要な入力と条件は[READMEのスコア表](../README.md#スコア)から参照できます。
 
 データセット全体・重み・評価器・正解は同梱していません。各配布元の利用条件を確認してください。
 
-リポジトリに含まれる音声データ（Notebook内の埋め込み音声を含む）と実録音由来の図の出典・利用条件は、[帰属情報](../notebooks/DATA_ATTRIBUTION.md)を参照してください。
+リポジトリに含まれる音声データ（marimoアプリ内の埋め込み音声を含む）と実録音由来の図の出典・利用条件は、[帰属情報](../docs/DATA_ATTRIBUTION.md)を参照してください。

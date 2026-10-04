@@ -1,6 +1,6 @@
 # ToothBrushの4条件を聞き比べる
 
-Notebook第3節と同じ正常録音のB0・B1・W1・SSです。各WAVは全長6秒、16 kHz、モノラル、PCM16。Notebookの音声プレーヤーに埋め込んだWAVをそのまま保存し、条件ごとの正規化は追加していません。
+marimoアプリ第3節と同じ正常録音のB0・B1・W1・SSです。各WAVは全長6秒、16 kHz、モノラル、PCM16。marimoアプリの音声プレーヤーに埋め込んだWAVをそのまま保存し、条件ごとの正規化は追加していません。
 
 | 条件 | 音声 |
 |---|---|
@@ -9,6 +9,6 @@ Notebook第3節と同じ正常録音のB0・B1・W1・SSです。各WAVは全長
 | W1：複素減算 | [WAVダウンロード](https://raw.githubusercontent.com/kasahart/asd-experiments/1595743c32c1695ea112cc215065d62a8695f51e/audio/02-toothbrush/w1.wav) · [ファイル](w1.wav) |
 | SS：スペクトル減算 | [WAVダウンロード](https://raw.githubusercontent.com/kasahart/asd-experiments/1595743c32c1695ea112cc215065d62a8695f51e/audio/02-toothbrush/ss.wav) · [ファイル](ss.wav) |
 
-「WAVダウンロード」から保存し、音声アプリで聞き比べてください。
+[marimoアプリ](https://kasahart.github.io/asd-experiments/)ではブラウザーで再生できます。WAVを保存する場合は「WAVダウンロード」を使ってください。
 
-音声データの出典・利用条件は、[帰属情報](../../notebooks/DATA_ATTRIBUTION.md)を参照してください。
+音声データの出典・利用条件は、[帰属情報](../../docs/DATA_ATTRIBUTION.md)を参照してください。

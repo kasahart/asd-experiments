@@ -9,7 +9,8 @@ license-files = ["LICENSE", "licenses/*.txt", "src/asd_min/beats/LICENSE", "src/
 requires-python = ">=3.10"
 dependencies = ["numpy>=1.26,<3", "soundfile>=0.12", "torch==2.7.1", "torchaudio==2.7.1"]
 [project.optional-dependencies]
-notebook = ["wandas==0.8.0", "nbformat", "nbclient", "ipykernel", "matplotlib", "pandas"]
+visualization = ["wandas==0.8.0", "matplotlib", "pandas"]
+app = ["marimo==0.25.1"]
 [project.scripts]
 asd-article = "asd_min.cli:main"
 [tool.setuptools.packages.find]
