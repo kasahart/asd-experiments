@@ -68,7 +68,7 @@ def _(ASSETS, mo):
 
 @app.cell
 def _(mo):
-    mo.md('## 3. 同じ実録音で波形を比較する\n\n使用する音源は、[DCASE 2026 Challenge Task 2 Additional Training Dataset v1](https://zenodo.org/records/20151556)に含まれる**電動歯ブラシ（ToothBrush）の正常動作の実録音**です。\n\n| 項目 | 使用する音源 |\n|---|---|\n| ファイル | `ToothBrush/train/section_00_source_train_normal_0000_noAttribute.wav` |\n| 区分 | section 00・sourceドメイン・正常訓練データ |\n| 長さ・形式 | 6秒・16 kHz・2チャンネル |\n| ch 0 | 機械に近いマイクの録音（B0） |\n| ch 1 | 機械から遠いマイクの同時録音（B1） |\n\n両マイクに機械音と環境音が混ざっています。遠方側も雑音だけの録音ではありません。同じ録音から、近接・遠方をそのまま使う場合と、遠方を参照して近接を処理する場合を比べます。\n\nW1は遠方の複素スペクトルを調整して近接から引き、SSはスペクトルの大きさを引きます。処理は実験と同じ関数です。\n\n対象録音の全6秒を処理しています。振幅軸・周波数軸・スペクトルのレベル軸・色範囲は4条件共通です。手動試聴では4条件すべて全長6秒の音声を再生します。\n\n各WAVは既存プレーヤーと同じPCM16・16 kHz・モノラル音声です。個別の正規化は追加していません。\n\n図はWandas 0.8.0で作成した保存図です。再描画する場合は[波形処理の説明](https://github.com/kasahart/asd-experiments/blob/docs/recording-wav-downloads/src/asd_min/waveform.md)を参照してください。この波形比較にモデルの重みは不要です。\n\n音声データ（アプリ内の埋め込み音声を含む）と実録音由来の図の出典・利用条件は、[帰属情報](https://github.com/kasahart/asd-experiments/blob/docs/recording-wav-downloads/docs/DATA_ATTRIBUTION.md)を参照してください。\n')
+    mo.md('## 3. 同じ実録音で波形を比較する\n\n使用する音源は、[DCASE 2026 Challenge Task 2 Additional Training Dataset v1](https://zenodo.org/records/20151556)に含まれる**電動歯ブラシ（ToothBrush）の正常動作の実録音**です。\n\n| 項目 | 使用する音源 |\n|---|---|\n| ファイル | `ToothBrush/train/section_00_source_train_normal_0000_noAttribute.wav` |\n| 区分 | section 00・sourceドメイン・正常訓練データ |\n| 長さ・形式 | 6秒・16 kHz・2チャンネル |\n| ch 0 | 機械に近いマイクの録音（B0） |\n| ch 1 | 機械から遠いマイクの同時録音（B1） |\n\n両マイクに機械音と環境音が混ざっています。遠方側も雑音だけの録音ではありません。同じ録音から、近接・遠方をそのまま使う場合と、遠方を参照して近接を処理する場合を比べます。\n\nW1は遠方の複素スペクトルを調整して近接から引き、SSはスペクトルの大きさを引きます。処理は実験と同じ関数です。\n\n対象録音の全6秒を処理しています。振幅軸・周波数軸・スペクトルのレベル軸・色範囲は4条件共通です。手動試聴では4条件すべて全長6秒の音声を再生します。\n\n各WAVは既存プレーヤーと同じPCM16・16 kHz・モノラル音声です。個別の正規化は追加していません。\n\n図はWandas 0.8.0で作成した保存図です。再描画する場合は[波形処理の説明](https://github.com/kasahart/asd-experiments/blob/07c48959cc8cfd660426b045b71982f3319738ec/src/asd_min/waveform.md)を参照してください。この波形比較にモデルの重みは不要です。\n\n音声データ（アプリ内の埋め込み音声を含む）と実録音由来の図の出典・利用条件は、[帰属情報](https://github.com/kasahart/asd-experiments/blob/07c48959cc8cfd660426b045b71982f3319738ec/docs/DATA_ATTRIBUTION.md)を参照してください。\n')
     return
 
 @app.cell
@@ -135,12 +135,12 @@ def _(ASSETS, mo):
 
 @app.cell
 def _(mo):
-    mo.md('## 4. 図と検知スコアの読み分け\n\nこの録音には機械音だけの正解波形がありません。振幅や帯域の変化は観察できますが、機械音の保持率や雑音除去の成功率には換算できません。上の検知スコアはデータ集合全体の評価で、この1録音の見た目や聞こえ方の順位ではありません。\n\n表示用STFTは可視化ライブラリWandasの処理です。W1・SSの計算用STFTは実験実装に固定してあり、表示から再計算しません。各条件で正常参照も作り直して比較しています。\n\n[波形処理の説明](https://github.com/kasahart/asd-experiments/blob/docs/recording-wav-downloads/src/asd_min/waveform.md) / [必要入力](https://github.com/kasahart/asd-experiments/blob/docs/recording-wav-downloads/docs/02-inputs.md) / [検証範囲](https://github.com/kasahart/asd-experiments/blob/docs/recording-wav-downloads/docs/02-validation.md)\n')
+    mo.md('## 4. 図と検知スコアの読み分け\n\nこの録音には機械音だけの正解波形がありません。振幅や帯域の変化は観察できますが、機械音の保持率や雑音除去の成功率には換算できません。上の検知スコアはデータ集合全体の評価で、この1録音の見た目や聞こえ方の順位ではありません。\n\n表示用STFTは可視化ライブラリWandasの処理です。W1・SSの計算用STFTは実験実装に固定してあり、表示から再計算しません。各条件で正常参照も作り直して比較しています。\n\n[波形処理の説明](https://github.com/kasahart/asd-experiments/blob/07c48959cc8cfd660426b045b71982f3319738ec/src/asd_min/waveform.md) / [必要入力](https://github.com/kasahart/asd-experiments/blob/07c48959cc8cfd660426b045b71982f3319738ec/docs/02-inputs.md) / [検証範囲](https://github.com/kasahart/asd-experiments/blob/07c48959cc8cfd660426b045b71982f3319738ec/docs/02-validation.md)\n')
     return
 
 @app.cell
 def _(mo):
-    mo.md('[再現用CLIとコード](https://github.com/kasahart/asd-experiments/blob/docs/recording-wav-downloads/README.md) / [アプリの実行・更新](https://github.com/kasahart/asd-experiments/blob/docs/recording-wav-downloads/apps/README.md) / [出典・利用条件](https://github.com/kasahart/asd-experiments/blob/docs/recording-wav-downloads/docs/DATA_ATTRIBUTION.md)')
+    mo.md('[再現用CLIとコード](https://github.com/kasahart/asd-experiments/blob/07c48959cc8cfd660426b045b71982f3319738ec/README.md) / [アプリの実行・更新](https://github.com/kasahart/asd-experiments/blob/07c48959cc8cfd660426b045b71982f3319738ec/apps/README.md) / [出典・利用条件](https://github.com/kasahart/asd-experiments/blob/07c48959cc8cfd660426b045b71982f3319738ec/docs/DATA_ATTRIBUTION.md)')
     return
 
 if __name__ == "__main__":

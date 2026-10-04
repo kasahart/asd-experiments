@@ -28,3 +28,5 @@ SS implements the magnitude equation in [Chu・Qian技術報告](https://dcase.c
 | [MERL技術報告](https://www.merl.com/publications/docs/TR2026-100.pdf) | The MERL Systems for DCASE 2026 Challenge Task 2 |
 | [Ozeki技術報告](https://dcase.community/documents/challenge2026/technical_reports/DCASE2026_Ozeki_101_t2.pdf) | Anomalous Sound Detection Method with Simple Noise Reduction |
 | [Chu・Qian技術報告](https://dcase.community/documents/challenge2026/technical_reports/DCASE2026_Qian_65_t2.pdf) | Anomalous Sound Detection System for DCASE 2026 Task 2 Using Dual-Channel Spectral Subtraction and Efficient Audio Transformer |
+
+The browser app is exported with [marimo 0.25.1](https://github.com/marimo-team/marimo/tree/0.25.1), licensed under [Apache-2.0](licenses/marimo-Apache-2.0.txt). The static export loads marimo frontend assets from its CDN; the original marimo license is retained unchanged.
