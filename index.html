@@ -11,8 +11,9 @@ header nav{display:flex;gap:24px;flex-wrap:wrap}header h1{font-size:clamp(2rem,6
 article{background:white;border:1px solid #d9e1ea;border-radius:16px;padding:28px}
 article h2{font-size:1.5rem;line-height:1.5;margin:0 0 12px}article p{margin:12px 0}
 .open{display:inline-block;background:#1759a5;color:white;text-decoration:none;padding:10px 20px;border-radius:8px;font-weight:600;margin:8px 0}
+.article-link{display:inline-block;margin:8px 0 8px 16px;font-weight:600}
 .related{font-size:.95rem}.related a{display:inline-block}footer{border-top:1px solid #d9e1ea;margin-top:40px;padding-top:20px;font-size:.95rem}
-@media(max-width:480px){main{padding:24px 18px 40px}article{padding:20px}article h2{font-size:1.3rem}}
+@media(max-width:480px){.article-link{display:block;margin:8px 0}main{padding:24px 18px 40px}article{padding:20px}article h2{font-size:1.3rem}}
 </style></head><body><main>
 <header><nav aria-label="関連リンク"><a href="https://github.com/kasahart/asd-experiments">GitHub：コード・実行手順</a></nav>
 <h1>ASD experiments</h1>
@@ -22,7 +23,8 @@ article h2{font-size:1.5rem;line-height:1.5;margin:0 0 12px}article p{margin:12p
 <h2>第2回：ノイズ除去で、異常検知は良くなるか？</h2>
 <p>近接・遠方マイク、複素減算、スペクトル減算の検知スコアを比較。同じ実録音の図と、4条件の6秒音声を確認できます。</p>
 <a class="open" href="apps/02-b0-b1-w1-ss/">アプリを開く →</a>
-<p class="related">関連記事：<a href="https://zenn.dev/kasahart/articles/kasahart-20260919-dcase2026-asd-01">連載の導入（第1回）</a></p>
+<a class="article-link" href="https://zenn.dev/kasahart/articles/kasahart-20260919-dcase2026-asd-02">記事を読む（Zenn）</a>
+<p class="related">関連記事：<a href="https://zenn.dev/kasahart/articles/kasahart-20260919-dcase2026-asd-01">連載の導入（Zenn第1回）</a></p>
 </article></section>
 <footer>再推論・再採点の手順はGitHubの各実験の説明を参照してください。図・音声の出典と利用条件は、各アプリに記載しています。</footer>
 </main></body></html>
