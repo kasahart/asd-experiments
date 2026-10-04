@@ -1,4 +1,5 @@
 .venv/
+.venv-app/
 __pycache__/
 *.egg-info/
 .ipynb_checkpoints/
@@ -17,3 +18,12 @@ checkpoints/
 
 # Reader-downloaded DCASE data (never commit)
 /eval_data/
+
+# Authorized six-second app listening examples only
+!/audio/02-toothbrush/b0.wav
+!/audio/02-toothbrush/b1.wav
+!/audio/02-toothbrush/w1.wav
+!/audio/02-toothbrush/ss.wav
+
+# Generated marimo sessions and HTML exports
+__marimo__/

@@ -10,7 +10,7 @@ The code combines the ASDKit foundation with implementations of BEAM/VarMin, RDP
 - BEATs, backbone and modules: Microsoft MIT headers and an extension for grid extraction. Retained [BEATs LICENSE](src/asd_min/beats/LICENSE), [NOTICE](src/asd_min/beats/NOTICE.md), and research MIT notice. Three Python files are copied byte-for-byte from the selected research snapshot; package-only `__init__.py` is new and intentionally omits optional training/tokenizer imports.
 - **W1**: waveform.py uses joint normalization, Torch STFT/ISTFT and full-recording complex least-squares. The received research MIT notice is retained. Additional validation/loading helpers are companion code.
 
-New companion CLI, notebook code and explanatory text, and documentation are licensed under the root MIT LICENSE, Copyright (c) 2026 kasahart. The dataset-derived figures and embedded audio in notebook section 3 are excluded from MIT and distributed under CC BY-NC-SA 4.0; see [data attribution and modifications](notebooks/DATA_ATTRIBUTION.md). Third-party LICENSE/NOTICE texts are retained.
+New companion CLI, marimo app code and explanatory text, and documentation are licensed under the root MIT LICENSE, Copyright (c) 2026 kasahart. The dataset-derived figures and embedded audio in app section 3 and the identical WAV listening examples in `audio/02-toothbrush` are excluded from MIT and distributed under CC BY-NC-SA 4.0; see [data attribution and modifications](docs/DATA_ATTRIBUTION.md). Third-party LICENSE/NOTICE texts are retained.
 
 SS implements the magnitude equation in [Chu・Qian技術報告](https://dcase.community/documents/challenge2026/technical_reports/DCASE2026_Qian_65_t2.pdf), Section 2.1.
 
@@ -28,3 +28,5 @@ SS implements the magnitude equation in [Chu・Qian技術報告](https://dcase.c
 | [MERL技術報告](https://www.merl.com/publications/docs/TR2026-100.pdf) | The MERL Systems for DCASE 2026 Challenge Task 2 |
 | [Ozeki技術報告](https://dcase.community/documents/challenge2026/technical_reports/DCASE2026_Ozeki_101_t2.pdf) | Anomalous Sound Detection Method with Simple Noise Reduction |
 | [Chu・Qian技術報告](https://dcase.community/documents/challenge2026/technical_reports/DCASE2026_Qian_65_t2.pdf) | Anomalous Sound Detection System for DCASE 2026 Task 2 Using Dual-Channel Spectral Subtraction and Efficient Audio Transformer |
+
+The browser app is exported with [marimo 0.25.1](https://github.com/marimo-team/marimo/tree/0.25.1), licensed under [Apache-2.0](licenses/marimo-Apache-2.0.txt). The static export loads marimo frontend assets from its CDN; the original marimo license is retained unchanged.

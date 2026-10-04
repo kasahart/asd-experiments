@@ -6,7 +6,7 @@
 
 `run()`は各条件・機種で、train/testの波形処理→特徴抽出→正常参照構築→異常度出力を同じ順序で行います。正常trainの再採点では同一pathの自己参照を除き、その異常度の90%点を閾値として、厳密に`score > threshold`なら異常判定を出します。閾値はAUC/pAUCの順位比較とは別の、判定CSVを作るための設定です。
 
-BEATs重みのSHA-256、train/test件数と匿名テスト名を確認し、既存出力を上書きしません。入力hash・時間・正常trainスコア・閾値をローカルに記録します。Notebookの波形計算は同じ`condition_audio()`を呼び、Wandasは可視化と手動試聴を担います。
+BEATs重みのSHA-256、train/test件数と匿名テスト名を確認し、既存出力を上書きしません。入力hash・時間・正常trainスコア・閾値をローカルに記録します。実録音の再描画も同じ`condition_audio()`を呼び、Wandasで図を作ります。
 
 
 入力計画は`plan()`、特徴抽出は`Encoder.extract()`、全体実行は`run()`です。CLIの`results`は保存表の閲覧、`infer`は生音声からの再推論、`evaluate`は指定した固定版の評価器による保存異常度の採点です。
@@ -23,14 +23,11 @@ BEATs重みのSHA-256、train/test件数と匿名テスト名を確認し、既�
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install torch==2.7.1 torchaudio==2.7.1 --index-url https://download.pytorch.org/whl/cpu
-python -m pip install -e '.[notebook]'
+python -m pip install -e .
 python -m asd_min.cli results
-# Notebookを実行するには、別途JupyterLabまたはVS CodeのJupyter機能を使用。
-# この.venvのPython kernelを選択する。
-# Jupyterで notebooks/02_b0_b1_w1_ss.ipynb を開く（自動再生なし）
 ```
 
-Notebookは保存表と実録音の比較を表示します。既定の`ENABLE_AUDIO=True`で全長6秒の手動再生コントロールを生成します。実データの推論・再採点には、以下のCLIを使います。
+保存結果・実録音の比較・手動試聴は[marimoアプリ](../../apps/README.md)で提供します。実データの推論・再採点には、以下のCLIを使います。
 
 ```bash
 # パスは取得先に置き換える。dry-runは件数確認で重みをロードしない。

@@ -1,0 +1,15 @@
+[
+  {
+    "slug": "02-b0-b1-w1-ss",
+    "title": "第2回：ノイズ除去で、異常検知は良くなるか？",
+    "description": "近接・遠方マイク、複素減算、スペクトル減算の検知スコアを比較。同じ実録音の図と、4条件の6秒音声を確認できます。",
+    "source": "apps/02_b0_b1_w1_ss.py",
+    "related_articles": [
+      {
+        "label": "連載の導入（Zenn第1回）",
+        "url": "https://zenn.dev/kasahart/articles/kasahart-20260919-dcase2026-asd-01"
+      }
+    ],
+    "article_url": "https://zenn.dev/kasahart/articles/kasahart-20260919-dcase2026-asd-02"
+  }
+]

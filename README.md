@@ -1,6 +1,6 @@
 # ASD experiments — Zenn連載の実験入口
 
-Zennの異常音検知（ASD）連載に対応する実験コードとNotebookです。手法・結果・解説を以下の表から参照できます。
+Zennの異常音検知（ASD）連載に対応する実験コードとmarimoアプリです。[アプリ一覧を開く](https://kasahart.github.io/asd-experiments/)。インストールやデータ取得は不要です。手法・結果・解説を以下の表から参照できます。
 
 <!-- experiments:start -->
 
@@ -8,7 +8,7 @@ Zennの異常音検知（ASD）連載に対応する実験コードとNotebook�
 
 ### DCASE 2026 Evaluation / BEATs_iter3
 
-[Notebook](notebooks/02_b0_b1_w1_ss.ipynb)
+[marimoアプリ](apps/02_b0_b1_w1_ss.py)
 
 | 手法 | 特徴 | 特徴抽出モデル | モデルの追加学習 | 参考文献 |
 |---|---|---|---|---|
@@ -62,12 +62,13 @@ xychart-beta horizontal
 
 | 調べたいこと | 入口 |
 |---|---|
+| 4条件の音を聞き比べる | [試聴用WAV](audio/02-toothbrush/README.md) |
 | 計算の仕組み | [実装案内](src/asd_min/README.md) |
 | CLIの実行・再採点 | [runner解説](src/asd_min/runner.md#cliを使う) |
 | コードの由来と利用条件 | [出典と利用条件](docs/rights.md)・[第三者通知](THIRD_PARTY_NOTICES.md) |
 | 確認した範囲 | [検証範囲](VALIDATION.md) |
 
-Notebookに比較用音声4件を埋め込んでいます。データセット・重み・評価器・正解CSVは同梱していません。配布元から取得し、そのパスを指定します。ライセンスと出典は[出典と利用条件](docs/rights.md)を参照してください。
+リポジトリに含まれる音声データ（marimoアプリ内の埋め込み音声を含む）の出典・利用条件は、[帰属情報](docs/DATA_ATTRIBUTION.md)を参照してください。データセット全体・重み・評価器・正解CSVは同梱していません。
 
-一覧とグラフの更新: [手法一覧](configs/readme-methods.csv)に特徴抽出モデル・モデルの追加学習を含む行を追加し、保存結果CSVと固定条件・入力取得・Notebookを指定して `python scripts/update_readme.py` を実行します。同じ比較範囲では同じ結果CSV・固定条件・入力取得を指定し、結果CSVにもスコア行を追加します。異なる比較条件には別の `comparison` を付けます。
-手法のコードと解説は同じ階層に置き、[実装案内](src/asd_min/README.md)へ行を追加します。各回の設定・結果・Notebookはその回の資料として保持し、検証記録は[検証範囲](VALIDATION.md)へ追加します。
+一覧とグラフの更新: [手法一覧](configs/readme-methods.csv)に特徴抽出モデル・モデルの追加学習を含む行を追加し、保存結果CSVと固定条件・入力取得・marimoアプリを指定して `python scripts/update_readme.py` を実行します。同じ比較範囲では同じ結果CSV・固定条件・入力取得を指定し、結果CSVにもスコア行を追加します。異なる比較条件には別の `comparison` を付けます。
+手法のコードと解説は同じ階層に置き、[実装案内](src/asd_min/README.md)へ行を追加します。各回の設定・結果・marimoアプリはその回の資料として保持し、検証記録は[検証範囲](VALIDATION.md)へ追加します。

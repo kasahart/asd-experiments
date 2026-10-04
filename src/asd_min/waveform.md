@@ -32,7 +32,17 @@ beta=1、gamma=0.1。位相は近接側。
 
 ## 実録音の表示
 
-NotebookはToothBrushの正常録音0000を全6秒処理し、可視化と手動試聴には全長6秒のデータを使います。Notebook内でSHA-256を確認し、`wd.read()`で読み込みます。B0・B1はチャンネルを選択し、W1・SSは`apply()`から実験と同じ`condition_audio()`を呼びます。`apply()`内では2chを保ち、処理後の近接側を取り出します。W1の係数を表示区間だけで推定し直しません。Wandasの`describe`で4条件の軸と色範囲を揃え、試聴用プレーヤーも個別正規化なしで表示します。機械音だけの正解波形はないため、保持率は算出しません。[図の出典・利用条件](../../notebooks/DATA_ATTRIBUTION.md)
+[marimoアプリ](../../apps/README.md)は保存済みの図と全長6秒の音声を表示します。図はWandas 0.8.0で作成しています。全条件で軸と色範囲を揃え、音声の個別正規化は追加していません。機械音だけの正解波形はないため、保持率は算出しません。[図・音声の出典と利用条件](../../docs/DATA_ATTRIBUTION.md)
+
+元データから再描画するには、[公式データと録音checksum](../../docs/02-inputs.md)を確認し、`ASD_DATA_ROOT`を`ToothBrush`があるディレクトリに設定します。重みは不要です。
+
+```bash
+python -m pip install -e '.[visualization]'
+ASD_DATA_ROOT=/path/to/eval_data/raw python scripts/render_recording.py
+```
+
+図は`outputs/recording-figures`へ保存します。保存先は`ASD_FIGURE_OUTPUT`で変更できます。スクリプトはSHA-256を確認してから`wd.read()`で全6秒を読み込み、B0・B1はチャンネル選択、W1・SSはWandasの`apply()`から共通の`condition_audio()`を呼びます。2chを保って処理した後に近接側を取り出します。W1の係数を表示区間だけで推定し直しません。`describe()`で波形・スペクトログラム・スペクトルを描き、`welch().plot(overlay=True)`で重ね描きします。表示用STFTと計算用STFTは別です。
+
 
 `synthetic()`は波形処理の単体テスト用入力です。
 
