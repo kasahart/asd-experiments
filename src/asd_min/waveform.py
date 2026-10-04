@@ -2,7 +2,7 @@
 # Copyright (c) 2026 kasahart (companion additions)
 # Portions adapted from research code Copyright (c) 2025 Takuya Fujimura.
 """Selected canonical W1 operations, adapted from the MIT research snapshot.
-See licenses/research-MIT.txt and docs/import-manifest.json. No Wandas DSP here.
+See licenses/research-MIT.txt and THIRD_PARTY_NOTICES.md. No Wandas DSP here.
 """
 import numpy as np
 import torch
