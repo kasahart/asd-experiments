@@ -1,7 +1,6 @@
 {
   "imported_sha256": {
     "licenses/research-MIT.txt": "48b5bacb6c8e0b30b8a1b11d915fba99a715f4764eb3b05165816b829d047041",
-    "licenses/beam-tfattr-MIT.txt": "4c8f86b27e449ba3ae8e7b265a3f857b9fa9ddaa7f0fb16c0e5889f776f083b3",
     "results/b0/decision_result_ToothBrush_section_00_test.csv": "4a989eeefb2d49838bc699ea6202151c0467a4da180206ba1a0858e852100fb9",
     "results/b0/anomaly_score_BlowerDustCollector_section_00_test.csv": "2625283def63924704b229a04c99234e6bc79303c3d6afe7c7b745498a32c5bd",
     "results/b0/decision_result_Sander_section_00_test.csv": "5c92e9341b5e9acbf2ae549417a4db4aa623782831fce9c190e1a2c621290a58",
