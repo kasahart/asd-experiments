@@ -68,7 +68,7 @@ xychart-beta horizontal
 | コードの由来と利用条件 | [出典と利用条件](docs/rights.md)・[第三者通知](THIRD_PARTY_NOTICES.md) |
 | 確認した範囲 | [検証範囲](VALIDATION.md) |
 
-Notebookに比較用音声4件を埋め込み、同じ6秒音声をWAVとして保存しています。データセット・重み・評価器・正解CSVは同梱していません。配布元から取得し、そのパスを指定します。ライセンスと出典は[出典と利用条件](docs/rights.md)を参照してください。
+Notebookに比較用音声4件を埋め込み、同じ6秒音声をWAVとして保存しています。データセット・重み・評価器・正解CSVは同梱していません。配布元から取得し、そのパスを指定します。実録音由来の図・音声は[CC BY-NC-SA 4.0（帰属・加工内容）](notebooks/DATA_ATTRIBUTION.md)です。
 
 一覧とグラフの更新: [手法一覧](configs/readme-methods.csv)に特徴抽出モデル・モデルの追加学習を含む行を追加し、保存結果CSVと固定条件・入力取得・Notebookを指定して `python scripts/update_readme.py` を実行します。同じ比較範囲では同じ結果CSV・固定条件・入力取得を指定し、結果CSVにもスコア行を追加します。異なる比較条件には別の `comparison` を付けます。
 手法のコードと解説は同じ階層に置き、[実装案内](src/asd_min/README.md)へ行を追加します。各回の設定・結果・Notebookはその回の資料として保持し、検証記録は[検証範囲](VALIDATION.md)へ追加します。
