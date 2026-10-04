@@ -40,17 +40,4 @@ Zenodo表示のダウンロード容量はtrain約2.8 GB、test 558.7 MB。ZIP�
 
 重みは約345 MiB。CLIは機種・条件ごとの特徴をメモリに保持します。RAM/VRAMの必要最小値は未測定です。CPUまたはGPUで実行でき、GPU PyTorchの導入は[PyTorch Get Started](https://pytorch.org/get-started/locally/)を参照してください。
 
-## 推論時間の目安
-
-各条件で5機種の正常音5,000件とテスト音1,000件を処理した既存の実測値です。採点時間は含まず、環境が異なる場合の所要時間は保証しません。
-
-| 条件 | 推論時間（秒） |
-|---|---:|
-| B0 | 73.727 |
-| B1 | 70.885 |
-| W1 | 84.277 |
-| SS | 94.937 |
-
-SSの使用機器はNVIDIA RTX PRO 6000 Blackwell Max-Q Workstation Edition、PyTorch 2.7.1+cu128です。B0・B1・W1の保存記録には機器名がありません。全条件のTorch CUDA最大割当量は528,886,272 bytesですが、GPU全体の使用量や必要最小VRAMではありません。
-
 まず `--machine ToothBrush --limit 5` で小規模に実行できます。
