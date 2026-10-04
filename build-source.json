@@ -1,7 +1,11 @@
 {
   "repository": "https://github.com/kasahart/asd-experiments",
-  "source_commit": "1a8e42d09636e3014f3b3e34fea9e51801bd10bd",
-  "app": "apps/02_b0_b1_w1_ss.py",
+  "source_commit": "b6ce25ecf51fead02a55c75225e276e06d4cae8b",
   "marimo": "0.25.1",
-  "export": "static HTML, no included source, no Python runtime"
+  "apps": [
+    {
+      "url": "apps/02-b0-b1-w1-ss/",
+      "source": "apps/02_b0_b1_w1_ss.py"
+    }
+  ]
 }
