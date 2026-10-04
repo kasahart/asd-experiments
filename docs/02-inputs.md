@@ -1,0 +1,43 @@
+# 第2回の入力取得（DCASE 2026 Task 2）
+
+1. [DCASE 2026 Challenge Task 2 Additional Training Dataset](https://zenodo.org/records/20151556)の5機種train ZIPと[DCASE 2026 Challenge Task 2 Evaluation Dataset](https://zenodo.org/records/20437238)の5機種test ZIPを取得し、同じ `eval_data/raw` に展開します。このパスを `--input` に指定します。
+2. [BEATs README](https://github.com/microsoft/unilm/blob/master/beats/README.md)の **Pre-Trained Model / Iter3** を取得し、`--checkpoint` に指定します。
+3. 採点には[dcase2026_task2_evaluator](https://github.com/nttcslab/dcase2026_task2_evaluator)と付属正解を使用しました。再採点時は取得先を `--evaluator` に指定します。評価器は `f6a94a2b5e614a9626c9d1ccff6df0705e6aaa75` にcheckoutし、変更のない状態で使います。依存関係と使い方は[dcase2026_task2_evaluator README](https://github.com/nttcslab/dcase2026_task2_evaluator/blob/f6a94a2b5e614a9626c9d1ccff6df0705e6aaa75/README.md)を参照してください。
+
+```text
+<INPUT>/BlowerDustCollector/{train,test}/*.wav
+<INPUT>/Sander/{train,test}/*.wav
+<INPUT>/SewingMachine/{train,test}/*.wav
+<INPUT>/ToothBrush/{train,test}/*.wav
+<INPUT>/ToyDrone/{train,test}/*.wav
+```
+
+ch0近接/ch1遠方、16 kHz stereo。各機種train1000/test200。正常参照はtrainのみです。音声・重みをrepoへ追加せず、外部取得先のpathを指定します。
+
+## Checksum
+
+以下は2026-10-03にZenodo各配布ページで確認した**ZIPのMD5**です。解凍後WAVのSHA-256とは異なります。配布元が更新された場合は配布元の値を確認してください。
+
+| zip | MD5 |
+|---|---|
+| eval_data_BlowerDustCollector_train.zip | e79342948772cf51e50ff601cd9621f3 |
+| eval_data_Sander_train.zip | 6cbcfbc65a09c4f3d00b9a55c50502ec |
+| eval_data_SewingMachine_train.zip | 74d08cacba3da88753badd69d19e577b |
+| eval_data_ToothBrush_train.zip | 6fa5f81796b5d37b3ed24bb8eff2ea25 |
+| eval_data_ToyDrone_train.zip | af3e4040ef7c67d7ee920608d0c38d82 |
+| eval_data_BlowerDustCollector_test.zip | ec90d56f189e84e6430fb2878c59cb84 |
+| eval_data_Sander_test.zip | 05f81c9a80e91c7b3cea15f8e8559b44 |
+| eval_data_SewingMachine_test.zip | f0a1a96b48006c301e8cec25e9214046 |
+| eval_data_ToothBrush_test.zip | 987395506fbb48c570d5d26babcab05e |
+| eval_data_ToyDrone_test.zip | b36102371c188b630d201d443a00bab2 |
+
+例: `md5sum eval_data_ToothBrush_test.zip`。重みは`sha256sum BEATs_iter3.pt`で確認します。
+CLIが使用するBEATs_iter3.ptのSHA-256は `8d1b234032a9ccff353612dc6c20982346dc2968b205b79d97303eb5e77bfb34`です。
+
+## 容量と計算資源
+
+Zenodo表示のダウンロード容量はtrain約2.8 GB、test 558.7 MB。ZIPと展開音声を同時保持するなら両方の空き容量が必要です。WAV headerの件数・長さから、PCM16 stereoの音声payloadは合計約3.99 GB（3600×10秒、1200×6秒、1200×16秒、16kHz×2ch×2bytes）と算出できます。Python環境・重み・生成物の容量は別途必要です。
+
+重みは約345 MiB。CLIは機種・条件ごとの特徴をメモリに保持します。RAM/VRAMの必要最小値は未測定です。CPUまたはGPUで実行でき、GPU PyTorchの導入は[PyTorch Get Started](https://pytorch.org/get-started/locally/)を参照してください。
+
+使用機器と実測時間は[第2回の検証範囲](02-validation.md)に記載しています。まず `--machine ToothBrush --limit 5` で小規模に実行できます。

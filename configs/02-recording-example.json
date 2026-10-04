@@ -1,0 +1,8 @@
+{
+  "path": "ToothBrush/train/section_00_source_train_normal_0000_noAttribute.wav",
+  "sha256": "f3443e70663d1133c54343104333e999e85a7535bdce48865601ca8df72478cd",
+  "duration_s": 6,
+  "selection": "ToothBrushの正常source training録音をファイル名順に3件確認し、先頭0000を使用。W1の残留量や検知スコアで選んでいない。",
+  "source": "https://zenodo.org/records/20151556",
+  "license": "CC BY-NC-SA 4.0"
+}

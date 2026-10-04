@@ -1,0 +1,34 @@
+{
+  "comparison": "DCASE 2026 Evaluation / BEATs_iter3",
+  "year": 2026,
+  "task": 2,
+  "split": "Evaluation",
+  "metric": "Official score",
+  "scale": "0-100",
+  "source_url": "https://dcase.community/challenge2026/task-first-shot-unsupervised-anomalous-sound-detection-for-machine-condition-monitoring-results",
+  "source_table": "Systems ranking / Evaluation Dataset / Official Score",
+  "checked_on": "2026-10-03",
+  "systems": [
+    {
+      "role": "official_baseline",
+      "label": "DCASE2026_baseline_task2_MSE",
+      "submission_code": "DCASE2026_baseline_task2_MSE",
+      "score": "59.80289616592438",
+      "role_label": "公式ベースライン",
+      "symbol": "BASE"
+    },
+    {
+      "role": "partial_method_reference",
+      "label": "Fujimura_MERL_task2_3",
+      "submission_code": "Fujimura_MERL_task2_3",
+      "score": "70.24115096031407",
+      "relation": "RDPなど集約・採点の一部を参考にしたシステム",
+      "method_source_url": "https://arxiv.org/html/2608.00447v1",
+      "method_source_name": "NA-SSL論文",
+      "role_label": "一部処理の参考元",
+      "symbol": "REF"
+    }
+  ],
+  "note": "本実験はBEATs_iter3を使用。REFはNA-BEATsを使うシステムで、RDPなど一部の処理を参考にしています。",
+  "group_label": "公式ベースライン・参考システム"
+}

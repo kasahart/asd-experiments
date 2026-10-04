@@ -1,21 +1,30 @@
 # Third-party notices
 
-Selected source snapshots and modifications are listed in [docs/rights.md](docs/rights.md) and [docs/import-manifest.json](docs/import-manifest.json).
+Selected source snapshots and modifications are listed in [出典と利用条件](docs/rights.md) and [import-manifest](docs/import-manifest.json).
 
-The research repository combines an ASDKit-derived foundation with later implementation additions. Retained copyright lines are the received license notices; they are not a claim that one person implemented every module.
+The code combines the ASDKit foundation with implementations of BEAM/VarMin, RDP, and W1.
 
-- **ASDKit foundation (`base.py`)**: derived from [TakuyaFujimura/dcase-asd-toolkit](https://github.com/TakuyaFujimura/dcase-asd-toolkit). [licenses/research-MIT.txt](licenses/research-MIT.txt) is byte-identical to the [public upstream LICENSE](https://github.com/TakuyaFujimura/dcase-asd-toolkit/blob/main/LICENSE), including Copyright (c) 2025 Takuya Fujimura.
-- **BEAM/VarMin (`beam.py`)**: a reproduction implementation added by kasahart in the research repository, on that existing foundation. The selected snapshot also includes later detail-returning API extensions. The received research MIT notice is retained; BEAM is not attributed wholesale to the upstream base-module author.
-- **RDP (`pooling.py`)**: a kasahart-added implementation of the published pooling method, selected from a hash-fixed snapshot. The received [licenses/beam-tfattr-MIT.txt](licenses/beam-tfattr-MIT.txt), including Copyright (c) 2025 Takuya Fujimura, is retained unchanged. That notice does not mean the RDP module itself was implemented by Fujimura.
-- BEATs, backbone and modules: Microsoft MIT headers plus research modifications for grid extraction. Retained [BEATs LICENSE](src/asd_min/beats/LICENSE), [NOTICE](src/asd_min/beats/NOTICE.md), and research MIT notice. Three Python files are copied byte-for-byte from the selected research snapshot; package-only `__init__.py` is new and intentionally omits optional training/tokenizer imports.
-- **W1**: waveform.py selects/adapts kasahart-added research operations for joint normalization, Torch STFT/ISTFT and full-recording complex least-squares. The received research MIT notice is retained. Additional validation/loading helpers are companion code.
+- **ASDKit foundation (`base.py`)**: derived from [ASDKit](https://github.com/TakuyaFujimura/dcase-asd-toolkit). [licenses/research-MIT.txt](licenses/research-MIT.txt) is byte-identical to the [ASDKit LICENSE](https://github.com/TakuyaFujimura/dcase-asd-toolkit/blob/main/LICENSE), including Copyright (c) 2025 Takuya Fujimura.
+- **BEAM/VarMin (`beam.py`)**: a reproduction implementation on the ASDKit foundation.  The research MIT notice is retained.
+- **RDP (`pooling.py`)**: an implementation of the RDP method proposed in [Temporal Pooling Strategies論文](https://arxiv.org/html/2603.04605v3), Section III-E. [NA-SSL論文](https://arxiv.org/html/2608.00447v1) is the reference for the adopted `gamma=4` and backend configuration. The received [licenses/beam-tfattr-MIT.txt](licenses/beam-tfattr-MIT.txt), including Copyright (c) 2025 Takuya Fujimura, is retained unchanged.
+- BEATs, backbone and modules: Microsoft MIT headers and an extension for grid extraction. Retained [BEATs LICENSE](src/asd_min/beats/LICENSE), [NOTICE](src/asd_min/beats/NOTICE.md), and research MIT notice. Three Python files are copied byte-for-byte from the selected research snapshot; package-only `__init__.py` is new and intentionally omits optional training/tokenizer imports.
+- **W1**: waveform.py uses joint normalization, Torch STFT/ISTFT and full-recording complex least-squares. The received research MIT notice is retained. Additional validation/loading helpers are companion code.
 
-BEATs reference: Sanyuan Chen et al., *BEATs: Audio Pre-Training with Acoustic Tokenizers*, ICML 2023, https://proceedings.mlr.press/v202/chen23ag.html . BEAM method reference: Takuya Fujimura et al., *The MERL Systems for DCASE 2026 Challenge Task 2*, https://www.merl.com/publications/docs/TR2026-100.pdf . This code does not reproduce MERL's complete winning system.
+New companion CLI, notebook code and explanatory text, and documentation are licensed under the root MIT LICENSE, Copyright (c) 2026 kasahart. The dataset-derived figures and embedded audio in notebook section 3 are excluded from MIT and distributed under CC BY-NC-SA 4.0; see [data attribution and modifications](notebooks/DATA_ATTRIBUTION.md). Third-party LICENSE/NOTICE texts are retained.
 
-New companion CLI, notebook and documentation are licensed under the root MIT LICENSE, Copyright (c) 2026 kasahart, as selected by the owner. Third-party copyright and MIT/NOTICE terms are retained without reassignment. Data, pretrained weights, evaluator and truth are external; the root MIT license grants no rights to those assets.
+SS implements the magnitude equation in [Chu・Qian技術報告](https://dcase.community/documents/challenge2026/technical_reports/DCASE2026_Qian_65_t2.pdf), Section 2.1.
 
-SS is a new MIT companion implementation of the magnitude equation described by Fan Chu and Mengui Qian, *Anomalous Sound Detection System for DCASE 2026 Task 2 Using Dual-Channel Spectral Subtraction and Efficient Audio Transformer*, Section 2.1, https://dcase.community/documents/challenge2026/technical_reports/DCASE2026_Qian_65_t2.pdf . No report PDF, team source implementation, model or weights are copied. Local STFT boundary choices are documented separately; this is not the full team's detector.
+## 参考文献
 
-## Implementation provenance and licensing are separate records
+本文の短名と正式タイトルは次の対応です。
 
-The research history records kasahart additions for BEAM/VarMin (`25c7d813`, 2026-08-08), patch-grid extraction and frequency pooling (`9a739900`, 2026-08-08), and W1 waveform diagnostics (`de3a8206`, 2026-08-12). The research source is private; [the public module guide](src/asd_min/README.md) explains the used code without requiring access. These history entries document implementation provenance; commit authorship alone is not a determination of legal ownership. The root MIT applies to the owner-selected new companion code and documents, while the received upstream MIT/NOTICE texts are preserved separately. No original copyright text is removed or reassigned.
+| 短名 | 正式タイトル |
+|---|---|
+| [BEATs論文](https://proceedings.mlr.press/v202/chen23ag.html) | BEATs: Audio Pre-Training with Acoustic Tokenizers |
+| [BEAM論文](https://arxiv.org/html/2603.13749) | Sub-Band Spectral Matching with Localized Score Aggregation for Robust Anomalous Sound Detection |
+| [VarMin論文](https://dcase.community/documents/workshop2025/proceedings/DCASE2025Workshop_Matsumoto_12.pdf) | Adjusting Bias in Anomaly Scores via Variance Minimization for Domain-Generalized Discriminative Anomalous Sound Detection |
+| [Temporal Pooling Strategies論文](https://arxiv.org/html/2603.04605v3) | Temporal Pooling Strategies for Training-Free Anomalous Sound Detection with Self-Supervised Audio Embeddings |
+| [NA-SSL論文](https://arxiv.org/html/2608.00447v1) | Anomalous Sound Detection Meets Noise-Aware Self-Supervised Learning |
+| [MERL技術報告](https://www.merl.com/publications/docs/TR2026-100.pdf) | The MERL Systems for DCASE 2026 Challenge Task 2 |
+| [Ozeki技術報告](https://dcase.community/documents/challenge2026/technical_reports/DCASE2026_Ozeki_101_t2.pdf) | Anomalous Sound Detection Method with Simple Noise Reduction |
+| [Chu・Qian技術報告](https://dcase.community/documents/challenge2026/technical_reports/DCASE2026_Qian_65_t2.pdf) | Anomalous Sound Detection System for DCASE 2026 Task 2 Using Dual-Channel Spectral Subtraction and Efficient Audio Transformer |

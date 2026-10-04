@@ -52,10 +52,34 @@ def condition_audio(wave, condition):
     raise ValueError(condition)
 
 
+SYNTHETIC_PARAMETERS = {
+    'sample_rate': 16000, 'duration': 1.0,
+    'noise': {'frequency': 1000, 'amplitude': .6,
+              'near_gain': .25, 'near_delay_ms': .8, 'far_gain': .75, 'far_delay_ms': 0.0},
+    'machine': {'frequency': 1900, 'amplitude': .6,
+                'near_gain': 1.0, 'near_delay_ms': 0.0, 'far_gain': .3, 'far_delay_ms': .8},
+}
+
+
+def synthetic_components():
+    """Two sources enter both microphones with distinct fixed gains and relative delays."""
+    p = SYNTHETIC_PARAMETERS
+    t = np.arange(int(p['sample_rate'] * p['duration']), dtype=np.float64) / p['sample_rate']
+    parts = {}
+    for role in ('noise', 'machine'):
+        source = p[role]
+        angle = 2 * np.pi * source['frequency'] * t
+        for microphone in ('near', 'far'):
+            parts[microphone + '_' + role] = (source['amplitude'] * source[microphone + '_gain']
+                                             * np.sin(angle - 2 * np.pi * source['frequency']
+                                                      * source[microphone + '_delay_ms'] / 1000))
+    return parts
+
+
 def synthetic():
-    t = np.arange(16000, dtype=np.float64) / 16000
-    return np.stack([.8*np.sin(2*np.pi*1000*t+.65)+.12*np.sin(2*np.pi*1900*t),
-                     .4*np.sin(2*np.pi*1000*t)]).astype(np.float32)
+    parts = synthetic_components()
+    return np.stack([parts['near_machine'] + parts['near_noise'],
+                     parts['far_machine'] + parts['far_noise']]).astype(np.float32)
 
 
 SS_PARAMETERS = {

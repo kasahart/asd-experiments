@@ -8,7 +8,7 @@ from asd_min.beam import BEAMVarianceMin
 
 
 def test_w1_silence_far_zero_and_scale():
-    x=synthetic()
+    x=np.random.default_rng(7).normal(0,.2,(2,16000)).astype(np.float32)
     np.testing.assert_array_equal(w1(np.zeros_like(x)),np.zeros(x.shape[1],np.float32))
     nofar=np.stack([x[0],np.zeros_like(x[0])])
     np.testing.assert_allclose(w1(nofar),x[0],atol=3e-7,rtol=2e-6)
@@ -66,3 +66,34 @@ def test_ss_waveform_contract():
     assert len(ss(x))==x.shape[1]
     np.testing.assert_allclose(ss(x*2),ss(x)*2,atol=5e-7,rtol=3e-6)
     assert np.isfinite(ss(x)).all()
+
+def test_notebook_rejects_wrong_recording_before_read(tmp_path):
+    import json
+    import hashlib
+    source = json.loads((Path(__file__).resolve().parents[1] /
+                         'notebooks/02_b0_b1_w1_ss.ipynb').read_text())
+    cell = next(c for c in source['cells'] if c['cell_type']=='code' and
+                'example = json.loads' in ''.join(c['source']))
+    (tmp_path / 'configs').mkdir()
+    (tmp_path / 'configs/02-recording-example.json').write_text(
+        json.dumps({'path': 'same-name.wav', 'sha256': '0'*64}))
+    (tmp_path / 'eval_data/raw').mkdir(parents=True)
+    (tmp_path / 'eval_data/raw/same-name.wav').write_bytes(b'wrong recording')
+    class UnexpectedRead:
+        def read(self, path):
+            raise AssertionError('Must reject before loading')
+    import os
+    from unittest.mock import patch
+    with patch.dict(os.environ, {}, clear=True):
+        with pytest.raises(ValueError, match='SHA-256'):
+            exec(''.join(cell['source']), {'ROOT': tmp_path, 'Path': Path,
+                 'json': json, 'hashlib': hashlib, 'os': os, 'wd': UnexpectedRead()})
+
+
+def test_notebook_license_metadata_scopes_embedded_outputs():
+    import json
+    n = json.loads((Path(__file__).resolve().parents[1] /
+                    'notebooks/02_b0_b1_w1_ss.ipynb').read_text())
+    assert 'license' not in n['metadata']
+    assert n['metadata']['licenses']['code_and_text'] == 'MIT'
+    assert n['metadata']['licenses']['section_3_data_figures_and_embedded_audio'] == 'CC-BY-NC-SA-4.0'

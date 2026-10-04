@@ -1,73 +1,73 @@
 # ASD experiments — Zenn連載の実験入口
 
-[第1回](https://zenn.dev/kasahart/articles/kasahart-20260919-dcase2026-asd-01)と[第2回草稿 PR #9](https://github.com/kasahart/zenn/pull/9)の読者向けの実験コードです。今回の対象は B0（近接）、B1（遠方）、W1（複素線形減算）、SS（式1のスペクトル減算）です。
+Zennの異常音検知（ASD）連載に対応する実験コードとNotebookです。手法・結果・解説を以下の表から参照できます。
 
-## GitHubで読むだけ
+<!-- experiments:start -->
 
-まず[第2回Notebook](notebooks/02_b0_b1_w1_ss.ipynb)を開いてください。保存済みの表と図を、**4条件の紹介 → 結果の読み方 → 合成図の見どころ**の順に読めます。インストールや音声・重みの取得は不要です。試聴・再実行はNotebook後半の任意操作です。GitHubでは静的な表と図を読む構成です。
+## 手法
 
-記事の既存報告は **B0 62.841 / B1 58.362 / W1 66.835**。これらは元の既存報告値です。このコピーの全件GPU再推論では保存異常度と最大差4.85e-8、順位・判定一致を確認し、固定公式evaluatorのローカル再採点でも主要指標が一致しました。今回新たに測定した **SSは62.325（B0比−0.516ポイント）** で、総合改善はありません。[4条件の保存表](results/summary-with-ss.csv)と[SS実験記録](docs/ss-validation.md)を参照してください。外部の独立追試とは主張しません。
+### DCASE 2026 Evaluation / BEATs_iter3
 
-## 実装を理解する
+[Notebook](notebooks/02_b0_b1_w1_ss.ipynb)
 
-[今回の自前実装と既存手法の対応](src/asd_min/README.md)で、BEATsのgrid抽出拡張、RDP、BEAM＋VarMin、W1、SS、共通runnerを解説しています。目的・入出力・直感・最小限の式と設定を、公開コードと出典に対応付けています。論文手法の再実装と独自の比較用コードを区別し、privateの元repoへアクセスできなくても読める説明です。
+| 手法 | 特徴 | 特徴抽出モデル | モデルの追加学習 | 参考文献 |
+|---|---|---|---|---|
+| B0 | 近接マイク | BEATs_iter3 | なし（重み固定） | — |
+| B1 | 遠方マイク | BEATs_iter3 | なし（重み固定） | — |
+| W1 | 振幅と位相を合わせて減算 | BEATs_iter3 | なし（重み固定） | [Ozeki技術報告](https://dcase.community/documents/challenge2026/technical_reports/DCASE2026_Ozeki_101_t2.pdf)（同形の減算） |
+| SS | 振幅スペクトル減算 | BEATs_iter3 | なし（重み固定） | [Chu・Qian技術報告](https://dcase.community/documents/challenge2026/technical_reports/DCASE2026_Qian_65_t2.pdf)（式1） |
 
-## 自分で実行する
+#### 公式ベースライン・参考システム
 
-| やりたいこと | 入口 | 必要なもの |
-|---|---|---|
-| 保存結果を読む | `python -m asd_min.cli results` / Notebookの表 | 音声・重み不要 |
-| 合成音で可視化・手動試聴 | [Notebook](notebooks/02_b0_b1_w1_ss.ipynb) | Wandas 0.8.0、CPU |
-| 保存異常度を公式再採点 | `evaluate`、[権利条件](docs/rights.md) | 読者取得のevaluator・正解、使用条件の確認が前提 |
-| 生音声から再推論 | `infer`、[入力取得](docs/inputs.md) | 公式音声とBEATs_iter3を読者が取得 |
+| 記号 | 役割 | システム | 参考文献 |
+|---|---|---|---|
+| BASE | 公式ベースライン | DCASE2026_baseline_task2_MSE | — |
+| REF | 一部処理の参考元 | Fujimura_MERL_task2_3 | [NA-SSL論文](https://arxiv.org/html/2608.00447v1) |
 
-Linux / Python 3.12 CPUで小規模検証しました。リポジトリをcloneまたはZIP取得してから、以下をそのルートで実行します。
+本実験はBEATs_iter3を使用。REFはNA-BEATsを使うシステムで、RDPなど一部の処理を参考にしています。
 
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-python -m pip install torch==2.7.1 torchaudio==2.7.1 --index-url https://download.pytorch.org/whl/cpu
-python -m pip install -e '.[notebook]'
-python -m asd_min.cli results
-# Notebookを実行するには、別途JupyterLabまたはVS CodeのJupyter機能を使用。
-# この.venvのPython kernelを選択する。
-# Jupyterで notebooks/02_b0_b1_w1_ss.ipynb を開く（自動再生なし）
+## スコア
+
+総合スコアは高いほど良く、本実験の手法はスコア順に並べています。
+
+### DCASE 2026 Evaluation / BEATs_iter3
+
+[固定条件](docs/02-protocol.md) · [入力取得](docs/02-inputs.md) · [総合値](results/02-summary.csv)
+
+青：本実験／灰：公式・参考値（異なるモデル）。
+
+```mermaid
+---
+config:
+    xyChart:
+        width: 480
+        height: 380
+        showDataLabel: true
+    themeVariables:
+        xyChart:
+            plotColorPalette: "#2458a6"
+    themeCSS: ".bar-plot-0 rect:nth-child(n+5) { fill: #9099a5; }"
+---
+xychart-beta horizontal
+    x-axis ["W1", "B0", "SS", "B1", "BASE", "REF"]
+    y-axis "Official score" 0 --> 100
+    bar [66.835, 62.841, 62.325, 58.362, 59.803, 70.241]
 ```
 
-Notebookの既定実行は保存表と合成デモだけです。音声再生ボタンは `ENABLE_AUDIO=True` で生成し、読者が手動で押します。実データ・推論・採点は別セルで明示的に有効化します。
+出典: [DCASE 2026 Task 2 Results](https://dcase.community/challenge2026/task-first-shot-unsupervised-anomalous-sound-detection-for-machine-condition-monitoring-results) · [システム名・参考値](results/02-challenge-references.json)
 
-```bash
-# パスは読者の取得先へ置き換える。dry-runは件数確認で重みをロードしない。
-python -m asd_min.cli infer --input /path/to/eval_data/raw \
-  --checkpoint /path/to/BEATs_iter3.pt --output outputs/part02 --dry-run
-# 1機種各5件のsmoke（記事スコアにはならない）
-python -m asd_min.cli infer --input /path/to/eval_data/raw \
-  --checkpoint /path/to/BEATs_iter3.pt --output outputs/smoke \
-  --machine ToothBrush --limit 5 --device cpu
-# 全5機種、各train1000/test200。4条件を明示。時間と資源を確認してから実行。
-python -m asd_min.cli infer --input /path/to/eval_data/raw \
-  --checkpoint /path/to/BEATs_iter3.pt --output outputs/part02 --conditions b0 b1 w1 ss --device cpu
-```
+<!-- experiments:end -->
 
-`infer`は条件別に正常参照を再構築し、匿名テスト名を保持した公式形式CSVを作ります。生音声や処理済み音声を保存しません。正常trainスコアと90%点閾値、入力SHA-256、実測時間をローカル出力に保存します。既存出力は上書きしません。`--limit`や`--machine`付き出力は公式全5機種スコアとして再採点できません。
+## 使い方と資料
 
-```bash
-# 使用条件を自分で確認・解決した読者のみ。flagは許諾や契約同意を取得する機能ではない。
-python -m asd_min.cli evaluate --system results/b0 \
-  --evaluator /path/to/official-evaluator --output outputs/rescore-b0 --terms-reviewed
-# b1、w1、ssも別の出力先で行う
-```
+| 調べたいこと | 入口 |
+|---|---|
+| 計算の仕組み | [実装案内](src/asd_min/README.md) |
+| CLIの実行・再採点 | [runner解説](src/asd_min/runner.md#cliを使う) |
+| コードの由来と利用条件 | [出典と利用条件](docs/rights.md)・[第三者通知](THIRD_PARTY_NOTICES.md) |
+| 確認した範囲 | [検証範囲](VALIDATION.md) |
 
-[固定条件](docs/protocol.md)、[出典・権利](docs/rights.md)、[検証範囲](VALIDATION.md)を参照してください。採点ライブラリの独立環境依存はevaluator公式案内に従って確認してください。取得経路があることだけで利用条件が解決したとは扱いません。
+Notebookに比較用音声4件を埋め込んでいます。データセット・重み・評価器・正解CSVは同梱していません。配布元から取得し、そのパスを指定します。ライセンスと出典は[出典と利用条件](docs/rights.md)を参照してください。
 
-```text
-src/asd_min/        CLIとNotebookが共有する最小計算核
-notebooks/         各回の入口（今回は02のみ）
-results/           B0/B1/W1の既存報告、SS新規結果と保存異常度
-licenses/          選択して移した第三者コードの条件
-docs/             取得・固定条件・出典（研究原本や私的履歴なし）
-```
-
-新規CLI・Notebook・説明文は[MIT](LICENSE)（Copyright 2026 kasahart）です。第三者部分は元の著作権表示・MIT/NOTICEを保持しています。音声データ・checkpoint・evaluator・正解の利用条件はroot MITの対象に含めません。Dis-BEATs、DNN、ensemble、UI、全5回原本、公式evaluator、正解CSV、音声、重みは同梱しません。
-
-SSの固定条件・検証範囲は[SS検証記録](docs/ss-validation.md)と[config](configs/02_ss.json)へ。SS全5機種6000音の抽出・採点はRTX PRO6000で94.94秒でした（checkpoint初期化・入力hash確認を除く）。読者環境の所要時間や最低機器要件を保証する値ではありません。BEATs公式project MITに沿ったローカル推論と、checkpoint再配布の確認は区別します。
+一覧とグラフの更新: [手法一覧](configs/readme-methods.csv)に特徴抽出モデル・モデルの追加学習を含む行を追加し、保存結果CSVと固定条件・入力取得・Notebookを指定して `python scripts/update_readme.py` を実行します。同じ比較範囲では同じ結果CSV・固定条件・入力取得を指定し、結果CSVにもスコア行を追加します。異なる比較条件には別の `comparison` を付けます。
+手法のコードと解説は同じ階層に置き、[実装案内](src/asd_min/README.md)へ行を追加します。各回の設定・結果・Notebookはその回の資料として保持し、検証記録は[検証範囲](VALIDATION.md)へ追加します。
