@@ -6,7 +6,7 @@
 
 `run()`は各条件・機種で、train/testの波形処理→特徴抽出→正常参照構築→異常度出力を同じ順序で行います。正常trainの再採点では同一pathの自己参照を除き、その異常度の90%点を閾値として、厳密に`score > threshold`なら異常判定を出します。閾値はAUC/pAUCの順位比較とは別の、判定CSVを作るための設定です。
 
-BEATs重みのSHA-256、train/test件数と匿名テスト名を確認し、既存出力を上書きしません。入力hash・時間・正常trainスコア・閾値をローカルに記録します。実録音の再描画も同じ`condition_audio()`を呼び、Wandasで図を作ります。
+BEATs重みの互換性、train/test件数と匿名テスト名を確認し、既存出力を上書きしません。入力hash・時間・正常trainスコア・閾値をローカルに記録します。実録音の再描画も同じ`condition_audio()`を呼び、Wandasで図を作ります。
 
 
 入力計画は`plan()`、特徴抽出は`Encoder.extract()`、全体実行は`run()`です。CLIの`results`は保存表の閲覧、`infer`は生音声からの再推論、`evaluate`は指定した固定版の評価器による保存異常度の採点です。

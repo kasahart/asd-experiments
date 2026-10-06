@@ -1,0 +1,28 @@
+# ASDKit由来の変更設定。既定のseed=1234・dcase2026・name=asd03を指定。
+# 参照元: https://github.com/TakuyaFujimura/dcase-asd-toolkit/blob/7601d673ef2ed5a2424965cac755365cf7112c5f/config/train/main.yaml
+# 原MIT通知: licenses/research-MIT.txt（リポジトリルート基準）。
+defaults:
+  - _self_
+  - datamodule: null
+  - frontend: null
+  - trainer: null
+  - callback: default
+  - experiments: null
+
+
+seed: 1234
+dcase: dcase2026
+name: asd03
+version: null
+result_dir: "./results"
+data_dir: "../data"
+
+label_dict_path: {}
+
+machine: null
+model_ver: null
+
+
+hydra:
+  run:
+    dir: ${result_dir}/${name}/${dcase}/${version}/${seed}/model/${model_ver}

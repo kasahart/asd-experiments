@@ -13,7 +13,6 @@ from .beam import BEAMVarianceMin
 from .pooling import frequency_pooling, sequence_to_time_frequency
 
 MACHINES = ('BlowerDustCollector', 'Sander', 'SewingMachine', 'ToothBrush', 'ToyDrone')
-CHECKPOINT_SHA256 = '8d1b234032a9ccff353612dc6c20982346dc2968b205b79d97303eb5e77bfb34'
 
 
 def digest(path):
@@ -44,13 +43,14 @@ def plan(root, machines=MACHINES, limit=None):
 
 
 class Encoder:
-    def __init__(self, checkpoint, device='cpu'):
+    def __init__(self, checkpoint, device='cpu', update_cfg=None):
         from .beats.BEATs import BEATs, BEATsConfig
-        if digest(checkpoint) != CHECKPOINT_SHA256:
-            raise ValueError('Expected article BEATs_iter3 checkpoint SHA-256')
         # Official checkpoint contains config dictionaries and tensors only.
         payload = torch.load(checkpoint, map_location='cpu', weights_only=True)
-        self.model = BEATs(BEATsConfig(payload['cfg']))
+        cfg = BEATsConfig(payload['cfg'])
+        if update_cfg:
+            cfg.update(update_cfg)
+        self.model = BEATs(cfg)
         self.model.load_state_dict(payload['model'], strict=True)
         if self.model.predictor is not None: raise ValueError('Frozen sequence BEATs required')
         self.model.to(device).eval().requires_grad_(False)
@@ -77,7 +77,7 @@ def run(root, checkpoint, output, conditions=('b0','b1','w1','ss'), device='cpu'
     if str(device).startswith('cuda'): torch.cuda.reset_peak_memory_stats(device)
     output.mkdir(parents=True)
     receipt = {'status':'running','mode':'smoke_not_article_score' if limit else 'full',
-               'conditions':list(conditions),'checkpoint_sha256':CHECKPOINT_SHA256,
+               'conditions':list(conditions),'checkpoint_sha256':digest(checkpoint),
                'torch':torch.__version__,'device':device,'input_sha256':{},'timings_seconds':{}}
     start = time.perf_counter()
     try:
@@ -98,11 +98,10 @@ def run(root, checkpoint, output, conditions=('b0','b1','w1','ss'), device='cpu'
                 backend.fit(features['train'])
                 train = backend.anomaly_score(features['train'])['main']
                 test = backend.anomaly_score(features['test'])['main']
-                threshold = float(np.quantile(train,.9,method='linear'))
+                from .evaluation import decisions_from_normal, write_submission
+                threshold, decisions = decisions_from_normal(train, test)
                 folder = output/condition; folder.mkdir(exist_ok=True)
-                for prefix, values in [('anomaly_score',test),('decision_result',(test > threshold).astype(int))]:
-                    with (folder/f'{prefix}_{machine}_section_00_test.csv').open('w',newline='') as f:
-                        csv.writer(f).writerows(zip(features['test']['path'],values.tolist()))
+                write_submission(folder, machine, features['test']['path'], test.tolist(), decisions.tolist())
                 with (folder/f'{machine}_train_score.csv').open('w',newline='') as f:
                     writer=csv.writer(f);writer.writerow(['filename','score']);writer.writerows(zip(features['train']['path'],train.tolist()))
                 (folder/f'{machine}_threshold.json').write_text(json.dumps({'q90':threshold})+'\n')
