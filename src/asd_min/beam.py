@@ -1,3 +1,4 @@
+# Research-derived; original MIT notice: licenses/research-MIT.txt
 """Band-wise Equalized Anomaly Measure with variance-minimum rescaling."""
 
 import logging
@@ -7,7 +8,6 @@ from typing import Any, Dict, Optional, Tuple
 
 import numpy as np
 
-from .base import BaseBackend
 
 logger = logging.getLogger(__name__)
 
@@ -245,7 +245,7 @@ class _BandMemory:
     alpha: np.ndarray
 
 
-class BEAMVarianceMin(BaseBackend):
+class BEAMVarianceMin:
     """BEAM backend with optional per-band variance-minimum score rescaling.
 
     The canonical reproduction assumes TrainAll leave-one-out calibration and a

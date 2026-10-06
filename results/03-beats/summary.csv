@@ -1,0 +1,9 @@
+split,detector,condition,official_score
+development,raw-BEATs,raw,61.32460384997094
+evaluation,raw-BEATs,raw,62.841128282372104
+development,raw-BEATs,w1_global,67.4800817922021
+evaluation,raw-BEATs,w1_global,66.83499584355611
+development,dis-BEATs,raw,63.04799147759941
+evaluation,dis-BEATs,raw,67.91591003652935
+development,dis-BEATs,w1_global,69.52825999893302
+evaluation,dis-BEATs,w1_global,70.65872019587287

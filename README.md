@@ -26,6 +26,34 @@ Zennの異常音検知（ASD）連載に対応する実験コードとmarimoア�
 
 本実験はBEATs_iter3を使用。REFはNA-BEATsを使うシステムで、RDPなど一部の処理を参考にしています。
 
+### DCASE 2026 Development / 固定BEATs（第3回）
+
+| 手法 | 特徴 | 特徴抽出モデル | モデルの追加学習 | 参考文献 |
+|---|---|---|---|---|
+| B0 | 近接マイク | BEATs_iter3 | なし（重み固定） | — |
+| W1 | 全区間の複素線形減算 | BEATs_iter3 | なし（重み固定） | — |
+
+### DCASE 2026 Development / BEATs追加学習（第3回）
+
+| 手法 | 特徴 | 特徴抽出モデル | モデルの追加学習 | 参考文献 |
+|---|---|---|---|---|
+| B0 | 近接マイク | BEATs_iter3 + LoRA | 正常12,000音・25epoch | — |
+| W1 | 全区間の複素線形減算 | BEATs_iter3 + LoRA | 正常12,000音・25epoch | — |
+
+### DCASE 2026 Evaluation / 固定BEATs（第3回）
+
+| 手法 | 特徴 | 特徴抽出モデル | モデルの追加学習 | 参考文献 |
+|---|---|---|---|---|
+| B0 | 近接マイク | BEATs_iter3 | なし（重み固定） | — |
+| W1 | 全区間の複素線形減算 | BEATs_iter3 | なし（重み固定） | — |
+
+### DCASE 2026 Evaluation / BEATs追加学習（第3回）
+
+| 手法 | 特徴 | 特徴抽出モデル | モデルの追加学習 | 参考文献 |
+|---|---|---|---|---|
+| B0 | 近接マイク | BEATs_iter3 + LoRA | 正常12,000音・25epoch | — |
+| W1 | 全区間の複素線形減算 | BEATs_iter3 + LoRA | 正常12,000音・25epoch | — |
+
 ## スコア
 
 総合スコアは高いほど良く、本実験の手法はスコア順に並べています。
@@ -56,7 +84,113 @@ xychart-beta horizontal
 
 出典: [DCASE 2026 Task 2 Results](https://dcase.community/challenge2026/task-first-shot-unsupervised-anomalous-sound-detection-for-machine-condition-monitoring-results) · [システム名・参考値](results/02-challenge-references.json)
 
+### DCASE 2026 Development / 固定BEATs（第3回）
+
+[固定条件](reproduction/asd03/README.md#入力と固定条件) · [入力取得](reproduction/asd03/README.md#入力の取得と配置) · [総合値](results/03-beats/summary.csv)
+
+青：本実験。
+
+```mermaid
+---
+config:
+    xyChart:
+        width: 480
+        height: 180
+        showDataLabel: true
+    themeVariables:
+        xyChart:
+            plotColorPalette: "#2458a6"
+---
+xychart-beta horizontal
+    x-axis ["W1", "B0"]
+    y-axis "Official score" 0 --> 100
+    bar [67.480, 61.325]
+```
+
+### DCASE 2026 Development / BEATs追加学習（第3回）
+
+[固定条件](reproduction/asd03/README.md#入力と固定条件) · [入力取得](reproduction/asd03/README.md#入力の取得と配置) · [総合値](results/03-beats/summary.csv)
+
+青：本実験。
+
+```mermaid
+---
+config:
+    xyChart:
+        width: 480
+        height: 180
+        showDataLabel: true
+    themeVariables:
+        xyChart:
+            plotColorPalette: "#2458a6"
+---
+xychart-beta horizontal
+    x-axis ["W1", "B0"]
+    y-axis "Official score" 0 --> 100
+    bar [69.528, 63.048]
+```
+
+### DCASE 2026 Evaluation / 固定BEATs（第3回）
+
+[固定条件](reproduction/asd03/README.md#入力と固定条件) · [入力取得](reproduction/asd03/README.md#入力の取得と配置) · [総合値](results/03-beats/summary.csv)
+
+青：本実験。
+
+```mermaid
+---
+config:
+    xyChart:
+        width: 480
+        height: 180
+        showDataLabel: true
+    themeVariables:
+        xyChart:
+            plotColorPalette: "#2458a6"
+---
+xychart-beta horizontal
+    x-axis ["W1", "B0"]
+    y-axis "Official score" 0 --> 100
+    bar [66.835, 62.841]
+```
+
+### DCASE 2026 Evaluation / BEATs追加学習（第3回）
+
+[固定条件](reproduction/asd03/README.md#入力と固定条件) · [入力取得](reproduction/asd03/README.md#入力の取得と配置) · [総合値](results/03-beats/summary.csv)
+
+青：本実験。
+
+```mermaid
+---
+config:
+    xyChart:
+        width: 480
+        height: 180
+        showDataLabel: true
+    themeVariables:
+        xyChart:
+            plotColorPalette: "#2458a6"
+---
+xychart-beta horizontal
+    x-axis ["W1", "B0"]
+    y-axis "Official score" 0 --> 100
+    bar [70.659, 67.916]
+```
+
 <!-- experiments:end -->
+
+## 実行環境
+
+依存関係は[pyproject.toml](pyproject.toml)で管理します。共通の`.venv`を使い、推論は基本依存、学習は`training`、アプリは`app`、表示は`visualization`、公式評価器の実行依存は`evaluation`、テストは`test`を追加します。学習にはPython3.11を使います。
+
+```bash
+python3.11 -m venv .venv
+.venv/bin/python -m pip install torch==2.7.1 torchaudio==2.7.1 torchvision==0.22.1 --index-url https://download.pytorch.org/whl/cu128
+.venv/bin/python -m pip install -e '.[training,app,visualization,evaluation,test]'
+.venv/bin/python reproduction/asd03/runtime.py install
+.venv/bin/python -m pip check
+```
+
+CPU環境は上のPyTorch配布先を`https://download.pytorch.org/whl/cpu`に変更します。[公式PyTorch 2.7.1構成](https://pytorch.org/get-started/previous-versions/)に合わせ、Torch・TorchAudio・TorchVisionを同じ配布先から導入します。推論だけなら`pip install -e .`で導入できます。最後の`runtime.py install`は[固定ASDKit archive](reproduction/asd03/upstream.lock.json)を仮想環境内へ取得してeditable導入する処理です。upstreamの必須モジュールがwheelに含まれないため、この方式を使い、Git・clone・checkout操作を不要にしています。
 
 ## 使い方と資料
 

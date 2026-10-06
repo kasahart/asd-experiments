@@ -58,7 +58,7 @@ def render(root):
         apps = {m['app_path'] for m in entries}
         common_app = len(apps) == 1
         lines += ['', f'### {group}', '']
-        if common_app:
+        if common_app and next(iter(apps)):
             lines += [f'[marimoアプリ]({next(iter(apps))})', '']
         lines += ['| 手法 | 特徴 | 特徴抽出モデル | モデルの追加学習 | 参考文献 |' + ('' if common_app else ' marimoアプリ |'),
                   '|---|---|---|---|---|' + ('' if common_app else '---|')]
@@ -69,9 +69,10 @@ def render(root):
                 reference = f"[{method['reference_name']}]({method['reference_url']})"
                 if method.get('reference_note'):
                     reference += f"（{method['reference_note']}）"
-            row = f"| {method['condition'].upper()} | {feature} | {method['feature_model']} | {method['model_training']} | {reference} |"
+            symbol = method.get('symbol') or method['condition'].upper()
+            row = f"| {symbol} | {feature} | {method['feature_model']} | {method['model_training']} | {reference} |"
             if not common_app:
-                row += f" [marimoアプリ]({method['app_path']}) |"
+                row += (f" [marimoアプリ]({method['app_path']}) |" if method['app_path'] else " — |")
             lines.append(row)
         references = references_for(root, entries)
         if references:
@@ -84,11 +85,21 @@ def render(root):
             lines += ['', references['note']]
     lines += ['', '## スコア', '', '総合スコアは高いほど良く、本実験の手法はスコア順に並べています。']
     for group, entries in groups.items():
-        sources = {(m['summary_path'], m['protocol_path'], m['inputs_path'], m.get('references_path', '')) for m in entries}
+        sources = {(m['summary_path'], m['protocol_path'], m['inputs_path'], m.get('references_path', ''),
+                    m.get('split', ''), m.get('detector', ''), m.get('score_multiplier') or '100') for m in entries}
         if len(sources) != 1:
             raise ValueError(f'{group}: use one result source, protocol and input guide per comparison')
-        summary_path, protocol_path, inputs_path, references_path = sources.pop()
-        scores = {row['condition']: Decimal(row['official_score']) * 100 for row in rows(root / summary_path)}
+        summary_path, protocol_path, inputs_path, references_path, split, detector, multiplier = sources.pop()
+        selected = [row for row in rows(root / summary_path)
+                    if (not split or row.get('split') == split) and (not detector or row.get('detector') == detector)]
+        if len({row['condition'] for row in selected}) != len(selected):
+            raise ValueError(f'{group}: ambiguous summary rows; specify split and detector')
+        scale = Decimal(multiplier)
+        if scale not in {Decimal(1), Decimal(100)}:
+            raise ValueError(f'{group}: score_multiplier must be 1 or 100')
+        scores = {row['condition']: Decimal(row['official_score']) * scale for row in selected}
+        if any(not value.is_finite() or not 0 <= value <= 100 for value in scores.values()):
+            raise ValueError(f'{group}: expected finite 0–100 scores')
         conditions = [m['condition'] for m in entries]
         if len(set(conditions)) != len(conditions):
             raise ValueError(f'{group}: duplicate method')
@@ -96,9 +107,12 @@ def render(root):
         ordered = sorted(conditions, key=lambda condition: (-scores[condition], condition))
         systems = references.get('systems', [])
         symbols = [system['symbol'] for system in systems]
-        if len(set(symbols)) != len(symbols) or set(symbols) & {c.upper() for c in conditions}:
+        method_symbols = {m['condition']: m.get('symbol') or m['condition'].upper() for m in entries}
+        if len(set(method_symbols.values())) != len(conditions):
+            raise ValueError(f'{group}: duplicate method symbol')
+        if len(set(symbols)) != len(symbols) or set(symbols) & set(method_symbols.values()):
             raise ValueError(f'{group}: duplicate chart symbol')
-        labels = [c.upper() for c in ordered] + symbols
+        labels = [method_symbols[c] for c in ordered] + symbols
         values = [scores[c] for c in ordered] + [Decimal(system['score']) for system in systems]
         lines += ['', f'### {group}', '',
                   f'[固定条件]({protocol_path}) · [入力取得]({inputs_path}) · [総合値]({summary_path})', '',
