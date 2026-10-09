@@ -5,7 +5,7 @@ Source attribution and modifications are listed below; see [出典と利用条�
 The code combines the ASDKit foundation with implementations of BEAM/VarMin, RDP, and W1.
 
 - **ASDKit foundation (`base.py`)**: derived from [ASDKit](https://github.com/TakuyaFujimura/dcase-asd-toolkit). [licenses/research-MIT.txt](licenses/research-MIT.txt) is byte-identical to the [ASDKit LICENSE](https://github.com/TakuyaFujimura/dcase-asd-toolkit/blob/main/LICENSE), including Copyright (c) 2025 Takuya Fujimura.
-- **BEAM/VarMin (`beam.py`)**: a reproduction implementation on the ASDKit foundation.  The research MIT notice is retained.
+- **BEAM/VarMin (`beam.py`, `varmin.py`, `band_distance.py`)**: a reproduction implementation on the ASDKit foundation.  The research MIT notice is retained.
 - **RDP (`pooling.py`)**: an implementation of the RDP method proposed in [Temporal Pooling Strategies論文](https://arxiv.org/html/2603.04605v3), Section III-E. [NA-SSL論文](https://arxiv.org/html/2608.00447v1) is the reference for the adopted `gamma=4` and backend configuration.
 - BEATs, backbone and modules: Microsoft MIT headers and an extension for grid extraction. Retained [BEATs LICENSE](src/asd_min/beats/LICENSE), [NOTICE](src/asd_min/beats/NOTICE.md), and research MIT notice. Three Python files are copied byte-for-byte from the selected research snapshot; package-only `__init__.py` is new and intentionally omits optional training/tokenizer imports.
 - **W1**: waveform.py uses joint normalization, Torch STFT/ISTFT and full-recording complex least-squares. The received research MIT notice is retained. Additional validation/loading helpers are companion code.

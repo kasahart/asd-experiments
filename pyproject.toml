@@ -17,3 +17,8 @@ asd-article = "asd_min.cli:main"
 where = ["src"]
 [tool.setuptools.package-data]
 "asd_min.beats" = ["LICENSE", "NOTICE.md"]
+[tool.ruff]
+extend-exclude = ["src/asd_min/beats", "apps", "scripts"]
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+ignore = ["E501"]  # long strings are left to the formatter

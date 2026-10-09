@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import math
-from typing import Optional, Tuple, Union
+from typing import NamedTuple, Optional, Tuple, Union
 
 import torch
 
@@ -63,6 +63,98 @@ def _expand_valid_time_mask(
     return mask
 
 
+def _validate_time_frequency(x_tf: torch.Tensor) -> None:
+    if x_tf.ndim != 4:
+        raise ValueError(f"x_tf must have shape [B, T, F, D], got {tuple(x_tf.shape)}")
+    if not x_tf.is_floating_point():
+        raise TypeError(f"x_tf must be floating point, got {x_tf.dtype}")
+    if not torch.isfinite(x_tf).all():
+        raise ValueError("x_tf contains NaN or Inf")
+
+
+class _ScaledBands(NamedTuple):
+    """Valid patches divided by one scale per sample and band.
+
+    The scale prevents overflow for finite inputs near the dtype limit; it does
+    not change the time weights, and ``restore_band_scale`` undoes it.
+    """
+
+    x: torch.Tensor  # [B, T, F, D], invalid patches set to zero
+    mask: torch.Tensor  # [B, T, F]
+    mean_weight: torch.Tensor  # [B, T, F, 1], 1 / valid count on valid patches
+    scale: torch.Tensor  # [B, 1, F, 1]
+
+
+def _scale_bands(
+    x_tf: torch.Tensor, valid_time_mask: Optional[torch.Tensor]
+) -> _ScaledBands:
+    mask = _expand_valid_time_mask(valid_time_mask, x_tf)
+    compute_dtype = (
+        torch.float32 if x_tf.dtype in {torch.float16, torch.bfloat16} else x_tf.dtype
+    )
+    x_compute = x_tf.to(dtype=compute_dtype)
+    mask_value = mask.unsqueeze(-1).to(dtype=compute_dtype)
+    valid_count = mask_value.sum(dim=1)
+    mean_weight = mask_value / valid_count.unsqueeze(1)
+    valid_x = x_compute.masked_fill(~mask.unsqueeze(-1), 0)
+    band_scale = valid_x.abs().amax(dim=(1, 3), keepdim=True)
+    safe_band_scale = torch.where(
+        band_scale > 0, band_scale, torch.ones_like(band_scale)
+    )
+    return _ScaledBands(valid_x / safe_band_scale, mask, mean_weight, safe_band_scale)
+
+
+def restore_band_scale(
+    pooled_scaled: torch.Tensor, bands: _ScaledBands, dtype: torch.dtype
+) -> torch.Tensor:
+    return (pooled_scaled.clamp(min=-1, max=1) * bands.scale.squeeze(1)).to(dtype)
+
+
+def time_mean(bands: _ScaledBands) -> torch.Tensor:
+    """mu[f] = mean over valid t of x[t,f]."""
+    return (bands.x * bands.mean_weight).sum(dim=1)
+
+
+def relative_deviation(
+    bands: _ScaledBands, mu: torch.Tensor, eps: float
+) -> torch.Tensor:
+    """r[t,f] = ||x[t,f] - mu[f]|| / max_t ||x[t,f] - mu[f]||.
+
+    ``r`` is zero for every t when the maximum deviation is at most ``eps``.
+    """
+    distance = torch.linalg.vector_norm(bands.x - mu.unsqueeze(1), dim=-1)
+    distance = distance.masked_fill(~bands.mask, 0)
+    max_distance = distance.amax(dim=1, keepdim=True)
+    scaled_eps = eps / bands.scale.squeeze(-1)
+    has_deviation = max_distance > scaled_eps
+    safe_max_distance = torch.where(
+        has_deviation, max_distance, torch.ones_like(max_distance)
+    )
+    return torch.where(
+        has_deviation,
+        distance / safe_max_distance,
+        torch.zeros_like(distance),
+    )
+
+
+def deviation_weights(
+    r: torch.Tensor, gamma: float, mask: torch.Tensor, dtype: torch.dtype
+) -> torch.Tensor:
+    """w[t,f] = (1 + r[t,f])^gamma / sum_t (1 + r[t,f])^gamma.
+
+    Computed as softmax_t(gamma * log1p(r)) so large gamma does not overflow.
+    """
+    weight_dtype = torch.float64 if gamma > torch.finfo(torch.float32).max else dtype
+    log_weight = torch.log1p(r.to(dtype=weight_dtype)) * gamma
+    log_weight = log_weight.masked_fill(~mask, -torch.inf)
+    return torch.softmax(log_weight, dim=1).to(dtype=dtype)
+
+
+def weighted_time_sum(x: torch.Tensor, weight: torch.Tensor) -> torch.Tensor:
+    """q[f] = sum_t w[t,f] x[t,f]."""
+    return (x * weight.unsqueeze(-1)).sum(dim=1)
+
+
 def relative_deviation_pooling(
     x_tf: torch.Tensor,
     gamma: float = 4.0,
@@ -80,12 +172,7 @@ def relative_deviation_pooling(
         return_weights: Also return normalized ``[B, T, F]`` weights.
     """
 
-    if x_tf.ndim != 4:
-        raise ValueError(f"x_tf must have shape [B, T, F, D], got {tuple(x_tf.shape)}")
-    if not x_tf.is_floating_point():
-        raise TypeError(f"x_tf must be floating point, got {x_tf.dtype}")
-    if not torch.isfinite(x_tf).all():
-        raise ValueError("x_tf contains NaN or Inf")
+    _validate_time_frequency(x_tf)
     if isinstance(gamma, bool) or not isinstance(gamma, (int, float)):
         raise TypeError("gamma must be a finite non-negative number")
     gamma = float(gamma)
@@ -94,54 +181,12 @@ def relative_deviation_pooling(
     if not math.isfinite(eps) or eps <= 0:
         raise ValueError(f"eps must be finite and positive, got {eps}")
 
-    mask = _expand_valid_time_mask(valid_time_mask, x_tf)
-    compute_dtype = (
-        torch.float32
-        if x_tf.dtype in {torch.float16, torch.bfloat16}
-        else x_tf.dtype
+    bands = _scale_bands(x_tf, valid_time_mask)
+    r = relative_deviation(bands, time_mean(bands), eps)
+    weight_compute = deviation_weights(r, gamma, bands.mask, bands.x.dtype)
+    pooled = restore_band_scale(
+        weighted_time_sum(bands.x, weight_compute), bands, x_tf.dtype
     )
-    x_compute = x_tf.to(dtype=compute_dtype)
-    mask_value = mask.unsqueeze(-1).to(dtype=compute_dtype)
-    valid_count = mask_value.sum(dim=1)
-    mean_weight = mask_value / valid_count.unsqueeze(1)
-    valid_x = x_compute.masked_fill(~mask.unsqueeze(-1), 0)
-
-    # Scale per sample/band before the norm and weighted sum. This prevents
-    # overflow for finite inputs near the dtype limit without changing weights.
-    band_scale = valid_x.abs().amax(dim=(1, 3), keepdim=True)
-    safe_band_scale = torch.where(
-        band_scale > 0, band_scale, torch.ones_like(band_scale)
-    )
-    x_scaled = valid_x / safe_band_scale
-    mean_scaled = (x_scaled * mean_weight).sum(dim=1)
-
-    distance = torch.linalg.vector_norm(
-        x_scaled - mean_scaled.unsqueeze(1), dim=-1
-    )
-    distance = distance.masked_fill(~mask, 0)
-    max_distance = distance.amax(dim=1, keepdim=True)
-    scaled_eps = eps / safe_band_scale.squeeze(-1)
-    has_deviation = max_distance > scaled_eps
-    safe_max_distance = torch.where(
-        has_deviation, max_distance, torch.ones_like(max_distance)
-    )
-    normalized_distance = torch.where(
-        has_deviation,
-        distance / safe_max_distance,
-        torch.zeros_like(distance),
-    )
-    weight_dtype = (
-        torch.float64
-        if gamma > torch.finfo(torch.float32).max
-        else compute_dtype
-    )
-    log_weight = torch.log1p(normalized_distance.to(dtype=weight_dtype)) * gamma
-    log_weight = log_weight.masked_fill(~mask, -torch.inf)
-    weight_compute = torch.softmax(log_weight, dim=1).to(dtype=compute_dtype)
-    pooled_scaled = (x_scaled * weight_compute.unsqueeze(-1)).sum(dim=1)
-    pooled = (
-        pooled_scaled.clamp(min=-1, max=1) * safe_band_scale.squeeze(1)
-    ).to(x_tf.dtype)
     weight = weight_compute.to(dtype=x_tf.dtype)
 
     if not torch.isfinite(pooled).all() or not torch.isfinite(weight).all():
@@ -172,34 +217,17 @@ def frequency_pooling(
         assert isinstance(pooled, torch.Tensor)
         return pooled
 
-    if x_tf.ndim != 4:
-        raise ValueError(f"x_tf must have shape [B, T, F, D], got {tuple(x_tf.shape)}")
-    if not x_tf.is_floating_point():
-        raise TypeError(f"x_tf must be floating point, got {x_tf.dtype}")
-    if not torch.isfinite(x_tf).all():
-        raise ValueError("x_tf contains NaN or Inf")
-    mask = _expand_valid_time_mask(valid_time_mask, x_tf)
-    compute_dtype = (
-        torch.float32
-        if x_tf.dtype in {torch.float16, torch.bfloat16}
-        else x_tf.dtype
-    )
-    x_compute = x_tf.to(dtype=compute_dtype)
-    mask_value = mask.unsqueeze(-1).to(dtype=compute_dtype)
-    mean_weight = mask_value / mask_value.sum(dim=1).unsqueeze(1)
-    valid_x = x_compute.masked_fill(~mask.unsqueeze(-1), 0)
-    band_scale = valid_x.abs().amax(dim=(1, 3), keepdim=True)
-    safe_band_scale = torch.where(
-        band_scale > 0, band_scale, torch.ones_like(band_scale)
-    )
-    mean_scaled = ((valid_x / safe_band_scale) * mean_weight).sum(dim=1)
-    return (
-        mean_scaled.clamp(min=-1, max=1) * safe_band_scale.squeeze(1)
-    ).to(x_tf.dtype)
+    _validate_time_frequency(x_tf)
+    bands = _scale_bands(x_tf, valid_time_mask)
+    return restore_band_scale(time_mean(bands), bands, x_tf.dtype)
 
 
 __all__ = [
+    "deviation_weights",
     "frequency_pooling",
+    "relative_deviation",
     "relative_deviation_pooling",
     "sequence_to_time_frequency",
+    "time_mean",
+    "weighted_time_sum",
 ]

@@ -1,11 +1,14 @@
 """Catch catalog additions that would create broken or ambiguous app URLs."""
+
 import importlib.util
 import json
 from pathlib import Path
 
 import pytest
 
-spec = importlib.util.spec_from_file_location("build_site", Path(__file__).resolve().parents[1] / "scripts/build_site.py")
+spec = importlib.util.spec_from_file_location(
+    "build_site", Path(__file__).resolve().parents[1] / "scripts/build_site.py"
+)
 site = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(site)
 
@@ -16,13 +19,17 @@ def test_registered_routes_and_return_link():
     for app in apps:
         assert f'href="apps/{app["slug"]}/"' in html
         assert f'href="{app["article_url"]}"' in html
-    export = site.add_navigation('<html><head></head><body><div id="root"></div></body></html>', apps[0])
+    export = site.add_navigation(
+        '<html><head></head><body><div id="root"></div></body></html>', apps[0]
+    )
     assert 'href="../../"' in export
     assert f'href="{apps[0]["article_url"]}"' in export
     assert '<div id="root"></div>' in export
 
 
-@pytest.mark.parametrize("failure", ["duplicate", "traversal", "missing-source", "invalid-article"])
+@pytest.mark.parametrize(
+    "failure", ["duplicate", "traversal", "missing-source", "invalid-article"]
+)
 def test_invalid_catalog_addition_fails_before_export(tmp_path, failure):
     apps = json.loads((site.ROOT / "configs/apps.json").read_text())
     if failure == "duplicate":

@@ -8,7 +8,6 @@ logger = logging.getLogger(__name__)
 
 
 class BaseBackend(ABC):
-
     @abstractmethod
     def fit(self, train_dict: dict) -> None:
         pass

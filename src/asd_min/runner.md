@@ -9,7 +9,15 @@
 BEATs重みのSHA-256、train/test件数と匿名テスト名を確認し、既存出力を上書きしません。入力hash・時間・正常trainスコア・閾値をローカルに記録します。実録音の再描画も同じ`condition_audio()`を呼び、Wandasで図を作ります。
 
 
-入力計画は`plan()`、特徴抽出は`Encoder.extract()`、全体実行は`run()`です。CLIの`results`は保存表の閲覧、`infer`は生音声からの再推論、`evaluate`は指定した固定版の評価器による保存異常度の採点です。
+| 手順 | 関数（[`runner.py`](runner.py)） |
+|---|---|
+| 件数・ファイル名の確認 | `plan()` |
+| 波形処理→BEATs→RDP | `extract_features()`（1録音は`Encoder.extract()`） |
+| 正常参照の構築・採点・90%点の閾値 | `score_machine()` |
+| 異常度・判定CSVと正常trainスコアの書き出し | `write_machine_outputs()` |
+| 条件・機種の順に上の手順を実行し、実行記録を残す | `run()` |
+
+条件名・機種・件数・RDPの`gamma`・VarMinの近傍数・閾値の分位点・重みと評価器の版は[`protocol.py`](protocol.py)にまとめています。CLIの`results`は保存表の閲覧、`infer`は生音声からの再推論、`evaluate`は指定した固定版の評価器による保存異常度の採点です。
 
 [公開コード：runner.py](runner.py) / [cli.py](cli.py) / [README](../../README.md)
 
