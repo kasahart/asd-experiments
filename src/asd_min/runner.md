@@ -18,7 +18,7 @@ BEATs重みのSHA-256、train/test件数と匿名テスト名を確認し、既�
 | 条件・機種の順に上の手順を実行し、実行記録を残す | `run()` |
 | Developmentの採点（Dev7・Dev5） | [`development.py`](development.py)の`score_development()` |
 
-条件名・機種・件数・RDPの`gamma`・VarMinの近傍数・閾値の分位点・重みと評価器の版は[`protocol.py`](protocol.py)にまとめています。CLIの`results`は保存表の閲覧、`infer`は生音声からの再推論、`evaluate`は指定した固定版の評価器による保存異常度の採点です。
+条件名・機種・件数・RDPの`gamma`・VarMinの近傍数・閾値の分位点・重みのSHA-256は[`protocol.py`](protocol.py)にまとめています。CLIの`results`は保存表の閲覧、`infer`は生音声からの再推論、`evaluate`は指定した固定版の評価器による保存異常度の採点です。
 
 [公開コード：runner.py](runner.py) / [cli.py](cli.py) / [README](../../README.md)
 
