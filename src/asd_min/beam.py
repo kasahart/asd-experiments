@@ -290,9 +290,6 @@ class BEAMVarianceMin(BaseBackend):
                 main_band[query_slice] = raw_band[query_slice]
                 main_reference_index[query_slice] = raw_index
 
-        if not np.isfinite(raw_band).all() or not np.isfinite(main_band).all():
-            raise FloatingPointError("BEAM scoring produced NaN or Inf")
-
         bands = np.arange(frequency_count)[None, :]
         raw_reference_embedding = memory.embeddings[raw_reference_index, bands, :]
         main_reference_embedding = memory.embeddings[main_reference_index, bands, :]

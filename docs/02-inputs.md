@@ -2,7 +2,7 @@
 
 1. [DCASE 2026 Challenge Task 2 Additional Training Dataset](https://zenodo.org/records/20151556)の5機種train ZIPと[DCASE 2026 Challenge Task 2 Evaluation Dataset](https://zenodo.org/records/20437238)の5機種test ZIPを取得し、同じ `eval_data/raw` に展開します。このパスを `--input` に指定します。
 2. [BEATs README](https://github.com/microsoft/unilm/blob/master/beats/README.md)の **Pre-Trained Model / Iter3** を取得し、`--checkpoint` に指定します。
-3. 採点には[dcase2026_task2_evaluator](https://github.com/nttcslab/dcase2026_task2_evaluator)と付属正解を使用しました。再採点時は取得先を `--evaluator` に指定します。評価器は `f6a94a2b5e614a9626c9d1ccff6df0705e6aaa75` にcheckoutし、変更のない状態で使います。依存関係と使い方は[dcase2026_task2_evaluator README](https://github.com/nttcslab/dcase2026_task2_evaluator/blob/f6a94a2b5e614a9626c9d1ccff6df0705e6aaa75/README.md)を参照してください。
+3. 採点には[dcase2026_task2_evaluator](https://github.com/nttcslab/dcase2026_task2_evaluator)と付属正解を使用しました。再採点時は取得先を `--evaluator` に指定します。評価器は `f6a94a2b5e614a9626c9d1ccff6df0705e6aaa75` にcheckoutして使います。依存関係と使い方は[dcase2026_task2_evaluator README](https://github.com/nttcslab/dcase2026_task2_evaluator/blob/f6a94a2b5e614a9626c9d1ccff6df0705e6aaa75/README.md)を参照してください。
 
 ```text
 <INPUT>/BlowerDustCollector/{train,test}/*.wav

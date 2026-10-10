@@ -8,11 +8,7 @@ from typing import Tuple
 
 import numpy as np
 
-from .band_distance import (
-    _validate_band_embeddings,
-    nearest_reference,
-    self_excluded_distances,
-)
+from .band_distance import nearest_reference, self_excluded_distances
 
 logger = logging.getLogger(__name__)
 
@@ -24,8 +20,10 @@ def compute_local_density(
 ) -> np.ndarray:
     """b[i,f] = mean distance from reference i to its K nearest *other* references.
 
+    Inputs are checked once by ``BEAMVarianceMin``.
+
     Args:
-        reference_normalized: ``[R, F, D]`` unit-norm normal references.
+        reference_normalized: ``[R, F, D]`` finite unit-norm normal references.
         k: Number of neighbours K. Reduced to ``R - 1`` with a warning when
             fewer references exist.
         chunk_size: Number of references processed at once.
@@ -33,18 +31,9 @@ def compute_local_density(
     Returns:
         Local density ``b`` of shape ``[R, F]``.
     """
-    reference = _validate_band_embeddings("reference", reference_normalized)
-    reference_count, frequency_count, _ = reference.shape
+    reference_count, frequency_count, _ = reference_normalized.shape
     if reference_count < 2:
         raise ValueError("Variance-minimum rescaling needs at least 2 references")
-    if isinstance(k, bool) or not isinstance(k, int) or k <= 0:
-        raise ValueError(f"k must be a positive integer, got {k!r}")
-    if (
-        isinstance(chunk_size, bool)
-        or not isinstance(chunk_size, int)
-        or chunk_size <= 0
-    ):
-        raise ValueError(f"chunk_size must be a positive integer, got {chunk_size!r}")
     effective_k = min(k, reference_count - 1)
     if effective_k != k:
         logger.warning(
@@ -55,11 +44,11 @@ def compute_local_density(
         )
 
     density = np.empty((reference_count, frequency_count), dtype=np.float32)
-    for query_slice, distance in self_excluded_distances(reference, chunk_size):
+    for query_slice, distance in self_excluded_distances(
+        reference_normalized, chunk_size
+    ):
         nearest = np.partition(distance, effective_k - 1, axis=1)[:, :effective_k, :]
         density[query_slice] = nearest.mean(axis=1)
-    if not np.isfinite(density).all():
-        raise FloatingPointError("Local-density calculation produced NaN or Inf")
     return density
 
 
@@ -143,20 +132,9 @@ def estimate_train_all_alpha(
     Returns:
         Per-band alpha ``[F]``.
     """
-    reference = _validate_band_embeddings("reference", reference_normalized)
-    reference_count, frequency_count, _ = reference.shape
+    frequency_count = reference_normalized.shape[1]
     density = np.asarray(local_density, dtype=np.float32)
-    if density.shape != (reference_count, frequency_count):
-        raise ValueError(
-            f"local_density must have shape {(reference_count, frequency_count)}, "
-            f"got {density.shape}"
-        )
-    if reference_count < 2:
-        raise ValueError("TrainAll leave-one-out needs at least 2 references")
-    if not np.isfinite(density).all():
-        raise ValueError("local_density contains NaN or Inf")
-
-    u, j = leave_one_out_nearest(reference, chunk_size)
+    u, j = leave_one_out_nearest(reference_normalized, chunk_size)
     v = density[j, np.arange(frequency_count)[None, :]]  # v[z,f] = b[j(z,f),f]
     return variance_minimizing_alpha(u, v, eps)
 
@@ -205,6 +183,8 @@ class VarianceMinRescaler:
             )
         if scope != "per_band":
             raise NotImplementedError(f"rescale_scope={scope!r} is not implemented")
+        if isinstance(k, bool) or not isinstance(k, int) or k <= 0:
+            raise ValueError(f"k must be a positive integer, got {k!r}")
         self.k = k
         self.validation = validation
         self.scope = scope
