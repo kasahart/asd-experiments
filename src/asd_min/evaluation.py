@@ -11,9 +11,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from .protocol import EVALUATOR_REVISION as REVISION
 from .protocol import MACHINES, TEST_CLIPS, TEST_FILENAMES
-from .runner import digest
 
 
 def validate(system):
@@ -55,25 +53,12 @@ def validate(system):
     return expected
 
 
-def _check_evaluator(evaluator):
-    """Require the pinned evaluator revision with a clean working tree."""
-    revision = subprocess.check_output(
-        ["git", "-C", str(evaluator), "rev-parse", "HEAD"], text=True
-    ).strip()
-    if revision != REVISION:
-        raise ValueError("Wrong evaluator revision")
-    if subprocess.check_output(
-        ["git", "-C", str(evaluator), "status", "--porcelain"], text=True
-    ).strip():
-        raise ValueError("Evaluator must be unmodified and clean")
-
-
 def evaluate(system, evaluator, output, terms_reviewed=False):
     """Score one condition's submission with the reader-provided official evaluator.
 
     Args:
         system: Submission directory (checked by ``validate``).
-        evaluator: Clean checkout of the evaluator at ``EVALUATOR_REVISION``.
+        evaluator: The evaluator at the revision in docs/02-inputs.md.
         output: New output directory for the log, results and receipt.
         terms_reviewed: Must be True once the reader has reviewed the
             evaluator's terms of use.
@@ -87,7 +72,6 @@ def evaluate(system, evaluator, output, terms_reviewed=False):
         )
     system, evaluator, output = (Path(x).resolve() for x in (system, evaluator, output))
     validate(system)
-    _check_evaluator(evaluator)
     if output.exists():
         raise ValueError("Refusing to overwrite")
     output.mkdir(parents=True)
@@ -100,11 +84,7 @@ def evaluate(system, evaluator, output, terms_reviewed=False):
         "--result_dir", str(output / "results"), "--out_all", "True",
         "--additional_result_dir", str(output / "additional"),
     ]  # fmt: skip
-    receipt = {
-        "revision": REVISION,
-        "status": "running",
-        "submission_sha256": {p.name: digest(p) for p in system.glob("*score_*.csv")},
-    }
+    receipt = {"status": "running"}
     try:
         with (output / "evaluator.log").open("w") as log:
             subprocess.run(

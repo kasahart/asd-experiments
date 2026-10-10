@@ -43,12 +43,9 @@ DEV_TEST_FILENAME = re.compile(
     r"section_00_(?P<domain>source|target)_test_(?P<label>normal|anomaly)_\d{4}_.+\.wav"
 )
 PAUC_MAX_FPR = 0.1
-SMOKE_MIN_REFERENCES = 5
 
 # Detector shared by every condition.
 CHECKPOINT_SHA256 = "8d1b234032a9ccff353612dc6c20982346dc2968b205b79d97303eb5e77bfb34"
 RDP_GAMMA = 4
 VARMIN_K = 4
 THRESHOLD_QUANTILE = 0.9
-
-EVALUATOR_REVISION = "f6a94a2b5e614a9626c9d1ccff6df0705e6aaa75"

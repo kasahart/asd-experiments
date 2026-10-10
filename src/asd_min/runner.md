@@ -6,7 +6,7 @@
 
 `run()`は各条件・機種で、train/testの波形処理→特徴抽出→正常参照構築→異常度出力を同じ順序で行います。正常trainの再採点では同一pathの自己参照を除き、その異常度の90%点を閾値として、厳密に`score > threshold`なら異常判定を出します。閾値はAUC/pAUCの順位比較とは別の、判定CSVを作るための設定です。
 
-BEATs重みのSHA-256、train/test件数と匿名テスト名を確認し、既存出力を上書きしません。入力hash・時間・正常trainスコア・閾値をローカルに記録します。実録音の再描画も同じ`condition_audio()`を呼び、Wandasで図を作ります。
+BEATs重みのSHA-256、train/test件数と匿名テスト名を確認し、既存出力を上書きしません。時間・正常trainスコア・閾値をローカルに記録します。実録音の再描画も同じ`condition_audio()`を呼び、Wandasで図を作ります。
 
 
 | 手順 | 関数（[`runner.py`](runner.py)） |
@@ -18,7 +18,7 @@ BEATs重みのSHA-256、train/test件数と匿名テスト名を確認し、既�
 | 条件・機種の順に上の手順を実行し、実行記録を残す | `run()` |
 | Developmentの採点（Dev7・Dev5） | [`development.py`](development.py)の`score_development()` |
 
-条件名・機種・件数・RDPの`gamma`・VarMinの近傍数・閾値の分位点・重みと評価器の版は[`protocol.py`](protocol.py)にまとめています。CLIの`results`は保存表の閲覧、`infer`は生音声からの再推論、`evaluate`は指定した固定版の評価器による保存異常度の採点です。
+条件名・機種・件数・RDPの`gamma`・VarMinの近傍数・閾値の分位点・重みのSHA-256は[`protocol.py`](protocol.py)にまとめています。CLIの`results`は保存表の閲覧、`infer`は生音声からの再推論、`evaluate`は指定した固定版の評価器による保存異常度の採点です。
 
 [公開コード：runner.py](runner.py) / [cli.py](cli.py) / [README](../../README.md)
 

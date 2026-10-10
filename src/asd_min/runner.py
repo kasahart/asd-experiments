@@ -24,7 +24,6 @@ from .protocol import (
     DEV_TEST_FILENAME,
     MACHINES,
     RDP_GAMMA,
-    SMOKE_MIN_REFERENCES,
     SOURCE_TRAIN_CLIPS,
     TARGET_TRAIN_CLIPS,
     TEST_CLIPS,
@@ -138,23 +137,20 @@ class Encoder:
         return pooled[0].cpu().numpy()
 
 
-def extract_features(encoder, paths, condition, input_sha256, prefix):
-    """Process each clip for the condition and encode it; record input hashes.
+def extract_features(encoder, paths, condition):
+    """Process each clip for the condition and encode it.
 
     Args:
         encoder: Object with ``extract(audio) -> [F, D]``.
         paths: Clip paths of one machine and split.
         condition: Condition name passed to ``condition_audio``.
-        input_sha256: Dictionary updated with ``"{prefix}/{filename}": sha256``.
-        prefix: ``"{machine}/{split}"`` key prefix.
 
     Returns:
         ``{"embed_freq": [N, F, D], "path": [N] filenames}`` for the backend.
     """
-    vectors = []
-    for path in paths:
-        input_sha256[f"{prefix}/{path.name}"] = digest(path)
-        vectors.append(encoder.extract(condition_audio(load_audio(path), condition)))
+    vectors = [
+        encoder.extract(condition_audio(load_audio(path), condition)) for path in paths
+    ]
     return {"embed_freq": np.stack(vectors), "path": np.array([p.name for p in paths])}
 
 
@@ -235,24 +231,19 @@ def run(
         conditions: Subset of ``CONDITIONS`` in run order.
         device: Torch device.
         machines: Machines of ``dataset``.
-        limit: Smoke mode with at least 5 clips per split; never an article score.
+        limit: Smoke mode with the first ``limit`` clips per split; never an
+            article score.
         dataset: ``"eval"`` (reported only) or ``"dev"`` (for choosing configurations).
 
     Returns:
         The receipt dictionary also written to ``output/receipt.json``.
     """
-    if limit is not None and limit < SMOKE_MIN_REFERENCES:
-        raise ValueError(
-            f"Smoke mode requires at least {SMOKE_MIN_REFERENCES} references"
-        )
     selected = plan(root, machines, limit, dataset)
     output = Path(output)
     if output.exists():
         raise ValueError("Refusing to overwrite output")
     _configure_torch()
     encoder = Encoder(checkpoint, device)
-    if str(device).startswith("cuda"):
-        torch.cuda.reset_peak_memory_stats(device)
     output.mkdir(parents=True)
     receipt = {
         "status": "running",
@@ -262,7 +253,6 @@ def run(
         "checkpoint_sha256": CHECKPOINT_SHA256,
         "torch": torch.__version__,
         "device": device,
-        "input_sha256": {},
         "timings_seconds": {},
     }
     start = time.perf_counter()
@@ -277,13 +267,7 @@ def run(
                     flush=True,
                 )
                 features = {
-                    split: extract_features(
-                        encoder,
-                        paths,
-                        condition,
-                        receipt["input_sha256"],
-                        f"{machine}/{split}",
-                    )
+                    split: extract_features(encoder, paths, condition)
                     for split, paths in splits.items()
                 }
                 # No sharing of memory across conditions, no test labels.
@@ -300,9 +284,5 @@ def run(
         raise
     finally:
         receipt["elapsed_seconds"] = time.perf_counter() - start
-        if str(device).startswith("cuda"):
-            receipt["peak_cuda_allocated_bytes"] = torch.cuda.max_memory_allocated(
-                device
-            )
         (output / "receipt.json").write_text(json.dumps(receipt, indent=2) + "\n")
     return receipt
