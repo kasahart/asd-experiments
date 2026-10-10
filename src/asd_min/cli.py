@@ -1,5 +1,7 @@
 # SPDX-License-Identifier: MIT
 # Copyright (c) 2026 kasahart
+"""Command line for article 2: view stored results, run inference, or rescore."""
+
 import argparse
 import csv
 import json
@@ -9,6 +11,7 @@ from .protocol import CONDITIONS, MACHINES
 
 
 def main():
+    """Parse ``results`` / ``infer`` / ``evaluate`` and run the chosen command."""
     parser = argparse.ArgumentParser(
         description="ASD experiments: article 2 B0/B1/W1/SS"
     )

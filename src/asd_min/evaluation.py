@@ -17,7 +17,18 @@ from .runner import digest
 
 
 def validate(system):
-    """Check one condition's submission: 5 machines x 2 CSVs, 200 finite rows each."""
+    """Check one condition's submission: 5 machines x 2 CSVs, 200 finite rows each.
+
+    Args:
+        system: Directory with the condition's ``anomaly_score_*`` and
+            ``decision_result_*`` CSVs.
+
+    Returns:
+        The set of expected filenames.
+
+    Raises:
+        ValueError: A file is missing, extra, or has wrong rows or values.
+    """
     system = Path(system)
     expected = set()
     for machine in MACHINES:
@@ -45,6 +56,7 @@ def validate(system):
 
 
 def _check_evaluator(evaluator):
+    """Require the pinned evaluator revision with a clean working tree."""
     revision = subprocess.check_output(
         ["git", "-C", str(evaluator), "rev-parse", "HEAD"], text=True
     ).strip()
@@ -57,6 +69,18 @@ def _check_evaluator(evaluator):
 
 
 def evaluate(system, evaluator, output, terms_reviewed=False):
+    """Score one condition's submission with the reader-provided official evaluator.
+
+    Args:
+        system: Submission directory (checked by ``validate``).
+        evaluator: Clean checkout of the evaluator at ``EVALUATOR_REVISION``.
+        output: New output directory for the log, results and receipt.
+        terms_reviewed: Must be True once the reader has reviewed the
+            evaluator's terms of use.
+
+    Returns:
+        Path of the evaluator's result CSV.
+    """
     if not terms_reviewed:
         raise ValueError(
             "Review evaluator conditions yourself first; see docs/rights.md"

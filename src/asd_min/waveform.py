@@ -13,6 +13,12 @@ import torch
 
 
 def load_audio(path):
+    """Read a 16 kHz two-channel WAV as float32 ``[2, N]`` (row 0 near, row 1 far).
+
+    Raises:
+        ValueError: The rate, channel count, length (> 512 samples) or
+            finiteness differs from the protocol.
+    """
     frames, rate = sf.read(path, dtype="float32", always_2d=True)
     if rate != 16000 or frames.shape[1] != 2 or len(frames) <= 512:
         raise ValueError("Expected 16 kHz stereo [near, far], length >512")
@@ -22,6 +28,7 @@ def load_audio(path):
 
 
 def _validate_stereo(wave, min_length, name):
+    """Return ``wave`` as float32 ``[2, N]`` after checking shape, length and finiteness."""
     array = np.asarray(wave, dtype=np.float32)
     if (
         array.ndim != 2
@@ -36,7 +43,16 @@ def _validate_stereo(wave, min_length, name):
 
 
 def _stft(tensor, p):
-    """Torch periodic-Hann STFT of [near, far] with the method's fixed settings."""
+    """Torch periodic-Hann STFT of [near, far] with the method's fixed settings.
+
+    Args:
+        tensor: ``[2, N]`` waveform.
+        p: ``W1_PARAMETERS`` or ``SS_PARAMETERS``.
+
+    Returns:
+        ``(spectra, window)``: complex ``[2, n_fft // 2 + 1, frames]`` and the
+        window to reuse in ``_istft``.
+    """
     window = torch.hann_window(p["win_length"], periodic=True, dtype=tensor.dtype)
     spectra = torch.stft(
         tensor,
@@ -54,6 +70,7 @@ def _stft(tensor, p):
 
 
 def _istft(spectrum, window, p, length):
+    """Inverse of ``_stft`` for one channel, trimmed to ``length`` samples."""
     return torch.istft(
         spectrum,
         n_fft=p["n_fft"],
@@ -72,10 +89,12 @@ def _istft(spectrum, window, p, length):
 
 
 def near_channel(wave):
+    """B0: the near microphone (row 0) as recorded."""
     return wave[0]
 
 
 def far_channel(wave):
+    """B1: the far microphone (row 1) as recorded."""
     return wave[1]
 
 
@@ -89,7 +108,15 @@ W1_PARAMETERS = {
 
 
 def peak_normalize(array):
-    """Scale both channels by one joint factor so the joint peak becomes 0.9."""
+    """Scale both channels by one joint factor so the joint peak becomes 0.9.
+
+    Args:
+        array: float32 ``[2, N]`` waveform.
+
+    Returns:
+        ``(normalized, scale)``; multiply by ``scale`` to restore. ``scale`` is 1
+        for (near) silence.
+    """
     peak = float(np.max(np.abs(array)))
     scale = peak / W1_PARAMETERS["peak"] if peak > 1e-12 else 1.0
     normalized = np.empty_like(array)
@@ -99,18 +126,49 @@ def peak_normalize(array):
 
 
 def w1_transfer(near, far):
-    """H[f] = sum_t C[f,t] conj(F[f,t]) / (sum_t |F[f,t]|^2 + eps)."""
+    """H[f] = sum_t C[f,t] conj(F[f,t]) / (sum_t |F[f,t]|^2 + eps).
+
+    The complex least-squares coefficient that best maps the far spectrum to the
+    near spectrum, estimated once over the whole recording.
+
+    Args:
+        near: Complex near spectrum ``C`` of shape ``[F, T]``.
+        far: Complex far spectrum ``F`` of shape ``[F, T]``.
+
+    Returns:
+        Complex ``[F]`` coefficients ``H``.
+    """
     return (near * far.conj()).sum(-1) / (
         far.abs().square().sum(-1) + W1_PARAMETERS["eps"]
     )
 
 
 def w1_residual(near, far, transfer):
-    """Y[f,t] = C[f,t] - H[f] F[f,t]."""
+    """Y[f,t] = C[f,t] - H[f] F[f,t].
+
+    Args:
+        near: Complex near spectrum ``C`` ``[F, T]``.
+        far: Complex far spectrum ``F`` ``[F, T]``.
+        transfer: ``H`` from ``w1_transfer``, shape ``[F]``.
+
+    Returns:
+        Complex residual spectrum ``Y`` ``[F, T]``.
+    """
     return near - transfer[:, None] * far
 
 
 def w1(wave):
+    """W1: complex least-squares subtraction of the far channel from the near one.
+
+    Steps: ``peak_normalize`` -> STFT -> ``w1_transfer`` (H) -> ``w1_residual``
+    (Y) -> ISTFT -> restore the joint scale.
+
+    Args:
+        wave: Finite ``[2, N]`` waveform (near, far), N > 512.
+
+    Returns:
+        float32 ``[N]`` residual waveform.
+    """
     array = _validate_stereo(wave, 512, "W1")
     normalized, scale = peak_normalize(array)
     tensor = torch.from_numpy(np.ascontiguousarray(normalized))
@@ -134,10 +192,17 @@ SS_PARAMETERS = {
 
 
 def ss_spectrum(near, far):
-    """|Y| = |C| - beta|F| if |C| > beta|F|, else gamma|C|; phase of C.
+    """SS Eq. (1): |Y| = |C| - beta|F| if |C| > beta|F|, else gamma|C|; phase of C.
 
     Not power subtraction or max(diff, gamma*near). Strict > is important:
     equal magnitudes use gamma*near. No far phase alignment.
+
+    Args:
+        near: Complex near spectrum ``C``.
+        far: Complex far spectrum ``F`` of the same shape.
+
+    Returns:
+        Complex spectrum with the subtracted magnitude and the near phase.
     """
     if near.shape != far.shape or not near.is_complex() or not far.is_complex():
         raise ValueError("Matching complex near/far spectra required")
@@ -149,12 +214,18 @@ def ss_spectrum(near, far):
 
 
 def ss(wave):
-    """Selected Qian equation with explicit local STFT boundary choices.
+    """SS: magnitude spectral subtraction with the near phase.
 
     The article/report specify Hann512/hop256, beta1/gamma0.1 and near phase.
     They do not specify periodic/center/padding. This local condition fixes
     Torch periodic Hann, center=True/reflect, raw physical channel scale.
     This is not a reproduction of the full Qian EAT/KNN system.
+
+    Args:
+        wave: Finite ``[2, N]`` waveform (near, far), N > 256.
+
+    Returns:
+        float32 ``[N]`` waveform.
     """
     array = _validate_stereo(wave, 256, "SS")
     tensor = torch.from_numpy(np.ascontiguousarray(array))
@@ -170,6 +241,15 @@ CONDITION_AUDIO = {"b0": near_channel, "b1": far_channel, "w1": w1, "ss": ss}
 
 
 def condition_audio(wave, condition):
+    """Return the 1-channel input the detector receives under ``condition``.
+
+    Args:
+        wave: ``[2, N]`` waveform (near, far).
+        condition: One of ``CONDITION_AUDIO`` (``b0``, ``b1``, ``w1``, ``ss``).
+
+    Returns:
+        ``[N]`` waveform.
+    """
     if condition not in CONDITION_AUDIO:
         raise ValueError(condition)
     return CONDITION_AUDIO[condition](wave)

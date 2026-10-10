@@ -22,7 +22,17 @@ def compute_local_density(
     k: int = 4,
     chunk_size: int = 128,
 ) -> np.ndarray:
-    """b[i,f] = mean distance from reference i to its K nearest *other* references."""
+    """b[i,f] = mean distance from reference i to its K nearest *other* references.
+
+    Args:
+        reference_normalized: ``[R, F, D]`` unit-norm normal references.
+        k: Number of neighbours K. Reduced to ``R - 1`` with a warning when
+            fewer references exist.
+        chunk_size: Number of references processed at once.
+
+    Returns:
+        Local density ``b`` of shape ``[R, F]``.
+    """
     reference = _validate_band_embeddings("reference", reference_normalized)
     reference_count, frequency_count, _ = reference.shape
     if reference_count < 2:
@@ -56,7 +66,18 @@ def compute_local_density(
 def leave_one_out_nearest(
     reference_normalized: np.ndarray, chunk_size: int = 128
 ) -> Tuple[np.ndarray, np.ndarray]:
-    """j(z,f) = raw nearest other reference of y[z]; u[z,f] = D(y[z,f], y[j(z,f),f])."""
+    """Raw nearest other reference of each normal reference (TrainAll leave-one-out).
+
+    j(z,f) = argmin_{i != z} D(y[z,f], y[i,f])
+    u[z,f] = D(y[z,f], y[j(z,f),f])
+
+    Args:
+        reference_normalized: ``[R, F, D]`` unit-norm normal references.
+        chunk_size: Number of references processed at once.
+
+    Returns:
+        ``(u, j)``: distances ``[R, F]`` (float32) and indices ``[R, F]``.
+    """
     reference_count, frequency_count, _ = reference_normalized.shape
     u = np.empty((reference_count, frequency_count), dtype=np.float32)
     j = np.empty((reference_count, frequency_count), dtype=np.intp)
@@ -70,7 +91,20 @@ def leave_one_out_nearest(
 def variance_minimizing_alpha(
     u: np.ndarray, v: np.ndarray, eps: float = 1e-12
 ) -> np.ndarray:
-    """alpha[f] = Cov_z(u[z,f], v[z,f]) / Var_z(v[z,f]); zero when Var <= eps."""
+    """alpha[f] = Cov_z(u[z,f], v[z,f]) / Var_z(v[z,f]).
+
+    This alpha minimizes the variance over z of ``u - alpha * v``, that is, of
+    the rescaled normal scores. Bands whose ``Var_z(v)`` is at most ``eps`` get
+    alpha = 0 with a warning. Alpha is not clipped and may be negative.
+
+    Args:
+        u: Raw leave-one-out distances ``[R, F]``.
+        v: Local density of the selected neighbour, ``v[z,f] = b[j(z,f),f]``.
+        eps: Variance threshold.
+
+    Returns:
+        Per-band alpha ``[F]`` (float32).
+    """
     frequency_count = u.shape[1]
     u_centered = u.astype(np.float64) - u.mean(axis=0, dtype=np.float64)
     v_centered = v.astype(np.float64) - v.mean(axis=0, dtype=np.float64)
@@ -95,7 +129,20 @@ def estimate_train_all_alpha(
     chunk_size: int = 128,
     eps: float = 1e-12,
 ) -> np.ndarray:
-    """Estimate per-band alpha with TrainAll leave-one-out validation."""
+    """Estimate per-band alpha with TrainAll leave-one-out validation.
+
+    Runs ``leave_one_out_nearest`` (j, u), gathers v[z,f] = b[j(z,f),f], and
+    returns ``variance_minimizing_alpha(u, v)``.
+
+    Args:
+        reference_normalized: ``[R, F, D]`` unit-norm normal references.
+        local_density: ``b`` from ``compute_local_density``, shape ``[R, F]``.
+        chunk_size: Number of references processed at once.
+        eps: Variance threshold for alpha.
+
+    Returns:
+        Per-band alpha ``[F]``.
+    """
     reference = _validate_band_embeddings("reference", reference_normalized)
     reference_count, frequency_count, _ = reference.shape
     density = np.asarray(local_density, dtype=np.float32)
@@ -117,12 +164,32 @@ def estimate_train_all_alpha(
 def rescaled_distance(
     distance: np.ndarray, alpha: np.ndarray, local_density: np.ndarray
 ) -> np.ndarray:
-    """D(q[f], y[i,f]) - alpha[f] b[i,f] for ``[Q, R, F]`` distances."""
+    """VarMin-rescaled distance D(q[f], y[i,f]) - alpha[f] b[i,f].
+
+    Args:
+        distance: Raw distances ``[Q, R, F]``.
+        alpha: Per-band coefficients ``[F]``.
+        local_density: ``b`` of the references, ``[R, F]``.
+
+    Returns:
+        Rescaled distances ``[Q, R, F]``; values may be negative.
+    """
     return distance - alpha[None, None, :] * local_density[None, :, :]
 
 
 class VarianceMinRescaler:
-    """Fit local density and per-band variance-minimizing weights."""
+    """Fit the VarMin terms ``b`` and ``alpha`` from normal references.
+
+    Only TrainAll validation and a separate alpha per band are implemented; the
+    arguments keep the ASDKit configuration names.
+
+    Args:
+        k: Number of neighbours for the local density.
+        validation: Must be ``"train_all"``.
+        scope: Must be ``"per_band"``.
+        chunk_size: Number of references processed at once.
+        eps: Variance threshold for alpha.
+    """
 
     def __init__(
         self,
@@ -145,6 +212,14 @@ class VarianceMinRescaler:
         self.eps = eps
 
     def fit(self, reference_normalized: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+        """Compute local density and alpha for one normal memory.
+
+        Args:
+            reference_normalized: ``[R, F, D]`` unit-norm normal references.
+
+        Returns:
+            ``(local_density, alpha)`` with shapes ``[R, F]`` and ``[F]``.
+        """
         density = compute_local_density(
             reference_normalized, k=self.k, chunk_size=self.chunk_size
         )

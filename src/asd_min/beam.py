@@ -36,7 +36,19 @@ def minimum_band_scores(
     local_density: Optional[np.ndarray] = None,
     alpha: Optional[np.ndarray] = None,
 ) -> np.ndarray:
-    """band[f] = min_i D, or min_i {D - alpha[f] b[i,f]} with VarMin."""
+    """Per-band BEAM score from precomputed distances.
+
+    raw:     band[f] = min_i D(q[f], y[i,f])
+    VarMin:  band[f] = min_i { D(q[f], y[i,f]) - alpha[f] b[i,f] }
+
+    Args:
+        distances: ``[Q, R, F]`` distances.
+        local_density: ``b`` of shape ``[R, F]``, or None for the raw score.
+        alpha: Per-band ``[F]`` coefficients, or None for the raw score.
+
+    Returns:
+        Band scores ``[Q, F]``.
+    """
     distance = np.asarray(distances)
     if distance.ndim != 3:
         raise ValueError(f"distances must have shape [Q, R, F], got {distance.shape}")
@@ -60,12 +72,28 @@ def minimum_band_scores(
 
 
 def band_mean(band_scores: np.ndarray) -> np.ndarray:
-    """score = uniform mean over frequency bands of ``[Q, F]`` band scores."""
+    """score = uniform mean over frequency bands.
+
+    Args:
+        band_scores: ``[Q, F]`` band scores.
+
+    Returns:
+        Clip scores ``[Q]``.
+    """
     return band_scores.mean(axis=1)
 
 
 @dataclass
 class _BandMemory:
+    """Normal memory of one section.
+
+    Attributes:
+        embeddings: ``[R, F, D]`` L2-normalized normal references ``y``.
+        paths: ``[R]`` reference filenames for self-match exclusion, or None.
+        local_density: ``b`` of shape ``[R, F]`` (zeros without rescaling).
+        alpha: Per-band ``[F]`` coefficients (zeros without rescaling).
+    """
+
     embeddings: np.ndarray
     paths: Optional[np.ndarray]
     local_density: np.ndarray
@@ -81,6 +109,17 @@ class BEAMVarianceMin(BaseBackend):
     available paper description does not fully disambiguate the per-band scope,
     so this is an explicit reproduction assumption rather than a paper-guaranteed
     detail.
+
+    Args:
+        embed_key: Feature dictionary key holding ``[N, F, D]`` band features.
+        sep_section: Build one memory per ``"section"`` value instead of one
+            shared memory.
+        use_rescaling: Apply VarMin; False gives raw BEAM scores as ``"main"``.
+        rescale_k: VarMin neighbour count K.
+        rescale_validation: VarMin validation; only ``"train_all"``.
+        rescale_scope: VarMin alpha scope; only ``"per_band"``.
+        chunk_size: Number of queries compared at once.
+        eps: Norm and variance threshold.
     """
 
     diagnostic_score_keys = {"raw", "rescale_delta"}
@@ -122,6 +161,7 @@ class BEAMVarianceMin(BaseBackend):
         self.band_shape: Optional[Tuple[int, int]] = None
 
     def _get_sections(self, extract_dict: dict, length: int) -> np.ndarray:
+        """Section id per clip; all zeros when sections are not separated."""
         if "section" not in extract_dict:
             if self.sep_section:
                 raise KeyError("section is required when sep_section=True")
@@ -133,6 +173,7 @@ class BEAMVarianceMin(BaseBackend):
 
     @staticmethod
     def _get_paths(extract_dict: dict, length: int) -> Optional[np.ndarray]:
+        """Filenames per clip used to exclude self matches, or None if absent."""
         if "path" not in extract_dict:
             return None
         paths = np.asarray(extract_dict["path"])
@@ -141,6 +182,14 @@ class BEAMVarianceMin(BaseBackend):
         return paths
 
     def fit(self, train_dict: dict) -> None:
+        """Build the normal memory (and VarMin terms) for each section.
+
+        Clips with ``is_normal != 1`` are skipped when ``"is_normal"`` is given.
+
+        Args:
+            train_dict: ``embed_key`` features ``[N, F, D]`` and optionally
+                ``"path"``, ``"section"`` and ``"is_normal"`` arrays of length N.
+        """
         embeddings = _validate_band_embeddings(
             self.embed_key, train_dict[self.embed_key]
         )
@@ -189,6 +238,19 @@ class BEAMVarianceMin(BaseBackend):
         query_paths: Optional[np.ndarray],
         memory: _BandMemory,
     ) -> Dict[str, np.ndarray]:
+        """Band scores and selected references for queries of one section.
+
+        A query whose path equals a reference path skips that reference, so
+        rescoring the training clips is leave-one-out.
+
+        Args:
+            query: ``[Q, F, D]`` query features.
+            query_paths: ``[Q]`` query filenames, or None.
+            memory: Fitted memory of the section.
+
+        Returns:
+            The dictionary described in ``anomaly_score_details``, for these queries.
+        """
         query_normalized = l2_normalize(query, eps=self.eps)
         query_count, frequency_count, _ = query.shape
         raw_band = np.empty((query_count, frequency_count), dtype=np.float32)
@@ -254,9 +316,25 @@ class BEAMVarianceMin(BaseBackend):
     def anomaly_score_details(self, test_dict: dict) -> Dict[str, np.ndarray]:
         """Return band-level BEAM scores and their selected references.
 
-        Reference indices are local to the fitted memory for each query's
-        section. Reference embeddings are the L2-normalized values stored in
-        that memory.
+        Reference indices are local to the fitted memory for each query's section.
+        Reference embeddings are the L2-normalized values stored in that memory.
+
+        Args:
+            test_dict: ``embed_key`` features ``[N, F, D]`` and optionally
+                ``"path"`` and ``"section"``.
+
+        Returns:
+            Arrays keyed by name (``N`` queries, ``F`` bands, ``D`` dimensions):
+
+            - ``main``, ``raw``, ``rescale_delta``: ``[N, F]`` VarMin band scores,
+              raw band scores, and their difference ``raw - main``.
+            - ``main_reference_index``, ``raw_reference_index``: ``[N, F]`` reference
+              chosen per band with and without VarMin.
+            - ``main_reference_embedding``, ``raw_reference_embedding``:
+              ``[N, F, D]`` features of those references.
+            - ``main_selected_density``, ``raw_selected_density``: ``[N, F]`` local
+              density ``b`` of those references.
+            - ``alpha``: ``[N, F]`` alpha of each query's section.
         """
         if not self.memory or self.band_shape is None:
             raise RuntimeError("fit() must be called before anomaly_score_details()")
@@ -307,6 +385,15 @@ class BEAMVarianceMin(BaseBackend):
         return details
 
     def anomaly_score(self, test_dict: dict) -> Dict[str, np.ndarray]:
+        """Clip-level anomaly scores: the band mean of ``anomaly_score_details``.
+
+        Args:
+            test_dict: Same as ``anomaly_score_details``.
+
+        Returns:
+            ``[N]`` arrays: ``main`` (VarMin score written to the CSV), ``raw``
+            (BEAM without VarMin) and ``rescale_delta`` (``raw - main``).
+        """
         if not self.memory or self.band_shape is None:
             raise RuntimeError("fit() must be called before anomaly_score()")
         details = self.anomaly_score_details(test_dict)

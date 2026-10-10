@@ -35,6 +35,7 @@ from .waveform import condition_audio, load_audio
 
 
 def digest(path):
+    """SHA-256 hex digest of a file, read in 1 MiB chunks."""
     h = hashlib.sha256()
     with Path(path).open("rb") as f:
         for chunk in iter(lambda: f.read(1024 * 1024), b""):
@@ -43,7 +44,20 @@ def digest(path):
 
 
 def plan(root, machines=MACHINES, limit=None):
-    """Check the fixed train/test inventory and return the files per machine."""
+    """Check the fixed train/test inventory and return the files per machine.
+
+    Args:
+        root: Directory holding ``<machine>/train`` and ``<machine>/test``.
+        machines: Evaluation machines to include.
+        limit: Keep only the first ``limit`` files per split (smoke runs only).
+
+    Returns:
+        ``{machine: {"train": [Path, ...], "test": [Path, ...]}}`` sorted by name.
+
+    Raises:
+        ValueError: Counts (1000 train with 990 source / 10 target, 200 test)
+            or anonymous test filenames differ from the protocol.
+    """
     root = Path(root)
     selected = {}
     for machine in machines:
@@ -73,7 +87,12 @@ def plan(root, machines=MACHINES, limit=None):
 
 
 class Encoder:
-    """Frozen BEATs_iter3 followed by frequency-preserving RDP: one [F, D] per clip."""
+    """Frozen BEATs_iter3 followed by frequency-preserving RDP: one [F, D] per clip.
+
+    Args:
+        checkpoint: BEATs_iter3 checkpoint; its SHA-256 must match the protocol.
+        device: Torch device for inference.
+    """
 
     def __init__(self, checkpoint, device="cpu"):
         from .beats.BEATs import BEATs, BEATsConfig
@@ -91,6 +110,14 @@ class Encoder:
 
     @torch.inference_mode()
     def extract(self, audio):
+        """Encode one waveform into band features.
+
+        Args:
+            audio: 1-channel ``[N]`` float32 waveform at 16 kHz.
+
+        Returns:
+            ``[F, D]`` RDP-pooled BEATs features as a NumPy array.
+        """
         x = torch.from_numpy(np.ascontiguousarray(audio))[None].to(self.device)
         sequence, mask, grid = self.model.extract_features_with_grid(x)
         tf = sequence_to_time_frequency(sequence, grid)
@@ -102,7 +129,18 @@ class Encoder:
 
 
 def extract_features(encoder, paths, condition, input_sha256, prefix):
-    """Process each clip for the condition and encode it; record input hashes."""
+    """Process each clip for the condition and encode it; record input hashes.
+
+    Args:
+        encoder: Object with ``extract(audio) -> [F, D]``.
+        paths: Clip paths of one machine and split.
+        condition: Condition name passed to ``condition_audio``.
+        input_sha256: Dictionary updated with ``"{prefix}/{filename}": sha256``.
+        prefix: ``"{machine}/{split}"`` key prefix.
+
+    Returns:
+        ``{"embed_freq": [N, F, D], "path": [N] filenames}`` for the backend.
+    """
     vectors = []
     for path in paths:
         input_sha256[f"{prefix}/{path.name}"] = digest(path)
@@ -115,6 +153,13 @@ def score_machine(train_features, test_features):
 
     Train clips are rescored without their own path. The decision threshold is
     the linear 90% point of those train scores; test labels are never used.
+
+    Args:
+        train_features: ``extract_features`` output for the train split.
+        test_features: ``extract_features`` output for the test split.
+
+    Returns:
+        ``(train_scores [N_train], test_scores [N_test], threshold)``.
     """
     backend = BEAMVarianceMin(
         rescale_k=VARMIN_K, rescale_validation="train_all", rescale_scope="per_band"
@@ -127,7 +172,12 @@ def score_machine(train_features, test_features):
 
 
 def write_machine_outputs(folder, machine, features, train, test, threshold):
-    """Write DCASE submission CSVs (strict score > threshold) and train records."""
+    """Write DCASE submission CSVs (strict score > threshold) and train records.
+
+    Files in ``folder``: ``anomaly_score_<machine>_section_00_test.csv``,
+    ``decision_result_<machine>_section_00_test.csv``,
+    ``<machine>_train_score.csv`` and ``<machine>_threshold.json``.
+    """
     for prefix, values in [
         ("anomaly_score", test),
         ("decision_result", (test > threshold).astype(int)),
@@ -161,6 +211,24 @@ def run(
     machines=MACHINES,
     limit=None,
 ):
+    """Run every condition and machine and write submissions plus ``receipt.json``.
+
+    For each condition and machine: ``extract_features`` (train, test) ->
+    ``score_machine`` -> ``write_machine_outputs``. No memory is shared between
+    conditions.
+
+    Args:
+        root: Raw Evaluation data directory (see ``plan``).
+        checkpoint: BEATs_iter3 checkpoint path.
+        output: New output directory; an existing one is refused.
+        conditions: Subset of ``CONDITIONS`` in run order.
+        device: Torch device.
+        machines: Subset of ``MACHINES``.
+        limit: Smoke mode with at least 5 clips per split; never an article score.
+
+    Returns:
+        The receipt dictionary also written to ``output/receipt.json``.
+    """
     if limit is not None and limit < SMOKE_MIN_REFERENCES:
         raise ValueError(
             f"Smoke mode requires at least {SMOKE_MIN_REFERENCES} references"

@@ -11,7 +11,15 @@ import torch
 def sequence_to_time_frequency(
     x_seq: torch.Tensor, grid_shape: Tuple[int, int]
 ) -> torch.Tensor:
-    """Restore a row-major ``[B, L, D]`` sequence to ``[B, T, F, D]``."""
+    """Restore a row-major patch sequence to its time-frequency grid.
+
+    Args:
+        x_seq: Patch sequence ``[B, L, D]`` with ``L = T * F``.
+        grid_shape: ``(T, F)`` patch counts.
+
+    Returns:
+        ``[B, T, F, D]`` tensor (a view of the input).
+    """
 
     if x_seq.ndim != 3:
         raise ValueError(
@@ -38,6 +46,11 @@ def sequence_to_time_frequency(
 def _expand_valid_time_mask(
     valid_time_mask: Optional[torch.Tensor], x_tf: torch.Tensor
 ) -> torch.Tensor:
+    """Expand an optional ``[B, T]`` or ``[B, T, F]`` mask to boolean ``[B, T, F]``.
+
+    None means every patch is valid. Every sample and band must keep at least
+    one valid time patch.
+    """
     batch, time, frequency, _ = x_tf.shape
     if time == 0:
         raise ValueError("x_tf must contain at least one time patch")
@@ -64,6 +77,7 @@ def _expand_valid_time_mask(
 
 
 def _validate_time_frequency(x_tf: torch.Tensor) -> None:
+    """Check that ``x_tf`` is a finite floating tensor of shape ``[B, T, F, D]``."""
     if x_tf.ndim != 4:
         raise ValueError(f"x_tf must have shape [B, T, F, D], got {tuple(x_tf.shape)}")
     if not x_tf.is_floating_point():
@@ -88,6 +102,17 @@ class _ScaledBands(NamedTuple):
 def _scale_bands(
     x_tf: torch.Tensor, valid_time_mask: Optional[torch.Tensor]
 ) -> _ScaledBands:
+    """Mask invalid patches and divide each sample and band by its maximum magnitude.
+
+    float16 and bfloat16 inputs are computed in float32.
+
+    Args:
+        x_tf: ``[B, T, F, D]`` features.
+        valid_time_mask: Optional ``[B, T]`` or ``[B, T, F]`` boolean mask.
+
+    Returns:
+        ``_ScaledBands`` holding the scaled features, mask, mean weights and scale.
+    """
     mask = _expand_valid_time_mask(valid_time_mask, x_tf)
     compute_dtype = (
         torch.float32 if x_tf.dtype in {torch.float16, torch.bfloat16} else x_tf.dtype
@@ -107,11 +132,19 @@ def _scale_bands(
 def restore_band_scale(
     pooled_scaled: torch.Tensor, bands: _ScaledBands, dtype: torch.dtype
 ) -> torch.Tensor:
+    """Undo ``_scale_bands`` on a pooled ``[B, F, D]`` result and cast to ``dtype``."""
     return (pooled_scaled.clamp(min=-1, max=1) * bands.scale.squeeze(1)).to(dtype)
 
 
 def time_mean(bands: _ScaledBands) -> torch.Tensor:
-    """mu[f] = mean over valid t of x[t,f]."""
+    """mu[f] = mean over valid t of x[t,f].
+
+    Args:
+        bands: Scaled features from ``_scale_bands``.
+
+    Returns:
+        ``[B, F, D]`` time mean (in the scaled domain).
+    """
     return (bands.x * bands.mean_weight).sum(dim=1)
 
 
@@ -120,7 +153,16 @@ def relative_deviation(
 ) -> torch.Tensor:
     """r[t,f] = ||x[t,f] - mu[f]|| / max_t ||x[t,f] - mu[f]||.
 
-    ``r`` is zero for every t when the maximum deviation is at most ``eps``.
+    ``r`` is zero for every t when the maximum deviation is at most ``eps``
+    (measured before scaling), so the pooling falls back to the plain mean.
+
+    Args:
+        bands: Scaled features from ``_scale_bands``.
+        mu: ``[B, F, D]`` output of ``time_mean``.
+        eps: Deviation threshold.
+
+    Returns:
+        ``[B, T, F]`` relative deviations in ``[0, 1]``; zero on invalid patches.
     """
     distance = torch.linalg.vector_norm(bands.x - mu.unsqueeze(1), dim=-1)
     distance = distance.masked_fill(~bands.mask, 0)
@@ -143,6 +185,16 @@ def deviation_weights(
     """w[t,f] = (1 + r[t,f])^gamma / sum_t (1 + r[t,f])^gamma.
 
     Computed as softmax_t(gamma * log1p(r)) so large gamma does not overflow.
+    Invalid patches get zero weight.
+
+    Args:
+        r: ``[B, T, F]`` output of ``relative_deviation``.
+        gamma: Non-negative emphasis exponent; 0 gives the plain mean.
+        mask: ``[B, T, F]`` valid patches.
+        dtype: Output dtype.
+
+    Returns:
+        ``[B, T, F]`` weights summing to one over t.
     """
     weight_dtype = torch.float64 if gamma > torch.finfo(torch.float32).max else dtype
     log_weight = torch.log1p(r.to(dtype=weight_dtype)) * gamma
@@ -151,7 +203,15 @@ def deviation_weights(
 
 
 def weighted_time_sum(x: torch.Tensor, weight: torch.Tensor) -> torch.Tensor:
-    """q[f] = sum_t w[t,f] x[t,f]."""
+    """q[f] = sum_t w[t,f] x[t,f].
+
+    Args:
+        x: ``[B, T, F, D]`` features.
+        weight: ``[B, T, F]`` time weights.
+
+    Returns:
+        ``[B, F, D]`` pooled features.
+    """
     return (x * weight.unsqueeze(-1)).sum(dim=1)
 
 
@@ -162,7 +222,10 @@ def relative_deviation_pooling(
     valid_time_mask: Optional[torch.Tensor] = None,
     return_weights: bool = False,
 ) -> Union[torch.Tensor, Tuple[torch.Tensor, torch.Tensor]]:
-    """Pool time independently per band, emphasizing relative deviations.
+    """RDP: pool time independently per band, emphasizing relative deviations.
+
+    Computes ``time_mean`` (mu), ``relative_deviation`` (r),
+    ``deviation_weights`` (w) and ``weighted_time_sum`` (q) in that order.
 
     Args:
         x_tf: Floating-point tensor with shape ``[B, T, F, D]``.
@@ -170,6 +233,10 @@ def relative_deviation_pooling(
         eps: Threshold below which the maximum deviation is treated as zero.
         valid_time_mask: Optional boolean ``[B, T]`` or ``[B, T, F]`` mask.
         return_weights: Also return normalized ``[B, T, F]`` weights.
+
+    Returns:
+        Pooled ``[B, F, D]`` features in the input dtype, and the weights when
+        ``return_weights`` is True.
     """
 
     _validate_time_frequency(x_tf)
@@ -203,7 +270,19 @@ def frequency_pooling(
     eps: float = 1e-8,
     valid_time_mask: Optional[torch.Tensor] = None,
 ) -> torch.Tensor:
-    """Pool ``[B, T, F, D]`` over time while retaining frequency bands."""
+    """Pool ``[B, T, F, D]`` over time while retaining frequency bands.
+
+    Args:
+        x_tf: ``[B, T, F, D]`` features.
+        mode: ``"rdp"`` (``relative_deviation_pooling``) or ``"mean"``
+            (``time_mean`` only).
+        gamma: RDP emphasis exponent; ignored for ``"mean"``.
+        eps: RDP deviation threshold; ignored for ``"mean"``.
+        valid_time_mask: Optional boolean ``[B, T]`` or ``[B, T, F]`` mask.
+
+    Returns:
+        ``[B, F, D]`` pooled features in the input dtype.
+    """
 
     if mode not in {"mean", "rdp"}:
         raise ValueError(f"pooling mode must be 'mean' or 'rdp', got {mode!r}")
