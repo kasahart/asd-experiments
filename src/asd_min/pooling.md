@@ -15,6 +15,14 @@ w[t,f] = (1 + r[t,f])^gamma / sum_t (1 + r[t,f])^gamma
 q[f] = sum_t w[t,f] x[t,f]
 ```
 
+| 式 | 関数（[`pooling.py`](pooling.py)） |
+|---|---|
+| `mu[f]` | `time_mean()` |
+| `r[t,f]` | `relative_deviation()` |
+| `w[t,f]` | `deviation_weights()` |
+| `q[f]` | `weighted_time_sum()` |
+| 全体 | `relative_deviation_pooling()`（`frequency_pooling(mode="rdp")`から呼ばれます） |
+
 **直感：** ずっと似た音が続く中で、短い区間だけ特徴が変わると、普通の平均では薄まります。RDPは平均から離れた区間を重くし、その変化を集約後にも残しやすくします。
 
 `gamma=4`は[NA-SSL論文](https://arxiv.org/html/2608.00447v1)に沿った固定値で、最大偏差が`eps=1e-8`以下なら均等な時間平均になります。公開実装は、任意の有効時間mask、有限値検査、数値overflowを避ける内部scaleとlog/softmaxによる重み計算も備えます。これらは基本式を安定に計算する実装上の工夫です。

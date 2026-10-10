@@ -9,7 +9,16 @@
 BEATs重みのSHA-256、train/test件数と匿名テスト名を確認し、既存出力を上書きしません。入力hash・時間・正常trainスコア・閾値をローカルに記録します。実録音の再描画も同じ`condition_audio()`を呼び、Wandasで図を作ります。
 
 
-入力計画は`plan()`、特徴抽出は`Encoder.extract()`、全体実行は`run()`です。CLIの`results`は保存表の閲覧、`infer`は生音声からの再推論、`evaluate`は指定した固定版の評価器による保存異常度の採点です。
+| 手順 | 関数（[`runner.py`](runner.py)） |
+|---|---|
+| 件数・ファイル名の確認 | `plan()` |
+| 波形処理→BEATs→RDP | `extract_features()`（1録音は`Encoder.extract()`） |
+| 正常参照の構築・採点・90%点の閾値 | `score_machine()` |
+| 異常度・判定CSVと正常trainスコアの書き出し | `write_machine_outputs()` |
+| 条件・機種の順に上の手順を実行し、実行記録を残す | `run()` |
+| Developmentの採点（Dev7・Dev5） | [`development.py`](development.py)の`score_development()` |
+
+条件名・機種・件数・RDPの`gamma`・VarMinの近傍数・閾値の分位点・重みと評価器の版は[`protocol.py`](protocol.py)にまとめています。CLIの`results`は保存表の閲覧、`infer`は生音声からの再推論、`evaluate`は指定した固定版の評価器による保存異常度の採点です。
 
 [公開コード：runner.py](runner.py) / [cli.py](cli.py) / [README](../../README.md)
 
@@ -40,6 +49,14 @@ python -m asd_min.cli infer --input /path/to/eval_data/raw \
 # 全5機種、各train1000/test200。4条件を明示。時間と資源を確認してから実行。
 python -m asd_min.cli infer --input /path/to/eval_data/raw \
   --checkpoint /path/to/BEATs_iter3.pt --output outputs/part02 --conditions b0 b1 w1 ss --device cpu
+```
+
+構成の選択にはDevelopment 7機種を使います。`--dataset dev`で同じ手順を実行し、`score-dev`でDev7とDev5を求めます。Developmentの採点に評価器は使いません。
+
+```bash
+python -m asd_min.cli infer --dataset dev --input /path/to/dev_data/raw \
+  --checkpoint /path/to/BEATs_iter3.pt --output outputs/part02-dev --conditions b0 b1 w1 ss --device cpu
+python -m asd_min.cli score-dev --system outputs/part02-dev/b0 --output outputs/part02-dev/b0-scores.csv
 ```
 
 `--limit`や`--machine`付きは動作確認用です。公式全5機種スコアの再採点には全件出力を使います。

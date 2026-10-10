@@ -14,6 +14,16 @@
 
 ch0近接/ch1遠方、16 kHz stereo。各機種train1000/test200。正常参照はtrainのみです。音声・重みをrepoへ追加せず、外部取得先のpathを指定します。
 
+## Development（構成の選択用）
+
+[DCASE 2026 Challenge Task 2 Development Dataset](https://zenodo.org/records/19336329)の7機種ZIP（`dev_ToyCar_r2.zip`、`dev_ToyCarEmu.zip`、`dev_bearingEmu.zip`、`dev_fan.zip`、`dev_gearboxEmu.zip`、`dev_sliderEmu.zip`、`dev_valveEmu.zip`）を同じ `dev_data/raw` に展開し、`--input` に指定して `--dataset dev` で実行します。`dev_ToyCar_r2.zip`は`ToyCar`として展開されます。
+
+```text
+<INPUT>/{ToyCar,ToyCarEmu,bearingEmu,fan,gearboxEmu,sliderEmu,valveEmu}/{train,test}/*.wav
+```
+
+各機種train1000（source990/target10）・test200で、Evaluationと同じch0近接/ch1遠方、16 kHz stereoです。testのファイル名には`section_00_target_test_anomaly_0005_noAttribute.wav`のようにdomainと正常・異常が入っており、採点（`score-dev`）だけがこの情報を使います。DevelopmentのZIPのMD5は下表に含めていません。
+
 ## Checksum
 
 以下は2026-10-03にZenodo各配布ページで確認した**ZIPのMD5**です。解凍後WAVのSHA-256とは異なります。配布元が更新された場合は配布元の値を確認してください。
