@@ -12,6 +12,14 @@ Evaluationの5機種。正常参照はAdditional Trainingの各1000正常音（s
 
 近接/遠方の**大きさ**をbeta1で減算し、`near_abs > far_abs`なら差、それ以外はgamma0.1×near_absを使い、近接位相で復元します。Hann512/hop256。periodic Hann・center=True・reflect・入力正規化なしは、報告が未指定の詳細を固定したローカル選択です。[SS config](../configs/02_ss.json)。正常参照はSS処理した音から再構築します。
 
+## Development（構成の選択）
+
+構成の選択はDevelopment 7機種（ToyCar、ToyCarEmu、bearingEmu、fan、gearboxEmu、sliderEmu、valveEmu）で行い、Evaluationは報告だけに使います。検知器・正常参照・閾値の手順はEvaluationと同じです。Developmentのtest正解はファイル名から読み、`score-dev`での採点だけに使います。
+
+- 機種ごと：AUC_source（source正常＋全異常）、AUC_target（target正常＋全異常）、pAUC（全件、FPR 0.1まで）。
+- **Dev7**：7機種×3指標＝21値の調和平均。選択に使います。
+- **Dev5**：ToyCar・ToyCarEmuを除いた5機種×3指標＝15値の調和平均。診断用です。
+
 ## 評価指標
 
 スコアはDCASE 2026 Task 2の公式評価指標に従って算出しています。詳細は[dcase2026_task2_evaluator README](https://github.com/nttcslab/dcase2026_task2_evaluator/blob/f6a94a2b5e614a9626c9d1ccff6df0705e6aaa75/README.md)を参照してください。

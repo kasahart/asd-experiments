@@ -6,15 +6,43 @@ Method parameters stay next to their method (W1/SS in waveform.py). This module
 holds what the runner, CLI and evaluation must agree on.
 """
 
-CONDITIONS = ("b0", "b1", "w1", "ss")
-MACHINES = ("BlowerDustCollector", "Sander", "SewingMachine", "ToothBrush", "ToyDrone")
+import re
 
-# Additional Training normal memory and anonymous Evaluation test clips per machine.
+CONDITIONS = ("b0", "b1", "w1", "ss")
+
+# Evaluation: reported only. Development: used to choose configurations.
+EVALUATION_MACHINES = (
+    "BlowerDustCollector",
+    "Sander",
+    "SewingMachine",
+    "ToothBrush",
+    "ToyDrone",
+)
+DEVELOPMENT_MACHINES = (
+    "ToyCar",
+    "ToyCarEmu",
+    "bearingEmu",
+    "fan",
+    "gearboxEmu",
+    "sliderEmu",
+    "valveEmu",
+)
+# Dev5 is a diagnostic subset without the ToyCar family.
+DEV5_EXCLUDED = ("ToyCar", "ToyCarEmu")
+DATASET_MACHINES = {"eval": EVALUATION_MACHINES, "dev": DEVELOPMENT_MACHINES}
+MACHINES = EVALUATION_MACHINES
+
+# Normal training memory and test clips per machine, the same in both datasets.
 TRAIN_CLIPS = 1000
 SOURCE_TRAIN_CLIPS = 990
 TARGET_TRAIN_CLIPS = 10
 TEST_CLIPS = 200
+# Evaluation test clips are anonymous; Development names carry domain and label.
 TEST_FILENAMES = frozenset(f"section_00_{i:04d}.wav" for i in range(TEST_CLIPS))
+DEV_TEST_FILENAME = re.compile(
+    r"section_00_(?P<domain>source|target)_test_(?P<label>normal|anomaly)_\d{4}_.+\.wav"
+)
+PAUC_MAX_FPR = 0.1
 SMOKE_MIN_REFERENCES = 5
 
 # Detector shared by every condition.

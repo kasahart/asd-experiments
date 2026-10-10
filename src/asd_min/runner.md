@@ -16,6 +16,7 @@ BEATs重みのSHA-256、train/test件数と匿名テスト名を確認し、既�
 | 正常参照の構築・採点・90%点の閾値 | `score_machine()` |
 | 異常度・判定CSVと正常trainスコアの書き出し | `write_machine_outputs()` |
 | 条件・機種の順に上の手順を実行し、実行記録を残す | `run()` |
+| Developmentの採点（Dev7・Dev5） | [`development.py`](development.py)の`score_development()` |
 
 条件名・機種・件数・RDPの`gamma`・VarMinの近傍数・閾値の分位点・重みと評価器の版は[`protocol.py`](protocol.py)にまとめています。CLIの`results`は保存表の閲覧、`infer`は生音声からの再推論、`evaluate`は指定した固定版の評価器による保存異常度の採点です。
 
@@ -48,6 +49,14 @@ python -m asd_min.cli infer --input /path/to/eval_data/raw \
 # 全5機種、各train1000/test200。4条件を明示。時間と資源を確認してから実行。
 python -m asd_min.cli infer --input /path/to/eval_data/raw \
   --checkpoint /path/to/BEATs_iter3.pt --output outputs/part02 --conditions b0 b1 w1 ss --device cpu
+```
+
+構成の選択にはDevelopment 7機種を使います。`--dataset dev`で同じ手順を実行し、`score-dev`でDev7とDev5を求めます。Developmentの採点に評価器は使いません。
+
+```bash
+python -m asd_min.cli infer --dataset dev --input /path/to/dev_data/raw \
+  --checkpoint /path/to/BEATs_iter3.pt --output outputs/part02-dev --conditions b0 b1 w1 ss --device cpu
+python -m asd_min.cli score-dev --system outputs/part02-dev/b0 --output outputs/part02-dev/b0-scores.csv
 ```
 
 `--limit`や`--machine`付きは動作確認用です。公式全5機種スコアの再採点には全件出力を使います。

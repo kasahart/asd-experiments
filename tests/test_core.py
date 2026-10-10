@@ -113,3 +113,56 @@ def test_protocol_matches_conditions_and_exported_config():
     assert tuple(CONDITION_AUDIO) == CONDITIONS
     config = Path(__file__).resolve().parents[1] / "configs/02_ss.json"
     assert json.loads(config.read_text())["parameters"] == SS_PARAMETERS
+
+
+def _dev_test_names():
+    names = []
+    for i in range(200):
+        domain = ("source", "target")[i % 2]
+        label = ("normal", "anomaly")[(i // 2) % 2]
+        names.append(f"section_00_{domain}_test_{label}_{i:04d}_noAttribute.wav")
+    return names
+
+
+def test_plan_development_inventory(tmp_path):
+    train = tmp_path / "fan/train"
+    test = tmp_path / "fan/test"
+    train.mkdir(parents=True)
+    test.mkdir(parents=True)
+    for i in range(1000):
+        domain = "source" if i < 990 else "target"
+        (train / f"section_00_{domain}_train_normal_{i:04d}_x.wav").touch()
+    for name in _dev_test_names():
+        (test / name).touch()
+    selected = plan(tmp_path, ("fan",), dataset="dev")
+    assert len(selected["fan"]["test"]) == 200
+    with pytest.raises(ValueError, match="not in the eval dataset"):
+        plan(tmp_path, ("fan",))
+    (test / _dev_test_names()[0]).rename(test / "section_00_0000.wav")
+    with pytest.raises(ValueError, match="labeled Development"):
+        plan(tmp_path, ("fan",), dataset="dev")
+
+
+def test_development_scores(tmp_path):
+    from asd_min.development import machine_metrics, score_development
+    from asd_min.protocol import DEVELOPMENT_MACHINES
+
+    names = _dev_test_names()
+    anomalous = np.array(["_anomaly_" in n for n in names], float)
+    perfect = machine_metrics(names, anomalous)
+    assert perfect == {
+        "auc_source": 1.0,
+        "auc_target": 1.0,
+        "pauc": 1.0,
+        "official": 1.0,
+    }
+    rng = np.random.default_rng(3)
+    for machine in DEVELOPMENT_MACHINES:
+        scores = anomalous + rng.normal(0, 1, 200)
+        with (tmp_path / f"anomaly_score_{machine}_section_00_test.csv").open("w") as f:
+            f.writelines(f"{n},{s}\n" for n, s in zip(names, scores))
+    rows, summary = score_development(tmp_path)
+    assert [r["machine"] for r in rows] == list(DEVELOPMENT_MACHINES)
+    assert 0.5 < summary["dev7"] < 1 and 0.5 < summary["dev5"] < 1
+    _, partial = score_development(tmp_path, ("fan",))
+    assert partial == {"dev7": None, "dev5": None}

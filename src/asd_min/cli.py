@@ -7,11 +7,11 @@ import csv
 import json
 from pathlib import Path
 
-from .protocol import CONDITIONS, MACHINES
+from .protocol import CONDITIONS, DATASET_MACHINES
 
 
 def main():
-    """Parse ``results`` / ``infer`` / ``evaluate`` and run the chosen command."""
+    """Parse ``results`` / ``infer`` / ``score-dev`` / ``evaluate`` and run it."""
     parser = argparse.ArgumentParser(
         description="ASD experiments: article 2 B0/B1/W1/SS"
     )
@@ -29,14 +29,27 @@ def main():
     infer.add_argument(
         "--conditions", nargs="+", choices=CONDITIONS, default=list(CONDITIONS)
     )
+    infer.add_argument(
+        "--dataset",
+        choices=tuple(DATASET_MACHINES),
+        default="eval",
+        help="dev: choose configurations (Dev7); eval: report only",
+    )
     infer.add_argument("--device", default="cpu")
-    infer.add_argument("--machine", choices=MACHINES)
+    infer.add_argument(
+        "--machine", choices=sorted({m for v in DATASET_MACHINES.values() for m in v})
+    )
     infer.add_argument("--limit", type=int, help="Smoke only; never an article score")
     infer.add_argument(
         "--dry-run",
         action="store_true",
         help="Validate inventory and show count; no checkpoint loading",
     )
+    dev = sub.add_parser(
+        "score-dev", help="Dev7/Dev5 from labeled Development test filenames"
+    )
+    dev.add_argument("--system", type=Path, required=True)
+    dev.add_argument("--output", type=Path, help="Optional per-machine CSV")
     ev = sub.add_parser(
         "evaluate", help="Requires reader-provided evaluator and resolved terms"
     )
@@ -55,9 +68,9 @@ def main():
     elif args.command == "infer":
         from .runner import plan, run
 
-        machines = (args.machine,) if args.machine else MACHINES
+        machines = (args.machine,) if args.machine else DATASET_MACHINES[args.dataset]
         if args.dry_run:
-            files = plan(args.input, machines, args.limit)
+            files = plan(args.input, machines, args.limit, args.dataset)
             print(
                 json.dumps(
                     {m: {s: len(p) for s, p in v.items()} for m, v in files.items()},
@@ -73,8 +86,22 @@ def main():
                 args.device,
                 machines,
                 args.limit,
+                args.dataset,
             )
             print(json.dumps(receipt, indent=2))
+    elif args.command == "score-dev":
+        from .development import score_development
+
+        rows, summary = score_development(args.system)
+        if args.output:
+            with args.output.open("w", newline="") as f:
+                writer = csv.DictWriter(f, fieldnames=list(rows[0]))
+                writer.writeheader()
+                writer.writerows(rows)
+        for row in rows:
+            print(f"{row['machine']}: {100 * row['official']:.3f}")
+        for name, value in summary.items():
+            print(f"{name.upper()}: {100 * value:.3f}")
     else:
         from .evaluation import evaluate
 

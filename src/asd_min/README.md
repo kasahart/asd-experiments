@@ -9,6 +9,7 @@
 | BEAM＋VarMin採点 | [beam.md](beam.md) | [beam.py](beam.py)・[varmin.py](varmin.py)・[band_distance.py](band_distance.py) |
 | 波形処理 | [waveform.md](waveform.md) | [waveform.py](waveform.py) |
 | 条件比較の実行 | [runner.md](runner.md) | [runner.py](runner.py)・[cli.py](cli.py) |
+| Developmentの採点 | [02-protocol.md](../../docs/02-protocol.md#development構成の選択) | [development.py](development.py) |
 | 固定条件の値 | [02-protocol.md](../../docs/02-protocol.md) | [protocol.py](protocol.py) |
 
 出典は[第三者通知](../../THIRD_PARTY_NOTICES.md)を参照してください。

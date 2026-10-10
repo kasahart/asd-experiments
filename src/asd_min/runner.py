@@ -20,6 +20,8 @@ from .pooling import frequency_pooling, sequence_to_time_frequency
 from .protocol import (
     CHECKPOINT_SHA256,
     CONDITIONS,
+    DATASET_MACHINES,
+    DEV_TEST_FILENAME,
     MACHINES,
     RDP_GAMMA,
     SMOKE_MIN_REFERENCES,
@@ -43,26 +45,30 @@ def digest(path):
     return h.hexdigest()
 
 
-def plan(root, machines=MACHINES, limit=None):
+def plan(root, machines=MACHINES, limit=None, dataset="eval"):
     """Check the fixed train/test inventory and return the files per machine.
 
     Args:
         root: Directory holding ``<machine>/train`` and ``<machine>/test``.
-        machines: Evaluation machines to include.
+        machines: Machines of ``dataset`` to include.
         limit: Keep only the first ``limit`` files per split (smoke runs only).
+        dataset: ``"eval"`` (anonymous test names) or ``"dev"`` (test names
+            carrying domain and normal/anomaly labels).
 
     Returns:
         ``{machine: {"train": [Path, ...], "test": [Path, ...]}}`` sorted by name.
 
     Raises:
         ValueError: Counts (1000 train with 990 source / 10 target, 200 test)
-            or anonymous test filenames differ from the protocol.
+            or test filenames differ from the protocol.
     """
+    if dataset not in DATASET_MACHINES:
+        raise ValueError(f"Unknown dataset: {dataset!r}")
     root = Path(root)
     selected = {}
     for machine in machines:
-        if machine not in MACHINES:
-            raise ValueError("Evaluation machines only")
+        if machine not in DATASET_MACHINES[dataset]:
+            raise ValueError(f"{machine} is not in the {dataset} dataset")
         selected[machine] = {}
         for split, count in [("train", TRAIN_CLIPS), ("test", TEST_CLIPS)]:
             paths = sorted((root / machine / split).glob("*.wav"))
@@ -80,8 +86,12 @@ def plan(root, machines=MACHINES, limit=None):
                         f"Expected {SOURCE_TRAIN_CLIPS} source and "
                         f"{TARGET_TRAIN_CLIPS} target normal training clips"
                     )
-            if split == "test" and {p.name for p in paths} != TEST_FILENAMES:
-                raise ValueError("Keep original anonymous Evaluation filenames")
+            if split == "test" and dataset == "eval":
+                if {p.name for p in paths} != TEST_FILENAMES:
+                    raise ValueError("Keep original anonymous Evaluation filenames")
+            if split == "test" and dataset == "dev":
+                if not all(DEV_TEST_FILENAME.fullmatch(p.name) for p in paths):
+                    raise ValueError("Keep original labeled Development filenames")
             selected[machine][split] = paths[:limit] if limit else paths
     return selected
 
@@ -210,6 +220,7 @@ def run(
     device="cpu",
     machines=MACHINES,
     limit=None,
+    dataset="eval",
 ):
     """Run every condition and machine and write submissions plus ``receipt.json``.
 
@@ -218,13 +229,14 @@ def run(
     conditions.
 
     Args:
-        root: Raw Evaluation data directory (see ``plan``).
+        root: Raw data directory of ``dataset`` (see ``plan``).
         checkpoint: BEATs_iter3 checkpoint path.
         output: New output directory; an existing one is refused.
         conditions: Subset of ``CONDITIONS`` in run order.
         device: Torch device.
-        machines: Subset of ``MACHINES``.
+        machines: Machines of ``dataset``.
         limit: Smoke mode with at least 5 clips per split; never an article score.
+        dataset: ``"eval"`` (reported only) or ``"dev"`` (for choosing configurations).
 
     Returns:
         The receipt dictionary also written to ``output/receipt.json``.
@@ -233,7 +245,7 @@ def run(
         raise ValueError(
             f"Smoke mode requires at least {SMOKE_MIN_REFERENCES} references"
         )
-    selected = plan(root, machines, limit)
+    selected = plan(root, machines, limit, dataset)
     output = Path(output)
     if output.exists():
         raise ValueError("Refusing to overwrite output")
@@ -245,6 +257,7 @@ def run(
     receipt = {
         "status": "running",
         "mode": "smoke_not_article_score" if limit else "full",
+        "dataset": dataset,
         "conditions": list(conditions),
         "checkpoint_sha256": CHECKPOINT_SHA256,
         "torch": torch.__version__,

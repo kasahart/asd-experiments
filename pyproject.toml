@@ -7,7 +7,7 @@ version = "0.1.0"
 license = "MIT"
 license-files = ["LICENSE", "licenses/*.txt", "src/asd_min/beats/LICENSE", "src/asd_min/beats/NOTICE.md"]
 requires-python = ">=3.10"
-dependencies = ["numpy>=1.26,<3", "soundfile>=0.12", "torch==2.7.1", "torchaudio==2.7.1"]
+dependencies = ["numpy>=1.26,<3", "scikit-learn>=1.3", "soundfile>=0.12", "torch==2.7.1", "torchaudio==2.7.1"]
 [project.optional-dependencies]
 visualization = ["wandas==0.8.0", "matplotlib", "pandas"]
 app = ["marimo==0.25.1"]
