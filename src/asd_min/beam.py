@@ -1,8 +1,9 @@
+# Research-derived; original MIT notice: licenses/research-MIT.txt
 """Band-wise Equalized Anomaly Measure with variance-minimum rescaling.
 
 Each equation in beam.md is one function: band distances in band_distance.py,
-VarMin terms in varmin.py, and the BEAM minimum and band mean here. The
-ASDKit backend interface and every name below stay importable from this module.
+VarMin terms in varmin.py, and the BEAM minimum and band mean here. Every
+name below stays importable from this module.
 """
 
 import logging
@@ -20,7 +21,6 @@ from .band_distance import (  # noqa: F401  (public names kept for compatibility
     l2_normalize,
     nearest_reference,
 )
-from .base import BaseBackend
 from .varmin import (  # noqa: F401  (public names kept for compatibility)
     VarianceMinRescaler,
     compute_local_density,
@@ -100,7 +100,7 @@ class _BandMemory:
     alpha: np.ndarray
 
 
-class BEAMVarianceMin(BaseBackend):
+class BEAMVarianceMin:
     """BEAM backend with optional per-band variance-minimum score rescaling.
 
     The canonical reproduction assumes TrainAll leave-one-out calibration and a

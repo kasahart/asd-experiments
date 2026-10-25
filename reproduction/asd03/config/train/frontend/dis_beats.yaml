@@ -1,0 +1,30 @@
+# ASDKit由来の変更設定。frontendとextractorを周波数保持用runtime.BEATsLoRAへ接続し、推論RDPのgammaを追加。
+# 参照元: https://github.com/TakuyaFujimura/dcase-asd-toolkit/blob/7601d673ef2ed5a2424965cac755365cf7112c5f/config/train/frontend/dis_beats.yaml
+# 原MIT通知: licenses/research-MIT.txt（リポジトリルート基準）。
+tgt_class: runtime.FrequencyDisPLModel
+rdp_gamma: 4
+
+optim_cfg:
+  tgt_class: torch.optim.AdamW
+  lr: 1.0e-4
+
+lrscheduler_cfg: null
+
+label_dict_path: ${label_dict_path}
+
+model_cfg:
+  extractor_cfg:
+    tgt_class: runtime.BEATsLoRA
+    lora_cfg:
+      r: 64
+      target_modules: ["q_proj", "v_proj"]
+    embed_size: 256
+    projection_type: "attn_stat_pool"
+    model_cfg:
+      ckpt_path: "pretrained_models/beats/BEATs_iter3.pt"
+      sr: ${datamodule.sr}
+      specaug: false
+  loss_cfg: {}
+  label_to_lossweight_dict:
+    main: 1
+  augmentation_cfg_list: []

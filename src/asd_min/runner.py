@@ -101,16 +101,21 @@ class Encoder:
     Args:
         checkpoint: BEATs_iter3 checkpoint; its SHA-256 must match the protocol.
         device: Torch device for inference.
+        update_cfg: Optional ``BEATsConfig`` overrides (for example dropout)
+            applied before the weights are loaded.
     """
 
-    def __init__(self, checkpoint, device="cpu"):
+    def __init__(self, checkpoint, device="cpu", update_cfg=None):
         from .beats.BEATs import BEATs, BEATsConfig
 
         if digest(checkpoint) != CHECKPOINT_SHA256:
             raise ValueError("Expected article BEATs_iter3 checkpoint SHA-256")
         # Official checkpoint contains config dictionaries and tensors only.
         payload = torch.load(checkpoint, map_location="cpu", weights_only=True)
-        self.model = BEATs(BEATsConfig(payload["cfg"]))
+        cfg = BEATsConfig(payload["cfg"])
+        if update_cfg:
+            cfg.update(update_cfg)
+        self.model = BEATs(cfg)
         self.model.load_state_dict(payload["model"], strict=True)
         if self.model.predictor is not None:
             raise ValueError("Frozen sequence BEATs required")

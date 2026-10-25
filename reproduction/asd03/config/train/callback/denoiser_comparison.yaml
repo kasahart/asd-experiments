@@ -1,0 +1,8 @@
+# 独自設定。ASDKitのcallback schemaで最終checkpointの保存頻度を指定。
+# 参照するschema: https://github.com/TakuyaFujimura/dcase-asd-toolkit/blob/7601d673ef2ed5a2424965cac755365cf7112c5f/config/train/callback/default.yaml
+tqdm_refresh_rate: 100
+callbacks:
+  last:
+    save_top_k: 1
+    save_last: true
+    every_n_epochs: 1
