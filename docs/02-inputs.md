@@ -2,7 +2,7 @@
 
 1. [DCASE 2026 Challenge Task 2 Additional Training Dataset](https://zenodo.org/records/20151556)の5機種train ZIPと[DCASE 2026 Challenge Task 2 Evaluation Dataset](https://zenodo.org/records/20437238)の5機種test ZIPを取得し、同じ `eval_data/raw` に展開します。このパスを `--input` に指定します。
 2. [BEATs README](https://github.com/microsoft/unilm/blob/master/beats/README.md)の **Pre-Trained Model / Iter3** を取得し、`--checkpoint` に指定します。
-3. 採点には[dcase2026_task2_evaluator](https://github.com/nttcslab/dcase2026_task2_evaluator)と付属正解を使用しました。再採点時は取得先を `--evaluator` に指定します。評価器は `f6a94a2b5e614a9626c9d1ccff6df0705e6aaa75` にcheckoutし、変更のない状態で使います。依存関係と使い方は[dcase2026_task2_evaluator README](https://github.com/nttcslab/dcase2026_task2_evaluator/blob/f6a94a2b5e614a9626c9d1ccff6df0705e6aaa75/README.md)を参照してください。
+3. 採点には[dcase2026_task2_evaluator](https://github.com/nttcslab/dcase2026_task2_evaluator)と付属正解を使用しました。再採点時は取得先を `--evaluator` に指定します。評価器は `f6a94a2b5e614a9626c9d1ccff6df0705e6aaa75` の版を使います。依存関係と使い方は[dcase2026_task2_evaluator README](https://github.com/nttcslab/dcase2026_task2_evaluator/blob/f6a94a2b5e614a9626c9d1ccff6df0705e6aaa75/README.md)を参照してください。
 
 ```text
 <INPUT>/BlowerDustCollector/{train,test}/*.wav
@@ -13,6 +13,16 @@
 ```
 
 ch0近接/ch1遠方、16 kHz stereo。各機種train1000/test200。正常参照はtrainのみです。音声・重みをrepoへ追加せず、外部取得先のpathを指定します。
+
+## Development（構成の選択用）
+
+[DCASE 2026 Challenge Task 2 Development Dataset](https://zenodo.org/records/19336329)の7機種ZIP（`dev_ToyCar_r2.zip`、`dev_ToyCarEmu.zip`、`dev_bearingEmu.zip`、`dev_fan.zip`、`dev_gearboxEmu.zip`、`dev_sliderEmu.zip`、`dev_valveEmu.zip`）を同じ `dev_data/raw` に展開し、`--input` に指定して `--dataset dev` で実行します。`dev_ToyCar_r2.zip`は`ToyCar`として展開されます。
+
+```text
+<INPUT>/{ToyCar,ToyCarEmu,bearingEmu,fan,gearboxEmu,sliderEmu,valveEmu}/{train,test}/*.wav
+```
+
+各機種train1000（source990/target10）・test200で、Evaluationと同じch0近接/ch1遠方、16 kHz stereoです。testのファイル名には`section_00_target_test_anomaly_0005_noAttribute.wav`のようにdomainと正常・異常が入っており、採点（`score-dev`）だけがこの情報を使います。DevelopmentのZIPのMD5は下表に含めていません。
 
 ## Checksum
 

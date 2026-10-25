@@ -8,8 +8,7 @@ import math
 import os
 import subprocess
 import sys
-from .runner import MACHINES
-REVISION = 'f6a94a2b5e614a9626c9d1ccff6df0705e6aaa75'
+from .protocol import MACHINES, TEST_CLIPS, TEST_FILENAMES, THRESHOLD_QUANTILE
 TRUTH_DIRS = ('ground_truth_data', 'ground_truth_domain', 'ground_truth_attributes')
 
 
@@ -18,7 +17,7 @@ def decisions_from_normal(train, test):
     train, test = np.asarray(train), np.asarray(test)
     if train.ndim != 1 or test.ndim != 1 or not len(train) or not np.isfinite(train).all() or not np.isfinite(test).all():
         raise ValueError('Expected finite normal-reference and test scores')
-    threshold = float(np.quantile(train, .9, method='linear'))
+    threshold = float(np.quantile(train, THRESHOLD_QUANTILE, method='linear'))
     return threshold, (test > threshold).astype(int)
 
 
@@ -33,17 +32,31 @@ def write_submission(system, machine, names, scores, decisions):
 
 
 def validate(system, machines=MACHINES, expected_names=None):
+    """Check a submission: 2 CSVs per machine, 200 unique finite rows each.
+
+    Args:
+        system: Directory with the ``anomaly_score_*`` and ``decision_result_*`` CSVs.
+        machines: Machines expected in the submission.
+        expected_names: ``{machine: set of test filenames}``; the anonymous
+            Evaluation names when omitted.
+
+    Returns:
+        The set of expected filenames.
+
+    Raises:
+        ValueError: A file is missing, extra, or has wrong rows or values.
+    """
     system = Path(system); expected = set()
     for machine in machines:
         names = (expected_names[machine] if expected_names is not None
-                 else {f'section_00_{i:04d}.wav' for i in range(200)})
-        if len(names) != 200:
+                 else TEST_FILENAMES)
+        if len(names) != TEST_CLIPS:
             raise ValueError('Official evaluation requires 200 unique test clips per machine')
         for prefix in ('anomaly_score', 'decision_result'):
             name = f'{prefix}_{machine}_section_00_test.csv'; expected.add(name)
             with (system / name).open() as stream: rows = list(csv.reader(stream))
-            if len(rows) != 200 or any(len(row) != 2 for row in rows): raise ValueError(name)
-            if len({row[0] for row in rows}) != 200 or {row[0] for row in rows} != set(names):
+            if len(rows) != TEST_CLIPS or any(len(row) != 2 for row in rows): raise ValueError(name)
+            if len({row[0] for row in rows}) != TEST_CLIPS or {row[0] for row in rows} != set(names):
                 raise ValueError('Filename mismatch')
             for _, value in rows:
                 number = float(value)
