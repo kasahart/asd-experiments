@@ -92,7 +92,8 @@ def load(path, frame_offset=0, num_frames=-1, normalize=True, channels_first=Tru
 
 
 def restore_beats(ckpt_path, update_cfg=None):
-    model = Encoder(ckpt_path, device='cpu', update_cfg=update_cfg).model
+    model = Encoder(ckpt_path, device='cpu', update_cfg=update_cfg,
+                    require_article_checkpoint=False).model
     # Encoder is frozen for inference; LoRA construction expects a trainable
     # backbone and applies its own parameter mask. Frozen frontends freeze again.
     return model.train().requires_grad_(True), model.cfg.encoder_embed_dim

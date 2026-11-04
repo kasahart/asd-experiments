@@ -99,16 +99,22 @@ class Encoder:
     """Frozen BEATs_iter3 followed by frequency-preserving RDP: one [F, D] per clip.
 
     Args:
-        checkpoint: BEATs_iter3 checkpoint; its SHA-256 must match the protocol.
+        checkpoint: BEATs checkpoint; the article BEATs_iter3 unless
+            ``require_article_checkpoint`` is False.
         device: Torch device for inference.
         update_cfg: Optional ``BEATsConfig`` overrides (for example dropout)
             applied before the weights are loaded.
+        require_article_checkpoint: Require the protocol SHA-256. The
+            configurable ASD03 runtime passes False and relies on the strict
+            state-dict load for compatibility.
     """
 
-    def __init__(self, checkpoint, device="cpu", update_cfg=None):
+    def __init__(
+        self, checkpoint, device="cpu", update_cfg=None, require_article_checkpoint=True
+    ):
         from .beats.BEATs import BEATs, BEATsConfig
 
-        if digest(checkpoint) != CHECKPOINT_SHA256:
+        if require_article_checkpoint and digest(checkpoint) != CHECKPOINT_SHA256:
             raise ValueError("Expected article BEATs_iter3 checkpoint SHA-256")
         # Official checkpoint contains config dictionaries and tensors only.
         payload = torch.load(checkpoint, map_location="cpu", weights_only=True)
