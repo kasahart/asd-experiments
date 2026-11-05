@@ -192,6 +192,17 @@ python3.11 -m venv .venv
 
 CPU環境は上のPyTorch配布先を`https://download.pytorch.org/whl/cpu`に変更します。[公式PyTorch 2.7.1構成](https://pytorch.org/get-started/previous-versions/)に合わせ、Torch・TorchAudio・TorchVisionを同じ配布先から導入します。推論だけなら`pip install -e .`で導入できます。最後の`runtime.py install`は[固定ASDKit archive](reproduction/asd03/upstream.lock.json)を仮想環境内へ取得してeditable導入する処理です。upstreamの必須モジュールがwheelに含まれないため、この方式を使い、Git・clone・checkout操作を不要にしています。
 
+### Dev Container
+
+[.devcontainer](.devcontainer)に、上と同じ手順で環境を作るDev Containerの設定を置いています。VS Codeの「Dev Containers: Reopen in Container」などで開くと、Python3.11のコンテナ内で`.venv`の作成から`pip check`までを自動で実行します。`.venv`はコンテナ用のボリュームに置くため、手元の`.venv`とは混ざりません。
+
+| 設定 | 用途 | 必要なもの |
+|---|---|---|
+| [.devcontainer/devcontainer.json](.devcontainer/devcontainer.json) | 学習・推論（CUDA 12.8版のPyTorch） | NVIDIA GPU、ドライバー、NVIDIA Container Toolkit |
+| [.devcontainer/cpu/devcontainer.json](.devcontainer/cpu/devcontainer.json) | テスト・アプリ・CPUでの推論 | Docker |
+
+GPU版はCUDAが使えないと作成時に止まります。その場合はCPU版を選びます。データ・重み・評価器は、リポジトリ内の`inputs/`（Gitの管理外）に置くと、コンテナからも同じパスで使えます。
+
 ## 使い方と資料
 
 | 調べたいこと | 入口 |
