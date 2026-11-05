@@ -29,7 +29,7 @@ training = [
     "tqdm==4.70.1",
     "threadpoolctl==3.7.0",
     "setuptools==79.0.1",
-    "wheel==0.45.1",
+    "wheel==0.46.2",
 ]
 evaluation = ["scipy==1.17.1", "scikit-learn==1.9.1", "pandas==2.3.3", "matplotlib", "librosa", "seaborn", "setuptools==79.0.1"]
 test = ["pytest"]
