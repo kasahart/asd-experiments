@@ -1,0 +1,19 @@
+# ASDKit由来。値・schemaは原版のまま。
+# 参照元: https://github.com/TakuyaFujimura/dcase-asd-toolkit/blob/7601d673ef2ed5a2424965cac755365cf7112c5f/config/train/callback/default.yaml
+# 原MIT通知: licenses/research-MIT.txt（リポジトリルート基準）。
+
+tqdm_refresh_rate: 1
+callbacks:
+  best:
+    monitor: "train/main"
+    filename: "epoch={epoch}-loss={train/main:.9f}"
+    save_top_k: 1
+    mode: "min"
+    auto_insert_metric_name: false
+  interval:
+    monitor: "train/main"
+    filename: "interval_epoch={epoch}-loss={train/main:.9f}"
+    save_top_k: -1
+    every_n_epochs: 4
+    save_last: true
+    auto_insert_metric_name: false

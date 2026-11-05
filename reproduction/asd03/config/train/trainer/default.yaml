@@ -1,0 +1,11 @@
+# ASDKit由来。値・schemaは原版のまま。
+# 参照元: https://github.com/TakuyaFujimura/dcase-asd-toolkit/blob/7601d673ef2ed5a2424965cac755365cf7112c5f/config/train/trainer/default.yaml
+# 原MIT通知: licenses/research-MIT.txt（リポジトリルート基準）。
+tgt_class: lightning.pytorch.Trainer
+max_epochs: 16
+min_epochs: null
+accelerator: "gpu"
+devices: [0]
+deterministic: true
+log_every_n_steps: 1
+check_val_every_n_epoch: 1

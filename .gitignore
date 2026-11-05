@@ -27,3 +27,6 @@ checkpoints/
 
 # Generated marimo sessions and HTML exports
 __marimo__/
+
+# Reader-provided inputs
+/inputs/

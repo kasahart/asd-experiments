@@ -1,0 +1,26 @@
+# ASDKit由来の変更設定。secを10秒に固定し、collatorをruntime.DCASEWaveCollatorへ接続。
+# 参照元: https://github.com/TakuyaFujimura/dcase-asd-toolkit/blob/7601d673ef2ed5a2424965cac755365cf7112c5f/config/train/datamodule/basic.yaml
+# 原MIT通知: licenses/research-MIT.txt（リポジトリルート基準）。
+
+batch_size: 64
+sr: 16000
+sec: 10
+num_workers: 0
+
+train:
+  dataloader:
+    batch_size: ${datamodule.batch_size}
+    num_workers: ${datamodule.num_workers}
+    pin_memory: true
+    shuffle: true
+  dataset:
+    tgt_class: asdkit.datasets.WaveDataset
+    path_selector_list:
+      - "${data_dir}/formatted/${dcase}/raw/*/train/*.wav"
+  batch_sampler: null
+  collator:
+    tgt_class: runtime.DCASEWaveCollator
+    sr: ${datamodule.sr}
+    sec: ${datamodule.sec}
+    shuffle: true
+    label_dict_path: ${label_dict_path}
