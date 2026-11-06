@@ -25,16 +25,12 @@ Zennの異常音検知（ASD）連載で使った実験コードとmarimoアプ�
 
 ## 手法
 
-### DCASE 2026 Evaluation / BEATs_iter3
-
-[marimoアプリ](apps/02_b0_b1_w1_ss.py)
-
-| 手法 | 特徴 | 特徴抽出モデル | モデルの追加学習 | 参考文献 |
-|---|---|---|---|---|
-| B0 | 近接マイク | BEATs_iter3 | なし（重み固定） | — |
-| B1 | 遠方マイク | BEATs_iter3 | なし（重み固定） | — |
-| W1 | 振幅と位相を合わせて減算 | BEATs_iter3 | なし（重み固定） | [Ozeki技術報告](https://dcase.community/documents/challenge2026/technical_reports/DCASE2026_Ozeki_101_t2.pdf)（同形の減算） |
-| SS | 振幅スペクトル減算 | BEATs_iter3 | なし（重み固定） | [Chu・Qian技術報告](https://dcase.community/documents/challenge2026/technical_reports/DCASE2026_Qian_65_t2.pdf)（式1） |
+| 手法 | 特徴 | 参考文献 | 使った回 |
+|---|---|---|---|
+| B0 | 近接マイク | — | 第2回・第3回 |
+| B1 | 遠方マイク | — | 第2回 |
+| W1 | 遠方マイクの大きさと位相を合わせて減算（全区間で推定） | [Ozeki技術報告](https://dcase.community/documents/challenge2026/technical_reports/DCASE2026_Ozeki_101_t2.pdf)（同形の減算） | 第2回・第3回 |
+| SS | 振幅スペクトル減算 | [Chu・Qian技術報告](https://dcase.community/documents/challenge2026/technical_reports/DCASE2026_Qian_65_t2.pdf)（式1） | 第2回 |
 
 #### 公式ベースライン・参考システム
 
@@ -45,154 +41,42 @@ Zennの異常音検知（ASD）連載で使った実験コードとmarimoアプ�
 
 本実験はBEATs_iter3を使用。REFはNA-BEATsを使うシステムで、RDPなど一部の処理を参考にしています。
 
-### DCASE 2026 Development / 固定BEATs（第3回）
-
-| 手法 | 特徴 | 特徴抽出モデル | モデルの追加学習 | 参考文献 |
-|---|---|---|---|---|
-| B0 | 近接マイク | BEATs_iter3 | なし（重み固定） | — |
-| W1 | 全区間の複素線形減算 | BEATs_iter3 | なし（重み固定） | — |
-
-### DCASE 2026 Development / BEATs追加学習（第3回）
-
-| 手法 | 特徴 | 特徴抽出モデル | モデルの追加学習 | 参考文献 |
-|---|---|---|---|---|
-| B0 | 近接マイク | BEATs_iter3 + LoRA | 正常12,000音・25epoch | — |
-| W1 | 全区間の複素線形減算 | BEATs_iter3 + LoRA | 正常12,000音・25epoch | — |
-
-### DCASE 2026 Evaluation / 固定BEATs（第3回）
-
-| 手法 | 特徴 | 特徴抽出モデル | モデルの追加学習 | 参考文献 |
-|---|---|---|---|---|
-| B0 | 近接マイク | BEATs_iter3 | なし（重み固定） | — |
-| W1 | 全区間の複素線形減算 | BEATs_iter3 | なし（重み固定） | — |
-
-### DCASE 2026 Evaluation / BEATs追加学習（第3回）
-
-| 手法 | 特徴 | 特徴抽出モデル | モデルの追加学習 | 参考文献 |
-|---|---|---|---|---|
-| B0 | 近接マイク | BEATs_iter3 + LoRA | 正常12,000音・25epoch | — |
-| W1 | 全区間の複素線形減算 | BEATs_iter3 + LoRA | 正常12,000音・25epoch | — |
-
 ## スコア
 
-総合スコアは高いほど良く、本実験の手法はスコア順に並べています。
+公式評価器の総合スコア（0–100、高いほど良い）です。回・データ・特徴抽出の組み合わせごとに1行です。
 
-### DCASE 2026 Evaluation / BEATs_iter3
+| 回 | データ | 特徴抽出モデル | モデルの追加学習 | B0 | B1 | W1 | SS | 資料 |
+|---|---|---|---|---|---|---|---|---|
+| 第2回 | Evaluation | BEATs_iter3 | なし（重み固定） | 62.841 | 58.362 | 66.835 | 62.325 | [条件](docs/02-protocol.md) · [入力](docs/02-inputs.md) · [CSV](results/02-summary.csv) |
+| 第3回 | Development | BEATs_iter3 | なし（重み固定） | 61.325 | — | 67.480 | — | [条件](reproduction/asd03/README.md#入力と固定条件) · [入力](reproduction/asd03/README.md#入力の取得と配置) · [CSV](results/03-beats/summary.csv) |
+| 第3回 | Development | BEATs_iter3 + LoRA | 正常12,000音・25epoch | 63.048 | — | 69.528 | — | [条件](reproduction/asd03/README.md#入力と固定条件) · [入力](reproduction/asd03/README.md#入力の取得と配置) · [CSV](results/03-beats/summary.csv) |
+| 第3回 | Evaluation | BEATs_iter3 | なし（重み固定） | 62.841 | — | 66.835 | — | [条件](reproduction/asd03/README.md#入力と固定条件) · [入力](reproduction/asd03/README.md#入力の取得と配置) · [CSV](results/03-beats/summary.csv) |
+| 第3回 | Evaluation | BEATs_iter3 + LoRA | 正常12,000音・25epoch | 67.916 | — | 70.659 | — | [条件](reproduction/asd03/README.md#入力と固定条件) · [入力](reproduction/asd03/README.md#入力の取得と配置) · [CSV](results/03-beats/summary.csv) |
 
-[固定条件](docs/02-protocol.md) · [入力取得](docs/02-inputs.md) · [総合値](results/02-summary.csv)
+第3回 Eval 固定のB0・W1は、第2回 Eval 固定と同じ処理・同じ結果です。
 
-青：本実験／灰：公式・参考値（異なるモデル）。
+参考値（Evaluation、本実験とは異なるモデル）：BASE（公式ベースライン）59.803、REF（一部処理の参考元）70.241。出典: [DCASE 2026 Task 2 Results](https://dcase.community/challenge2026/task-first-shot-unsupervised-anomalous-sound-detection-for-machine-condition-monitoring-results) · [システム名・参考値](results/02-challenge-references.json)
 
-```mermaid
----
-config:
-    xyChart:
-        width: 480
-        height: 380
-        showDataLabel: true
-    themeVariables:
-        xyChart:
-            plotColorPalette: "#2458a6"
-    themeCSS: ".bar-plot-0 rect:nth-child(n+5) { fill: #9099a5; }"
----
-xychart-beta horizontal
-    x-axis ["W1", "B0", "SS", "B1", "BASE", "REF"]
-    y-axis "Official score" 0 --> 100
-    bar [66.835, 62.841, 62.325, 58.362, 59.803, 70.241]
-```
+### 全回の一覧
 
-出典: [DCASE 2026 Task 2 Results](https://dcase.community/challenge2026/task-first-shot-unsupervised-anomalous-sound-detection-for-machine-condition-monitoring-results) · [システム名・参考値](results/02-challenge-references.json)
-
-### DCASE 2026 Development / 固定BEATs（第3回）
-
-[固定条件](reproduction/asd03/README.md#入力と固定条件) · [入力取得](reproduction/asd03/README.md#入力の取得と配置) · [総合値](results/03-beats/summary.csv)
-
-青：本実験。
+青：本実験（回・データ・特徴抽出の順、各組の中はスコア順）／灰：公式・参考値（異なるモデル）。
 
 ```mermaid
 ---
 config:
     xyChart:
-        width: 480
-        height: 180
+        width: 640
+        height: 780
         showDataLabel: true
     themeVariables:
         xyChart:
             plotColorPalette: "#2458a6"
+    themeCSS: ".bar-plot-0 rect:nth-child(n+13) { fill: #9099a5; }"
 ---
 xychart-beta horizontal
-    x-axis ["W1", "B0"]
+    x-axis ["第2回 Eval 固定 W1", "第2回 Eval 固定 B0", "第2回 Eval 固定 SS", "第2回 Eval 固定 B1", "第3回 Dev 固定 W1", "第3回 Dev 固定 B0", "第3回 Dev 追加学習 W1", "第3回 Dev 追加学習 B0", "第3回 Eval 固定 W1", "第3回 Eval 固定 B0", "第3回 Eval 追加学習 W1", "第3回 Eval 追加学習 B0", "参考 Eval BASE", "参考 Eval REF"]
     y-axis "Official score" 0 --> 100
-    bar [67.480, 61.325]
-```
-
-### DCASE 2026 Development / BEATs追加学習（第3回）
-
-[固定条件](reproduction/asd03/README.md#入力と固定条件) · [入力取得](reproduction/asd03/README.md#入力の取得と配置) · [総合値](results/03-beats/summary.csv)
-
-青：本実験。
-
-```mermaid
----
-config:
-    xyChart:
-        width: 480
-        height: 180
-        showDataLabel: true
-    themeVariables:
-        xyChart:
-            plotColorPalette: "#2458a6"
----
-xychart-beta horizontal
-    x-axis ["W1", "B0"]
-    y-axis "Official score" 0 --> 100
-    bar [69.528, 63.048]
-```
-
-### DCASE 2026 Evaluation / 固定BEATs（第3回）
-
-[固定条件](reproduction/asd03/README.md#入力と固定条件) · [入力取得](reproduction/asd03/README.md#入力の取得と配置) · [総合値](results/03-beats/summary.csv)
-
-青：本実験。
-
-```mermaid
----
-config:
-    xyChart:
-        width: 480
-        height: 180
-        showDataLabel: true
-    themeVariables:
-        xyChart:
-            plotColorPalette: "#2458a6"
----
-xychart-beta horizontal
-    x-axis ["W1", "B0"]
-    y-axis "Official score" 0 --> 100
-    bar [66.835, 62.841]
-```
-
-### DCASE 2026 Evaluation / BEATs追加学習（第3回）
-
-[固定条件](reproduction/asd03/README.md#入力と固定条件) · [入力取得](reproduction/asd03/README.md#入力の取得と配置) · [総合値](results/03-beats/summary.csv)
-
-青：本実験。
-
-```mermaid
----
-config:
-    xyChart:
-        width: 480
-        height: 180
-        showDataLabel: true
-    themeVariables:
-        xyChart:
-            plotColorPalette: "#2458a6"
----
-xychart-beta horizontal
-    x-axis ["W1", "B0"]
-    y-axis "Official score" 0 --> 100
-    bar [70.659, 67.916]
+    bar [66.835, 62.841, 62.325, 58.362, 67.480, 61.325, 69.528, 63.048, 66.835, 62.841, 70.659, 67.916, 59.803, 70.241]
 ```
 
 <!-- experiments:end -->

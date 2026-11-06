@@ -11,23 +11,43 @@ renderer = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(renderer)
 
 
-def test_each_comparison_renders_its_canonical_scores_and_no_empty_app_link():
+def test_score_table_and_single_chart_use_canonical_scores():
     rendered = renderer.render(ROOT)
     scores = rendered.split('## スコア', 1)[1]
-    sections = {part.splitlines()[0]: part for part in scores.split('\n### ')[1:]}
-    expected = {
-        'DCASE 2026 Evaluation / BEATs_iter3': [66.835, 62.841, 62.325, 58.362, 59.803, 70.241],
-        'DCASE 2026 Development / 固定BEATs（第3回）': [67.480, 61.325],
-        'DCASE 2026 Development / BEATs追加学習（第3回）': [69.528, 63.048],
-        'DCASE 2026 Evaluation / 固定BEATs（第3回）': [66.835, 62.841],
-        'DCASE 2026 Evaluation / BEATs追加学習（第3回）': [70.659, 67.916],
-    }
-    assert set(sections) == set(expected)
-    for name, values in expected.items():
-        text = re.search(r'\n    bar \[([^]]+)\]', sections[name]).group(1)
-        assert [float(x) for x in text.split(', ')] == values
-    assert '[marimoアプリ]()' not in rendered
-    assert rendered.count('| B0 |') == 5 and rendered.count('| W1 |') == 5
+    rows = [line for line in scores.splitlines() if line.startswith('| 第')]
+    expected = [
+        ['第2回', 'Evaluation', '62.841', '58.362', '66.835', '62.325'],
+        ['第3回', 'Development', '61.325', '—', '67.480', '—'],
+        ['第3回', 'Development', '63.048', '—', '69.528', '—'],
+        ['第3回', 'Evaluation', '62.841', '—', '66.835', '—'],
+        ['第3回', 'Evaluation', '67.916', '—', '70.659', '—'],
+    ]
+    cells = [[c.strip() for c in row.strip('|').split('|')] for row in rows]
+    assert [c[:2] + c[4:8] for c in cells] == expected
+    assert scores.count('```mermaid') == 1
+    text = re.search(r'\n    bar \[([^]]+)\]', scores).group(1)
+    assert [float(x) for x in text.split(', ')] == [
+        66.835, 62.841, 62.325, 58.362, 67.480, 61.325, 69.528, 63.048,
+        66.835, 62.841, 70.659, 67.916, 59.803, 70.241]
+    assert '第3回 Eval 固定のB0・W1は、第2回 Eval 固定と同じ処理・同じ結果です。' in scores
+
+
+def test_method_symbols_are_defined_once():
+    methods = renderer.render(ROOT).split('## スコア', 1)[0]
+    for symbol in ('B0', 'B1', 'W1', 'SS'):
+        assert methods.count(f'| {symbol} |') == 1
+
+
+def test_same_symbol_must_keep_one_description(tmp_path):
+    (tmp_path / 'configs').mkdir()
+    text = (ROOT / 'configs/readme-methods.csv').read_text(encoding='utf-8')
+    (tmp_path / 'configs/readme-methods.csv').write_text(
+        text.replace('w1_global,遠方マイクの大きさと位相を合わせて減算（全区間で推定）', 'w1_global,別の説明'), encoding='utf-8')
+    for path in ('results/02-summary.csv', 'results/02-challenge-references.json', 'results/03-beats/summary.csv'):
+        (tmp_path / path).parent.mkdir(parents=True, exist_ok=True)
+        (tmp_path / path).write_bytes((ROOT / path).read_bytes())
+    with pytest.raises(ValueError, match='one description'):
+        renderer.render(tmp_path)
 
 
 def test_ambiguous_split_or_detector_cannot_overwrite_scores(tmp_path):
