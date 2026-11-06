@@ -61,44 +61,13 @@ Evaluationの第3回 固定のB0・W1は、第2回 固定と同じ処理・同�
 
 青：本実験（スコア順）／灰：公式・参考値（異なるモデル）。
 
-```mermaid
----
-config:
-    xyChart:
-        width: 640
-        height: 580
-        showDataLabel: true
-    themeVariables:
-        xyChart:
-            plotColorPalette: "#2458a6"
-    themeCSS: ".bar-plot-0 rect:nth-child(n+9) { fill: #9099a5; }"
----
-xychart-beta horizontal
-    x-axis ["第3回 追加学習 W1", "第3回 追加学習 B0", "第2回 固定 W1", "第3回 固定 W1", "第3回 固定 B0", "第2回 固定 B0", "第2回 固定 SS", "第2回 固定 B1", "BASE", "REF"]
-    y-axis "Official score" 0 --> 100
-    bar [70.659, 67.916, 66.835, 66.835, 62.841, 62.841, 62.325, 58.362, 59.803, 70.241]
-```
+![Evaluationの総合スコア（スコア順）](results/readme/score-evaluation.svg)
 
 ### Development
 
 青：本実験（スコア順）。
 
-```mermaid
----
-config:
-    xyChart:
-        width: 640
-        height: 280
-        showDataLabel: true
-    themeVariables:
-        xyChart:
-            plotColorPalette: "#2458a6"
----
-xychart-beta horizontal
-    x-axis ["第3回 追加学習 W1", "第3回 固定 W1", "第3回 追加学習 B0", "第3回 固定 B0"]
-    y-axis "Official score" 0 --> 100
-    bar [69.528, 67.480, 63.048, 61.325]
-```
+![Developmentの総合スコア（スコア順）](results/readme/score-development.svg)
 
 <!-- experiments:end -->
 

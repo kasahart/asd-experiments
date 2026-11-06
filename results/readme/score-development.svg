@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="633" height="210" viewBox="0 0 633 210" font-family="'Hiragino Sans','Noto Sans CJK JP','Yu Gothic',Meiryo,sans-serif" font-size="13">
+<rect width="633" height="210" fill="#ffffff"/>
+<line x1="133.0" y1="34" x2="133.0" y2="170" stroke="#888888" stroke-width="1"/>
+<text x="133.0" y="186" text-anchor="middle" fill="#333333">0</text>
+<line x1="177.0" y1="34" x2="177.0" y2="170" stroke="#d5d9de" stroke-width="1"/>
+<text x="177.0" y="186" text-anchor="middle" fill="#333333">10</text>
+<line x1="221.0" y1="34" x2="221.0" y2="170" stroke="#d5d9de" stroke-width="1"/>
+<text x="221.0" y="186" text-anchor="middle" fill="#333333">20</text>
+<line x1="265.0" y1="34" x2="265.0" y2="170" stroke="#d5d9de" stroke-width="1"/>
+<text x="265.0" y="186" text-anchor="middle" fill="#333333">30</text>
+<line x1="309.0" y1="34" x2="309.0" y2="170" stroke="#d5d9de" stroke-width="1"/>
+<text x="309.0" y="186" text-anchor="middle" fill="#333333">40</text>
+<line x1="353.0" y1="34" x2="353.0" y2="170" stroke="#d5d9de" stroke-width="1"/>
+<text x="353.0" y="186" text-anchor="middle" fill="#333333">50</text>
+<line x1="397.0" y1="34" x2="397.0" y2="170" stroke="#d5d9de" stroke-width="1"/>
+<text x="397.0" y="186" text-anchor="middle" fill="#333333">60</text>
+<line x1="441.0" y1="34" x2="441.0" y2="170" stroke="#d5d9de" stroke-width="1"/>
+<text x="441.0" y="186" text-anchor="middle" fill="#333333">70</text>
+<line x1="485.0" y1="34" x2="485.0" y2="170" stroke="#d5d9de" stroke-width="1"/>
+<text x="485.0" y="186" text-anchor="middle" fill="#333333">80</text>
+<line x1="529.0" y1="34" x2="529.0" y2="170" stroke="#d5d9de" stroke-width="1"/>
+<text x="529.0" y="186" text-anchor="middle" fill="#333333">90</text>
+<line x1="573.0" y1="34" x2="573.0" y2="170" stroke="#d5d9de" stroke-width="1"/>
+<text x="573.0" y="186" text-anchor="middle" fill="#333333">100</text>
+<text x="353.0" y="204" text-anchor="middle" fill="#333333">Official score</text>
+<text x="125" y="55.5" text-anchor="end" fill="#222222">第3回 追加学習 W1</text>
+<rect x="133" y="40.0" width="305.9" height="22" fill="#2458a6"/>
+<text x="443.9" y="55.5" fill="#222222">69.528</text>
+<text x="125" y="89.5" text-anchor="end" fill="#222222">第3回 固定 W1</text>
+<rect x="133" y="74.0" width="296.9" height="22" fill="#2458a6"/>
+<text x="434.9" y="89.5" fill="#222222">67.480</text>
+<text x="125" y="123.5" text-anchor="end" fill="#222222">第3回 追加学習 B0</text>
+<rect x="133" y="108.0" width="277.4" height="22" fill="#2458a6"/>
+<text x="415.4" y="123.5" fill="#222222">63.048</text>
+<text x="125" y="157.5" text-anchor="end" fill="#222222">第3回 固定 B0</text>
+<rect x="133" y="142.0" width="269.8" height="22" fill="#2458a6"/>
+<text x="407.8" y="157.5" fill="#222222">61.325</text>
+</svg>

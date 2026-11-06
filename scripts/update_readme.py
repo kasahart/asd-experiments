@@ -1,8 +1,9 @@
 # SPDX-License-Identifier: MIT
 # Copyright (c) 2026 kasahart
-"""Render README methods and score graphs from method metadata and canonical result CSVs."""
+"""Render README methods, score tables and SVG score charts from method metadata and canonical result CSVs."""
 import argparse
 import csv
+import html
 import json
 from decimal import Decimal
 from pathlib import Path
@@ -16,21 +17,48 @@ def rows(path):
         return list(csv.DictReader(stream))
 
 
+BLUE = '#2458a6'
+GRAY = '#9099a5'
+CHART_DIR = 'results/readme'
+
+
+def text_width(text, size):
+    """Rough rendered width: CJK glyphs are about one em, others about 0.6 em."""
+    return sum(size if ord(char) > 0x2E80 else 0.6 * size for char in text)
+
+
 def chart(labels, values, reference_count=0):
-    categories = ', '.join(json.dumps(label, ensure_ascii=False) for label in labels)
-    lines = ['```mermaid', '---', 'config:', '    xyChart:',
-             '        width: 640', f'        height: {80 + 50 * len(labels)}',
-             '        showDataLabel: true',
-             '    themeVariables:', '        xyChart:',
-             '            plotColorPalette: "#2458a6"']
-    if reference_count:
-        first_reference = len(labels) - reference_count + 1
-        lines += [f'    themeCSS: ".bar-plot-0 rect:nth-child(n+{first_reference}) {{ fill: #9099a5; }}"']
-    lines += ['---', 'xychart-beta horizontal',
-              f'    x-axis [{categories}]',
-              '    y-axis "Official score" 0 --> 100',
-              '    bar [' + ', '.join(f'{value:.3f}' for value in values) + ']', '```']
-    return '\n'.join(lines)
+    """Horizontal bar chart as a self-contained SVG with a 10-point grid."""
+    size, row, bar = 13, 34, 22
+    label_width = int(max(text_width(label, size) for label in labels)) + 16
+    plot_width, top = 440, 34
+    left = label_width
+    height = top + row * len(labels) + 40
+    width = left + plot_width + 60
+    scale = plot_width / 100
+    font = "font-family=\"'Hiragino Sans','Noto Sans CJK JP','Yu Gothic',Meiryo,sans-serif\""
+    out = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" '
+           f'viewBox="0 0 {width} {height}" {font} font-size="{size}">',
+           f'<rect width="{width}" height="{height}" fill="#ffffff"/>']
+    bottom = top + row * len(labels)
+    for tick in range(0, 101, 10):
+        x = left + tick * scale
+        stroke = '#888888' if tick == 0 else '#d5d9de'
+        out.append(f'<line x1="{x:.1f}" y1="{top}" x2="{x:.1f}" y2="{bottom}" stroke="{stroke}" stroke-width="1"/>')
+        out.append(f'<text x="{x:.1f}" y="{bottom + 16}" text-anchor="middle" fill="#333333">{tick}</text>')
+    out.append(f'<text x="{left + plot_width / 2:.1f}" y="{bottom + 34}" text-anchor="middle" fill="#333333">'
+               'Official score</text>')
+    first_reference = len(labels) - reference_count
+    for index, (label, value) in enumerate(zip(labels, values)):
+        y = top + row * index + (row - bar) / 2
+        length = float(value) * scale
+        color = GRAY if index >= first_reference else BLUE
+        out.append(f'<text x="{left - 8}" y="{y + bar / 2 + 4.5:.1f}" text-anchor="end" fill="#222222">'
+                   f'{html.escape(label)}</text>')
+        out.append(f'<rect x="{left}" y="{y:.1f}" width="{length:.1f}" height="{bar}" fill="{color}"/>')
+        out.append(f'<text x="{left + length + 5:.1f}" y="{y + bar / 2 + 4.5:.1f}" fill="#222222">{value:.3f}</text>')
+    out.append('</svg>')
+    return '\n'.join(out) + '\n'
 
 
 def references_for(root, entries):
@@ -117,7 +145,8 @@ def method_table(groups):
     return lines, list(symbols)
 
 
-def render(root):
+def build(root):
+    files = {}
     groups = comparisons(root, rows(root / 'configs/readme-methods.csv'))
     table, symbols = method_table(groups)
     lines = ['## 手法', '', *table]
@@ -170,10 +199,16 @@ def render(root):
         shown = systems if references and references['split'] == dataset else []
         labels += [system['symbol'] for system in shown]
         values += [Decimal(system['score']) for system in shown]
+        path = f'{CHART_DIR}/score-{dataset.lower()}.svg'
         lines += ['', f'### {dataset}', '',
                   '青：本実験（スコア順）' + ('／灰：公式・参考値（異なるモデル）。' if shown else '。'), '',
-                  chart(labels, values, len(shown))]
-    return '\n'.join(lines)
+                  f'![{dataset}の総合スコア（スコア順）]({path})']
+        files[path] = chart(labels, values, len(shown))
+    return '\n'.join(lines), files
+
+
+def render(root):
+    return build(root)[0]
 
 
 def main():
@@ -185,13 +220,17 @@ def main():
     current = path.read_text(encoding='utf-8')
     before, rest = current.split(START)
     _, after = rest.split(END)
-    updated = before + START + '\n\n' + render(root) + '\n\n' + END + after
+    text, files = build(root)
+    updated = before + START + '\n\n' + text + '\n\n' + END + after
+    outputs = {path: updated, **{root / name: content for name, content in files.items()}}
+    stale = [p for p, content in outputs.items() if not p.exists() or p.read_text(encoding='utf-8') != content]
     if args.check:
-        if updated != current:
-            parser.exit(1, 'README is stale; run python scripts/update_readme.py\n')
+        if stale:
+            parser.exit(1, 'README or charts are stale; run python scripts/update_readme.py\n')
     else:
-        path.write_text(updated, encoding='utf-8')
-
+        for p, content in outputs.items():
+            p.parent.mkdir(parents=True, exist_ok=True)
+            p.write_text(content, encoding='utf-8')
 
 if __name__ == '__main__':
     main()

@@ -24,12 +24,16 @@ def test_score_table_and_single_chart_use_canonical_scores():
     ]
     cells = [[c.strip() for c in row.strip('|').split('|')] for row in rows]
     assert [c[:2] + c[4:8] for c in cells] == expected
-    charts = {name: re.search(r'\n    bar \[([^]]+)\]', scores.split(f'\n### {name}\n', 1)[1]).group(1)
-              for name in ('Evaluation', 'Development')}
-    assert scores.count('```mermaid') == 2
-    assert [float(x) for x in charts['Evaluation'].split(', ')] == [
+    text, files = renderer.build(ROOT)
+    assert '```mermaid' not in text
+    charts = {name: [float(v) for v in re.findall(r'>(\d+\.\d{3})</text>', files[f'results/readme/score-{name}.svg'])]
+              for name in ('evaluation', 'development')}
+    assert charts['evaluation'] == [
         70.659, 67.916, 66.835, 66.835, 62.841, 62.841, 62.325, 58.362, 59.803, 70.241]
-    assert [float(x) for x in charts['Development'].split(', ')] == [69.528, 67.480, 63.048, 61.325]
+    assert charts['development'] == [69.528, 67.480, 63.048, 61.325]
+    for name in charts:
+        assert f'](results/readme/score-{name}.svg)' in scores
+        assert (ROOT / f'results/readme/score-{name}.svg').read_text(encoding='utf-8') == files[f'results/readme/score-{name}.svg']
     assert 'Evaluationの第3回 固定のB0・W1は、第2回 固定と同じ処理・同じ結果です。' in scores
 
 

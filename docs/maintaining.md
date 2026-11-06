@@ -2,7 +2,7 @@
 
 ## READMEの手法表・スコア・グラフを更新する
 
-READMEの`<!-- experiments:start -->`から`<!-- experiments:end -->`までは`scripts/update_readme.py`が生成します。手で編集しません。
+READMEの`<!-- experiments:start -->`から`<!-- experiments:end -->`までと、スコアのグラフ`results/readme/*.svg`は`scripts/update_readme.py`が生成します。手で編集しません。
 
 1. [手法一覧](../configs/readme-methods.csv)に行を追加します。回（`round`）・データ（`dataset`）・グラフの軸に出す短い組名（`chart_prefix`、例：`第3回 追加学習`。同じデータの中で重ならないもの）・特徴抽出モデル・モデルの追加学習・保存結果CSV・固定条件・入力取得を指定します。同じ記号の手法は、どの回でも同じ特徴と参考文献にします。
 2. marimoアプリや新しい回は、READMEの「連載の回と実験」表へ手で行を追加します。
