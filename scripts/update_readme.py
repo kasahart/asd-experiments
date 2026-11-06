@@ -161,17 +161,17 @@ def render(root):
                       f"出典: [DCASE 2026 Task 2 Results]({references['source_url']}) · "
                       f"[システム名・参考値]({with_references[0]['references_path']})"]
 
-    labels, values = [], []
-    for group in groups:
-        for symbol in sorted(group['scores'], key=lambda s: (-group['scores'][s], s)):
-            labels.append(f"{group['chart_prefix']} {symbol}")
-            values.append(group['scores'][symbol])
+    bars = [(group['scores'][symbol], f"{group['chart_prefix']} {symbol}")
+            for group in groups for symbol in group['scores']]
+    bars.sort(key=lambda bar: (-bar[0], bar[1]))
+    labels = [label for _, label in bars]
+    values = [value for value, _ in bars]
     if systems:
         short = {'Evaluation': 'Eval', 'Development': 'Dev'}.get(references['split'], references['split'])
         labels += [f'参考 {short} {symbol}' for symbol in reference_symbols]
     values += [Decimal(system['score']) for system in systems]
     lines += ['', '### 全回の一覧', '',
-              '青：本実験（回・データ・特徴抽出の順、各組の中はスコア順）' +
+              '青：本実験（スコア順）' +
               ('／灰：公式・参考値（異なるモデル）。' if systems else '。'), '',
               chart(labels, values, len(systems))]
     return '\n'.join(lines)

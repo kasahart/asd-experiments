@@ -27,8 +27,8 @@ def test_score_table_and_single_chart_use_canonical_scores():
     assert scores.count('```mermaid') == 1
     text = re.search(r'\n    bar \[([^]]+)\]', scores).group(1)
     assert [float(x) for x in text.split(', ')] == [
-        66.835, 62.841, 62.325, 58.362, 67.480, 61.325, 69.528, 63.048,
-        66.835, 62.841, 70.659, 67.916, 59.803, 70.241]
+        70.659, 69.528, 67.916, 67.480, 66.835, 66.835, 63.048, 62.841,
+        62.841, 62.325, 61.325, 58.362, 59.803, 70.241]
     assert '第3回 Eval 固定のB0・W1は、第2回 Eval 固定と同じ処理・同じ結果です。' in scores
 
 
