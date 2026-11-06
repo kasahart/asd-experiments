@@ -44,6 +44,8 @@ B0（近接ch）とW1（全区間の複素線形減算）を入力に、BEATs_it
 
 リポジトリ共通の[実行環境](../../README.md#実行環境)から`training` extraと固定ASDKitを導入します。公式採点には同じ環境の`evaluation` extraを使います。依存版はrootの`pyproject.toml`、ASDKitのcommit・archive URL・SHA-256は`upstream.lock.json`、取得時にarchiveのSHA-256を確認します。実行時にコード・YAML・入力のSHA一致は要求しません。
 
+`runtime.py install`は[固定ASDKit archive](upstream.lock.json)を仮想環境内へ取得し、editable導入します。upstreamの必須モジュールがwheelに含まれないためこの方式を使い、Git・clone・checkoutの操作を不要にしています。
+
 repoルートから実行します。`inputs/...`は手元の取得先に置き換え、出力先は入力データの外にある新しいディレクトリにします。
 
 ```bash

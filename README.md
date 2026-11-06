@@ -1,6 +1,25 @@
-# ASD experiments — Zenn連載の実験入口
+# ASD experiments — Zenn連載の実験コード
 
-Zennの異常音検知（ASD）連載に対応する実験コードとmarimoアプリです。[アプリ一覧を開く](https://kasahart.github.io/asd-experiments/)。インストールやデータ取得は不要です。手法・結果・解説を以下の表から参照できます。
+Zennの異常音検知（ASD）連載で使った実験コードとmarimoアプリです。DCASE 2026 Task 2の2chマイク録音を使い、周囲の音の除去やBEATsの追加学習で検知スコアがどう変わるかを比べています。結果は[アプリ一覧](https://kasahart.github.io/asd-experiments/)からブラウザで見られます。インストールやデータ取得は不要です。
+
+## 目的別の入口
+
+| やりたいこと | 入口 | 必要なもの |
+|---|---|---|
+| 結果・図・音声をブラウザで見る | [アプリ一覧](https://kasahart.github.io/asd-experiments/) | なし |
+| 第2回の条件比較を再現する | [CLIの実行](src/asd_min/runner.md#cliを使う)・[入力取得](docs/02-inputs.md) | データ・BEATs重み・公式評価器（CPUでも可） |
+| 第3回のBEATs追加学習を再現する | [第3回の再現手順](reproduction/asd03/README.md) | NVIDIA GPU・データ・BEATs重み・公式評価器 |
+| 計算の仕組みを読む | [実装案内](src/asd_min/README.md) | — |
+| 利用条件を確かめる | [出典と利用条件](docs/rights.md)・[第三者通知](THIRD_PARTY_NOTICES.md)・[音声の帰属情報](docs/DATA_ATTRIBUTION.md) | — |
+
+## 連載の回と実験
+
+| 回 | 比べたもの | アプリ | 固定条件 |
+|---|---|---|---|
+| [第2回](https://zenn.dev/kasahart/articles/kasahart-20260919-dcase2026-asd-02) | 近接・遠方マイクと2種類の減算（B0・B1・W1・SS）、BEATs重み固定 | [第2回のアプリ](https://kasahart.github.io/asd-experiments/apps/02-b0-b1-w1-ss/) | [第2回の固定条件](docs/02-protocol.md) |
+| 第3回 | B0とW1を、BEATs重み固定と追加学習（LoRA）で比較 | — | [第3回の固定条件](reproduction/asd03/README.md#入力と固定条件) |
+
+記号（B0・W1など）の意味は下の[手法](#手法)、数値は[スコア](#スコア)にまとめています。
 
 <!-- experiments:start -->
 
@@ -180,7 +199,20 @@ xychart-beta horizontal
 
 ## 実行環境
 
-依存関係は[pyproject.toml](pyproject.toml)で管理します。共通の`.venv`を使い、推論は基本依存、学習は`training`、アプリは`app`、表示は`visualization`、公式評価器の実行依存は`evaluation`、テストは`test`を追加します。学習にはPython3.11を使います。
+依存関係は[pyproject.toml](pyproject.toml)で管理します。学習にはPython 3.11を使います。
+
+### Dev Container（推奨）
+
+[.devcontainer](.devcontainer)の設定を使うと、VS Codeの「Dev Containers: Reopen in Container」などで開くだけで、下の手動導入と同じ環境（`.venv`の作成から`pip check`まで）を自動で作ります。`.venv`はコンテナ用のボリュームに置くため、手元の`.venv`とは混ざりません。
+
+| 設定 | 用途 | 必要なもの |
+|---|---|---|
+| [.devcontainer/devcontainer.json](.devcontainer/devcontainer.json) | 学習・推論（CUDA 12.8版のPyTorch） | NVIDIA GPU、ドライバー、NVIDIA Container Toolkit |
+| [.devcontainer/cpu/devcontainer.json](.devcontainer/cpu/devcontainer.json) | テスト・アプリ・CPUでの推論 | Docker |
+
+GPU版はCUDAが使えないと作成時に止まります。その場合はCPU版を選びます。データ・重み・評価器は、リポジトリ内の`inputs/`（Gitの管理外）に置くと、コンテナからも同じパスで使えます。
+
+### 手動で導入する
 
 ```bash
 python3.11 -m venv .venv
@@ -190,28 +222,15 @@ python3.11 -m venv .venv
 .venv/bin/python -m pip check
 ```
 
-CPU環境は上のPyTorch配布先を`https://download.pytorch.org/whl/cpu`に変更します。[公式PyTorch 2.7.1構成](https://pytorch.org/get-started/previous-versions/)に合わせ、Torch・TorchAudio・TorchVisionを同じ配布先から導入します。推論だけなら`pip install -e .`で導入できます。最後の`runtime.py install`は[固定ASDKit archive](reproduction/asd03/upstream.lock.json)を仮想環境内へ取得してeditable導入する処理です。upstreamの必須モジュールがwheelに含まれないため、この方式を使い、Git・clone・checkout操作を不要にしています。
-
-### Dev Container
-
-[.devcontainer](.devcontainer)に、上と同じ手順で環境を作るDev Containerの設定を置いています。VS Codeの「Dev Containers: Reopen in Container」などで開くと、Python3.11のコンテナ内で`.venv`の作成から`pip check`までを自動で実行します。`.venv`はコンテナ用のボリュームに置くため、手元の`.venv`とは混ざりません。
-
-| 設定 | 用途 | 必要なもの |
-|---|---|---|
-| [.devcontainer/devcontainer.json](.devcontainer/devcontainer.json) | 学習・推論（CUDA 12.8版のPyTorch） | NVIDIA GPU、ドライバー、NVIDIA Container Toolkit |
-| [.devcontainer/cpu/devcontainer.json](.devcontainer/cpu/devcontainer.json) | テスト・アプリ・CPUでの推論 | Docker |
-
-GPU版はCUDAが使えないと作成時に止まります。その場合はCPU版を選びます。データ・重み・評価器は、リポジトリ内の`inputs/`（Gitの管理外）に置くと、コンテナからも同じパスで使えます。
-
-## 使い方と資料
-
-| 調べたいこと | 入口 |
+| extra | 用途 |
 |---|---|
-| 計算の仕組み | [実装案内](src/asd_min/README.md) |
-| CLIの実行・再採点 | [runner解説](src/asd_min/runner.md#cliを使う) |
-| コードの由来と利用条件 | [出典と利用条件](docs/rights.md)・[第三者通知](THIRD_PARTY_NOTICES.md) |
+| （なし） | 推論だけ（`pip install -e .`） |
+| `training` | 第3回の追加学習 |
+| `app` | marimoアプリ |
+| `visualization` | 図の表示 |
+| `evaluation` | 公式評価器の実行 |
+| `test` | テスト |
 
-リポジトリに含まれる音声データ（marimoアプリ内の埋め込み音声を含む）の出典・利用条件は、[帰属情報](docs/DATA_ATTRIBUTION.md)を参照してください。データセット全体・重み・評価器・正解CSVは同梱していません。
+CPU環境では、PyTorchの配布先を`https://download.pytorch.org/whl/cpu`に変えます。Torch・TorchAudio・TorchVisionは[公式PyTorch 2.7.1構成](https://pytorch.org/get-started/previous-versions/)に合わせて同じ配布先から導入します。`runtime.py install`は第3回の学習で使う固定ASDKitを導入します（詳細は[第3回の実行環境](reproduction/asd03/README.md#実行環境)）。
 
-一覧とグラフの更新: [手法一覧](configs/readme-methods.csv)に特徴抽出モデル・モデルの追加学習を含む行を追加し、保存結果CSVと固定条件・入力取得・marimoアプリを指定して `python scripts/update_readme.py` を実行します。同じ比較範囲では同じ結果CSV・固定条件・入力取得を指定し、結果CSVにもスコア行を追加します。異なる比較条件には別の `comparison` を付けます。
-手法のコードと解説は同じ階層に置き、[実装案内](src/asd_min/README.md)へ行を追加します。各回の設定・結果・marimoアプリはその回の資料として保持します。
+データセット全体・重み・評価器・正解CSVは同梱していません。結果一覧とグラフを更新する手順は[保守手順](docs/maintaining.md)にあります。
