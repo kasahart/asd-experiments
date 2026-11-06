@@ -53,11 +53,11 @@ Zennの異常音検知（ASD）連載で使った実験コードとmarimoアプ�
 | 第3回 | Evaluation | BEATs_iter3 | なし（重み固定） | 62.841 | — | 66.835 | — | [条件](reproduction/asd03/README.md#入力と固定条件) · [入力](reproduction/asd03/README.md#入力の取得と配置) · [CSV](results/03-beats/summary.csv) |
 | 第3回 | Evaluation | BEATs_iter3 + LoRA | 正常12,000音・25epoch | 67.916 | — | 70.659 | — | [条件](reproduction/asd03/README.md#入力と固定条件) · [入力](reproduction/asd03/README.md#入力の取得と配置) · [CSV](results/03-beats/summary.csv) |
 
-第3回 Eval 固定のB0・W1は、第2回 Eval 固定と同じ処理・同じ結果です。
+Evaluationの第3回 固定のB0・W1は、第2回 固定と同じ処理・同じ結果です。
 
 参考値（Evaluation、本実験とは異なるモデル）：BASE（公式ベースライン）59.803、REF（一部処理の参考元）70.241。出典: [DCASE 2026 Task 2 Results](https://dcase.community/challenge2026/task-first-shot-unsupervised-anomalous-sound-detection-for-machine-condition-monitoring-results) · [システム名・参考値](results/02-challenge-references.json)
 
-### 全回の一覧
+### Evaluation
 
 青：本実験（スコア順）／灰：公式・参考値（異なるモデル）。
 
@@ -66,17 +66,38 @@ Zennの異常音検知（ASD）連載で使った実験コードとmarimoアプ�
 config:
     xyChart:
         width: 640
-        height: 780
+        height: 580
         showDataLabel: true
     themeVariables:
         xyChart:
             plotColorPalette: "#2458a6"
-    themeCSS: ".bar-plot-0 rect:nth-child(n+13) { fill: #9099a5; }"
+    themeCSS: ".bar-plot-0 rect:nth-child(n+9) { fill: #9099a5; }"
 ---
 xychart-beta horizontal
-    x-axis ["第3回 Eval 追加学習 W1", "第3回 Dev 追加学習 W1", "第3回 Eval 追加学習 B0", "第3回 Dev 固定 W1", "第2回 Eval 固定 W1", "第3回 Eval 固定 W1", "第3回 Dev 追加学習 B0", "第3回 Eval 固定 B0", "第2回 Eval 固定 B0", "第2回 Eval 固定 SS", "第3回 Dev 固定 B0", "第2回 Eval 固定 B1", "参考 Eval BASE", "参考 Eval REF"]
+    x-axis ["第3回 追加学習 W1", "第3回 追加学習 B0", "第2回 固定 W1", "第3回 固定 W1", "第3回 固定 B0", "第2回 固定 B0", "第2回 固定 SS", "第2回 固定 B1", "BASE", "REF"]
     y-axis "Official score" 0 --> 100
-    bar [70.659, 69.528, 67.916, 67.480, 66.835, 66.835, 63.048, 62.841, 62.841, 62.325, 61.325, 58.362, 59.803, 70.241]
+    bar [70.659, 67.916, 66.835, 66.835, 62.841, 62.841, 62.325, 58.362, 59.803, 70.241]
+```
+
+### Development
+
+青：本実験（スコア順）。
+
+```mermaid
+---
+config:
+    xyChart:
+        width: 640
+        height: 280
+        showDataLabel: true
+    themeVariables:
+        xyChart:
+            plotColorPalette: "#2458a6"
+---
+xychart-beta horizontal
+    x-axis ["第3回 追加学習 W1", "第3回 固定 W1", "第3回 追加学習 B0", "第3回 固定 B0"]
+    y-axis "Official score" 0 --> 100
+    bar [69.528, 67.480, 63.048, 61.325]
 ```
 
 <!-- experiments:end -->

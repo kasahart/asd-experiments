@@ -87,9 +87,9 @@ def comparisons(root, methods):
                        'summary_path': summary_path, 'protocol_path': protocol_path, 'inputs_path': inputs_path,
                        'round': single(entries, 'round', group), 'dataset': single(entries, 'dataset', group),
                        'chart_prefix': single(entries, 'chart_prefix', group)})
-    prefixes = [c['chart_prefix'] for c in result]
-    if len(set(prefixes)) != len(prefixes) or not all(prefixes):
-        raise ValueError('Each comparison needs its own chart_prefix')
+    prefixes = [(c['dataset'], c['chart_prefix']) for c in result]
+    if len(set(prefixes)) != len(prefixes) or not all(p for _, p in prefixes):
+        raise ValueError('Each comparison needs its own chart_prefix within a dataset')
     return result
 
 
@@ -154,26 +154,25 @@ def render(root):
             same_setup = all(group['entries'][0][k] == earlier['entries'][0][k]
                              for k in ('dataset', 'feature_model', 'model_training'))
             if same_setup and shared and all(abs(group['scores'][s] - earlier['scores'][s]) < Decimal('1e-9') for s in shared):
-                lines += ['', f"{group['chart_prefix']}の{'・'.join(shared)}は、{earlier['chart_prefix']}と同じ処理・同じ結果です。"]
+                lines += ['', f"{group['dataset']}の{group['chart_prefix']}の{'・'.join(shared)}は、{earlier['chart_prefix']}と同じ処理・同じ結果です。"]
     if references:
         values = '、'.join(f"{s['symbol']}（{s['role_label']}）{Decimal(s['score']):.3f}" for s in systems)
         lines += ['', f"参考値（{references['split']}、本実験とは異なるモデル）：{values}。"
                       f"出典: [DCASE 2026 Task 2 Results]({references['source_url']}) · "
                       f"[システム名・参考値]({with_references[0]['references_path']})"]
 
-    bars = [(group['scores'][symbol], f"{group['chart_prefix']} {symbol}")
-            for group in groups for symbol in group['scores']]
-    bars.sort(key=lambda bar: (-bar[0], bar[1]))
-    labels = [label for _, label in bars]
-    values = [value for value, _ in bars]
-    if systems:
-        short = {'Evaluation': 'Eval', 'Development': 'Dev'}.get(references['split'], references['split'])
-        labels += [f'参考 {short} {symbol}' for symbol in reference_symbols]
-    values += [Decimal(system['score']) for system in systems]
-    lines += ['', '### 全回の一覧', '',
-              '青：本実験（スコア順）' +
-              ('／灰：公式・参考値（異なるモデル）。' if systems else '。'), '',
-              chart(labels, values, len(systems))]
+    for dataset in dict.fromkeys(group['dataset'] for group in groups):
+        bars = [(group['scores'][symbol], f"{group['chart_prefix']} {symbol}")
+                for group in groups if group['dataset'] == dataset for symbol in group['scores']]
+        bars.sort(key=lambda bar: (-bar[0], bar[1]))
+        labels = [label for _, label in bars]
+        values = [value for value, _ in bars]
+        shown = systems if references and references['split'] == dataset else []
+        labels += [system['symbol'] for system in shown]
+        values += [Decimal(system['score']) for system in shown]
+        lines += ['', f'### {dataset}', '',
+                  '青：本実験（スコア順）' + ('／灰：公式・参考値（異なるモデル）。' if shown else '。'), '',
+                  chart(labels, values, len(shown))]
     return '\n'.join(lines)
 
 

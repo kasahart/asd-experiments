@@ -24,12 +24,13 @@ def test_score_table_and_single_chart_use_canonical_scores():
     ]
     cells = [[c.strip() for c in row.strip('|').split('|')] for row in rows]
     assert [c[:2] + c[4:8] for c in cells] == expected
-    assert scores.count('```mermaid') == 1
-    text = re.search(r'\n    bar \[([^]]+)\]', scores).group(1)
-    assert [float(x) for x in text.split(', ')] == [
-        70.659, 69.528, 67.916, 67.480, 66.835, 66.835, 63.048, 62.841,
-        62.841, 62.325, 61.325, 58.362, 59.803, 70.241]
-    assert '第3回 Eval 固定のB0・W1は、第2回 Eval 固定と同じ処理・同じ結果です。' in scores
+    charts = {name: re.search(r'\n    bar \[([^]]+)\]', scores.split(f'\n### {name}\n', 1)[1]).group(1)
+              for name in ('Evaluation', 'Development')}
+    assert scores.count('```mermaid') == 2
+    assert [float(x) for x in charts['Evaluation'].split(', ')] == [
+        70.659, 67.916, 66.835, 66.835, 62.841, 62.841, 62.325, 58.362, 59.803, 70.241]
+    assert [float(x) for x in charts['Development'].split(', ')] == [69.528, 67.480, 63.048, 61.325]
+    assert 'Evaluationの第3回 固定のB0・W1は、第2回 固定と同じ処理・同じ結果です。' in scores
 
 
 def test_method_symbols_are_defined_once():
