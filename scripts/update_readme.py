@@ -96,11 +96,11 @@ def comparisons(root, methods):
         models = {(m['feature_model'], m['model_training']) for m in entries}
         if len(models) != 1:
             raise ValueError(f'{group}: use separate comparison groups for different feature models or model training')
-        sources = {(m['summary_path'], m['protocol_path'], m['inputs_path'], m.get('references_path', ''),
+        sources = {(m['summary_path'], m.get('references_path', ''),
                     m.get('split', ''), m.get('detector', ''), m.get('score_multiplier') or '100') for m in entries}
         if len(sources) != 1:
-            raise ValueError(f'{group}: use one result source, protocol and input guide per comparison')
-        summary_path, protocol_path, inputs_path, references_path, split, detector, multiplier = sources.pop()
+            raise ValueError(f'{group}: use one result source per comparison')
+        summary_path, references_path, split, detector, multiplier = sources.pop()
         selected = [row for row in rows(root / summary_path)
                     if (not split or row.get('split') == split) and (not detector or row.get('detector') == detector)]
         if len({row['condition'] for row in selected}) != len(selected):
@@ -120,7 +120,7 @@ def comparisons(root, methods):
             raise ValueError(f'{group}: expected finite 0–100 scores')
         result.append({'name': group, 'entries': entries, 'scores': scores,
                        'references': references_for(root, entries), 'references_path': references_path,
-                       'summary_path': summary_path, 'protocol_path': protocol_path, 'inputs_path': inputs_path,
+                       'summary_path': summary_path,
                        'experiments': [single(entries, 'experiment', group)], 'dataset': single(entries, 'dataset', group),
                        'chart_prefix': single(entries, 'chart_prefix', group)})
     return result
@@ -160,15 +160,18 @@ def merge_identical(groups):
     for group in groups:
         for earlier in merged:
             same_setup = all(group['entries'][0][k] == earlier['entries'][0][k]
-                             for k in ('dataset', 'feature_model', 'model_training'))
+                             for k in ('dataset', 'feature_model', 'model_training', 'chart_prefix'))
             shared = set(group['scores']) & set(earlier['scores'])
-            if (same_setup and shared == set(group['scores'])
-                    and all(abs(group['scores'][s] - earlier['scores'][s]) < Decimal('1e-9') for s in shared)):
+            if same_setup and shared:
+                if any(abs(group['scores'][s] - earlier['scores'][s]) >= Decimal('1e-9') for s in shared):
+                    raise ValueError(f"{group['name']}: {'・'.join(sorted(shared))} differ from {earlier['name']} under the same setup")
+                earlier['scores'].update(group['scores'])
                 earlier['experiments'] += [e for e in group['experiments'] if e not in earlier['experiments']]
                 earlier['sources'] += [s for s in [group['summary_path']] if s not in earlier['sources']]
                 break
         else:
-            merged.append({**group, 'experiments': list(group['experiments']), 'sources': [group['summary_path']]})
+            merged.append({**group, 'scores': dict(group['scores']), 'experiments': list(group['experiments']),
+                           'sources': [group['summary_path']]})
     keys = [(g['dataset'], g['chart_prefix']) for g in merged]
     if len(set(keys)) != len(keys) or not all(prefix for _, prefix in keys):
         raise ValueError('Each comparison needs its own chart_prefix within a dataset')
@@ -212,12 +215,13 @@ def summary_chart(panels, dataset, systems):
             out.append(f'<circle cx="{x(start):.1f}" cy="{y}" r="5.5" fill="#ffffff" stroke="{base}" stroke-width="2"/>')
             out.append(f'<circle cx="{x(end):.1f}" cy="{y}" r="5.5" fill="{color}" stroke="#ffffff" stroke-width="1.5"/>')
             text_x = max(x(start), x(end)) + 12
-            out.append(f'<text x="{text_x:.1f}" y="{y + 4.5}" fill="{color}" font-weight="bold">{end - start:+.2f}</text>')
-            out.append(f'<text x="{text_x + 46:.1f}" y="{y + 4.5}" fill="{muted}" font-size="12">{start:.1f} → {end:.1f}</text>')
+            delta = f'{end - start:+.2f}'.replace('-', '−')
+            out.append(f'<text x="{text_x:.1f}" y="{y + 4.5}" fill="{color}" font-weight="bold">{delta}</text>')
+            out.append(f'<text x="{text_x + 48:.1f}" y="{y + 4.5}" fill="{muted}" font-size="12">{start:.3f} → {end:.3f}</text>')
         y0 = bottom + 40
     caption = f'{dataset} 総合スコア' + ('（破線は公式ベースライン・参考システム）' if systems else '')
     out.append(f'<text x="{left + width / 2}" y="{y0 - 6}" text-anchor="middle" font-size="12" fill="{muted}">{caption}</text>')
-    height, total = y0 + 6, left + width + 150
+    height, total = y0 + 6, left + width + 170
     return '\n'.join([f'<svg xmlns="http://www.w3.org/2000/svg" width="{total}" height="{height}" '
                       f'viewBox="0 0 {total} {height}" {font} font-size="13">',
                       f'<rect width="{total}" height="{height}" fill="#ffffff"/>', *out, '</svg>']) + '\n'
@@ -249,17 +253,14 @@ def summary(root, groups, references):
     for panel in panels:
         parts = []
         for label, note, start, end in panel['rows']:
-            symbol = label.split(' ', 1)[0]
-            parts.append(f"{symbol}{'（' + note + '）' if note else ''} {end - start:+.2f}".replace('-', '−'))
+            parts.append(f"{label}{'（' + note + '）' if note else ''} {end - start:+.2f}".replace('-', '−'))
         headline.append(f"- **{panel['title']}**（基準：{panel['baseline']}）：{'、'.join(parts)}")
     readme = [f'![明示的なノイズ除去の効果と、BEATs追加学習の効果（{datasets[0]}）]({path})', '', *headline, '',
-              f'値は {datasets[0]} の総合スコアの差（処理後 − 基準）で、各条件1回分の結果です。'
+              f'値は {datasets[0]} の総合スコア（0–100、高いほど良い）の差（処理後 − 基準）で、各条件1回分の結果です。'
               + ('破線は公式ベースライン（BASE）と参考システム（REF）で、モデルが異なります。' if shown else '')
               + f'{"・".join(datasets[1:])}の差と全スコアは[結果の詳細](docs/results.md)にあります。']
-    results = ['## 結果の要点', '', f'![明示的なノイズ除去の効果と、BEATs追加学習の効果（{datasets[0]}）](../{path})', '', *lines, '',
-               '値は総合スコアの差（処理後 − 基準）で、各条件1回分の結果です。'
-               + ('図の破線は公式ベースライン（BASE）と参考システム（REF）で、モデルが異なります。' if shown else '')
-               + '各値は下の[スコア](#スコア)の表から計算しています。']
+    results = ['## 結果の要点', '', '[README](../README.md#結果の要点)の図と同じ比較を、データごとの差で示します。', '', *lines, '',
+               '差は下の[スコア](#スコア)の丸め前の値から計算しています（表示値の引き算とは最終桁がずれることがあります）。']
     return '\n'.join(readme), '\n'.join(results), {path: summary_chart(panels, datasets[0], shown)}
 
 
@@ -275,13 +276,16 @@ def build(root):
     references = with_references[0]['references'] if with_references else {}
     systems = references.get('systems', [])
     if references:
-        lines += ['', '#### ' + references['group_label'], '',
-                  '| 記号 | 役割 | システム | 参考文献 |', '|---|---|---|---|']
+        lines += ['', '### ' + references['group_label'], '',
+                  f"| 記号 | 役割 | システム | {references['split']} | 参考文献 |", '|---|---|---|---|---|']
         for system in systems:
             reference = (f"[{system['method_source_name']}]({system['method_source_url']})"
                          if system.get('method_source_url') else '—')
-            lines.append(f"| {system['symbol']} | {system['role_label']} | {system['label']} | {reference} |")
-        lines += ['', references['note']]
+            lines.append(f"| {system['symbol']} | {system['role_label']} | {system['label']} | "
+                         f"{Decimal(system['score']):.3f} | {reference} |")
+        lines += ['', references['note'] + '本実験とはモデルが異なるので、同じ条件の順位ではありません。'
+                  f"出典: [DCASE 2026 Task 2 Results]({references['source_url']}) · "
+                  f"[システム名・参考値](../{with_references[0]['references_path']})"]
     reference_symbols = [system['symbol'] for system in systems]
     if len(set(reference_symbols)) != len(reference_symbols) or set(reference_symbols) & set(symbols):
         raise ValueError('duplicate chart symbol')
@@ -296,12 +300,6 @@ def build(root):
                      + ' | '.join(cells) + f" | {'・'.join(sorted(group['experiments']))} |")
     sources = list(dict.fromkeys(path for g in groups for path in g['sources']))
     lines += ['', '数値の正本：' + '・'.join(f'[{path}](../{path})' for path in sources)]
-    if references:
-        values = '、'.join(f"{s['symbol']}（{s['role_label']}）{Decimal(s['score']):.3f}" for s in systems)
-        lines += ['', f"参考値（{references['split']}、本実験とは異なるモデル）：{values}。"
-                      f"出典: [DCASE 2026 Task 2 Results]({references['source_url']}) · "
-                      f"[システム名・参考値](../{with_references[0]['references_path']})"]
-
     for dataset in dict.fromkeys(group['dataset'] for group in groups):
         bars = [(group['scores'][symbol], f"{group['chart_prefix']} {symbol}")
                 for group in groups if group['dataset'] == dataset for symbol in group['scores']]
@@ -318,7 +316,8 @@ def build(root):
         files[path] = chart(labels, values, len(shown))
     readme_summary, results_summary, summary_files = summary(root, groups, references)
     files.update(summary_files)
-    return results_summary + '\n\n' + '\n'.join(lines), files, readme_summary
+    head, _, scores = '\n'.join(lines).partition('\n## スコア')
+    return head.rstrip('\n') + '\n\n' + results_summary + '\n\n## スコア' + scores, files, readme_summary
 
 
 def render(root):

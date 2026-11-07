@@ -107,7 +107,7 @@ $PY reproduction/asd03/run.py --stage all --smoke \
 
 ## 確認結果
 
-集計値は[結果の詳細](../../docs/results.md)、CSVの説明は[results/03-beats](../../results/03-beats/README.md)を参照してください。掲載集計は周波数保持BEATsの同等構成で25epoch学習したcheckpointによる結果です。この外部ASDKit接続で確認した範囲はcheckpoint復元・特徴とスコアの一致・2step学習で、25epochの独立再学習は未検証です。
+集計値は[結果の詳細](../../docs/results.md)、CSVの説明は[実験2の結果CSV](../../results/03-beats/README.md)を参照してください。掲載集計は周波数保持BEATsの同等構成で25epoch学習したcheckpointによる結果です。この外部ASDKit接続で確認した範囲はcheckpoint復元・特徴とスコアの一致・2step学習で、25epochの独立再学習は未検証です。
 
 ## 出典とライセンス
 

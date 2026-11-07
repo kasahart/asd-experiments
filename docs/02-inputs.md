@@ -1,6 +1,6 @@
 # 入力の取得（DCASE 2026 Task 2）
 
-実験1はEvaluation（Additional trainingのtrainとEvaluationのtest）を、実験2はDevelopmentも使います。配置は各実験の手順（[実験1](../src/asd_min/runner.md#cliを使う)・[実験2](../reproduction/asd03/README.md#入力の取得と配置)）に従います。
+実験1はEvaluation（Additional trainingのtrainとEvaluationのtest）を使い、配置はこのページのとおりです。実験2はDevelopmentも使い、配置は[実験2の手順](../reproduction/asd03/README.md#入力の取得と配置)に従います。
 
 1. [DCASE 2026 Challenge Task 2 Additional Training Dataset](https://zenodo.org/records/20151556)の5機種train ZIPと[DCASE 2026 Challenge Task 2 Evaluation Dataset](https://zenodo.org/records/20437238)の5機種test ZIPを取得し、同じ `eval_data/raw` に展開します。このパスを `--input` に指定します。
 2. [BEATs README](https://github.com/microsoft/unilm/blob/master/beats/README.md)の **Pre-Trained Model / Iter3** を取得し、`--checkpoint` に指定します。
@@ -50,6 +50,6 @@ CLIが使用するBEATs_iter3.ptのSHA-256は `8d1b234032a9ccff353612dc6c2098234
 
 Zenodo表示のダウンロード容量はtrain約2.8 GB、test 558.7 MB。ZIPと展開音声を同時保持するなら両方の空き容量が必要です。WAV headerの件数・長さから、PCM16 stereoの音声payloadは合計約3.99 GB（3600×10秒、1200×6秒、1200×16秒、16kHz×2ch×2bytes）と算出できます。Python環境・重み・生成物の容量は別途必要です。
 
-重みは約345 MiB。CLIは機種・条件ごとの特徴をメモリに保持します。RAM/VRAMの必要最小値は未測定です。CPUまたはGPUで実行でき、GPU PyTorchの導入は[PyTorch Get Started](https://pytorch.org/get-started/locally/)を参照してください。
+重みは約345 MiB。CLIは機種・条件ごとの特徴をメモリに保持します。RAM/VRAMの必要最小値は未測定です。CPUまたはGPUで実行できます（[実行環境](setup.md)）。
 
 まず `--machine ToothBrush --limit 5` で小規模に実行できます。

@@ -24,7 +24,7 @@ BEATs重みのSHA-256、train/test件数と匿名テスト名を確認し、既�
 
 ## CLIを使う
 
-以下は実験1の実行例です。環境は[実行環境](../../docs/setup.md)のとおり作り（推論だけなら`pip install -e .`で足ります）、入力は[入力の取得](../../docs/02-inputs.md)に従って配置します。`python -m asd_min.cli results`で保存結果の表を確認できます。
+以下は実験1の実行例です。環境は[実行環境](../../docs/setup.md)のとおり作り（推論だけなら`pip install -e .`で足ります）、入力は[入力の取得](../../docs/02-inputs.md)のとおり取得・配置します。`python -m asd_min.cli results`で保存結果の表を確認できます。
 
 保存結果・実録音の比較・手動試聴は[marimoアプリ](../../apps/README.md)で提供します。実データの推論・再採点には、以下のCLIを使います。
 

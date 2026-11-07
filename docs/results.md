@@ -4,20 +4,6 @@
 
 <!-- experiments:start -->
 
-## 結果の要点
-
-![明示的なノイズ除去の効果と、BEATs追加学習の効果（Evaluation）](../results/readme/summary.svg)
-
-| 観点 | 比較 | Evaluation | Development |
-|---|---|---|---|
-| ① 明示的なノイズ除去の効果 | B0（固定）→ W1（固定） | +3.99 | +6.16 |
-|  | B0（固定）→ SS（固定） | −0.52 | — |
-|  | B0（追加学習）→ W1（追加学習） | +2.74 | +6.48 |
-| ② BEATs 追加学習の効果 | B0（固定）→ B0（追加学習） | +5.07 | +1.72 |
-|  | W1（固定）→ W1（追加学習） | +3.82 | +2.05 |
-
-値は総合スコアの差（処理後 − 基準）で、各条件1回分の結果です。図の破線は公式ベースライン（BASE）と参考システム（REF）で、モデルが異なります。各値は下の[スコア](#スコア)の表から計算しています。
-
 ## 手法
 
 | 手法 | 特徴 | 参考文献 | 使った実験 |
@@ -27,14 +13,28 @@
 | W1 | 遠方マイクの大きさと位相を合わせて減算（全区間で推定） | [Ozeki技術報告](https://dcase.community/documents/challenge2026/technical_reports/DCASE2026_Ozeki_101_t2.pdf)（同形の減算） | 実験1・実験2 |
 | SS | 振幅スペクトル減算 | [Chu・Qian技術報告](https://dcase.community/documents/challenge2026/technical_reports/DCASE2026_Qian_65_t2.pdf)（式1） | 実験1 |
 
-#### 公式ベースライン・参考システム
+### 公式ベースライン・参考システム
 
-| 記号 | 役割 | システム | 参考文献 |
+| 記号 | 役割 | システム | Evaluation | 参考文献 |
+|---|---|---|---|---|
+| BASE | 公式ベースライン | DCASE2026_baseline_task2_MSE | 59.803 | — |
+| REF | 一部処理の参考元 | Fujimura_MERL_task2_3 | 70.241 | [NA-SSL論文](https://arxiv.org/html/2608.00447v1) |
+
+本実験はBEATs_iter3を使います。REFはNA-BEATsを使うシステムで、本実験はその一部の処理（RDPなど）を参考にしています。本実験とはモデルが異なるので、同じ条件の順位ではありません。出典: [DCASE 2026 Task 2 Results](https://dcase.community/challenge2026/task-first-shot-unsupervised-anomalous-sound-detection-for-machine-condition-monitoring-results) · [システム名・参考値](../results/02-challenge-references.json)
+
+## 結果の要点
+
+[README](../README.md#結果の要点)の図と同じ比較を、データごとの差で示します。
+
+| 観点 | 比較 | Evaluation | Development |
 |---|---|---|---|
-| BASE | 公式ベースライン | DCASE2026_baseline_task2_MSE | — |
-| REF | 一部処理の参考元 | Fujimura_MERL_task2_3 | [NA-SSL論文](https://arxiv.org/html/2608.00447v1) |
+| ① 明示的なノイズ除去の効果 | B0（重み固定）→ W1（重み固定） | +3.99 | +6.16 |
+|  | B0（重み固定）→ SS（重み固定） | −0.52 | — |
+|  | B0（追加学習）→ W1（追加学習） | +2.74 | +6.48 |
+| ② BEATs 追加学習の効果 | B0（重み固定）→ B0（追加学習） | +5.07 | +1.72 |
+|  | W1（重み固定）→ W1（追加学習） | +3.82 | +2.05 |
 
-本実験はBEATs_iter3を使用。REFはNA-BEATsを使うシステムで、RDPなど一部の処理を参考にしています。
+差は下の[スコア](#スコア)の丸め前の値から計算しています（表示値の引き算とは最終桁がずれることがあります）。
 
 ## スコア
 
@@ -48,8 +48,6 @@
 | Development | BEATs_iter3 + LoRA（正常12,000音・25epoch） | 63.048 | — | 69.528 | — | 実験2 |
 
 数値の正本：[results/02-summary.csv](../results/02-summary.csv)・[results/03-beats/summary.csv](../results/03-beats/summary.csv)
-
-参考値（Evaluation、本実験とは異なるモデル）：BASE（公式ベースライン）59.803、REF（一部処理の参考元）70.241。出典: [DCASE 2026 Task 2 Results](https://dcase.community/challenge2026/task-first-shot-unsupervised-anomalous-sound-detection-for-machine-condition-monitoring-results) · [システム名・参考値](../results/02-challenge-references.json)
 
 ### Evaluation
 

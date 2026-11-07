@@ -11,9 +11,15 @@
 | [.devcontainer/devcontainer.json](../.devcontainer/devcontainer.json) | 学習・推論（CUDA 12.8版のPyTorch） | NVIDIA GPU、ドライバー、NVIDIA Container Toolkit |
 | [.devcontainer/cpu/devcontainer.json](../.devcontainer/cpu/devcontainer.json) | テスト・アプリ・CPUでの推論 | Docker |
 
-GPU版はCUDAが使えないと作成時に止まります。その場合はCPU版を選びます。データ・重み・評価器は、リポジトリ内の`inputs/`（Gitの管理外）に置くと、コンテナからも同じパスで使えます。
+GPU版はCUDAが使えないと作成時に止まるので、その場合はCPU版で開きます。データ・重み・評価器は、リポジトリ内の`inputs/`（Gitの管理外）に置くと、コンテナからも同じパスで使えます。
 
 ## 手動で導入する
+
+| やりたいこと | 入れるもの |
+|---|---|
+| marimoアプリを読むだけ | marimoだけ（[アプリの説明](../apps/README.md#ローカルで読む編集する)） |
+| 実験1の推論（CPUでも可） | 下の2行目（配布先を`cpu`に）と`pip install -e .` |
+| 実験2の学習・公式採点・テストまで | 下の全部 |
 
 ```bash
 python3.11 -m venv .venv
@@ -34,8 +40,4 @@ python3.11 -m venv .venv
 
 CPU環境では、PyTorchの配布先を`https://download.pytorch.org/whl/cpu`に変えます。Torch・TorchAudio・TorchVisionは[公式PyTorch 2.7.1構成](https://pytorch.org/get-started/previous-versions/)に合わせて同じ配布先から導入します。`runtime.py install`は実験2の学習で使う固定ASDKitを仮想環境内へ取得してeditable導入します。upstreamの必須モジュールがwheelに含まれないためこの方式を使い、Git・clone・checkoutの操作を不要にしています（取得元は[upstream.lock.json](../reproduction/asd03/upstream.lock.json)）。
 
-marimoアプリを読むだけなら、Torch不要の軽い環境で足ります（[アプリの説明](../apps/README.md#ローカルで読む編集する)）。
-
-## 入力データ・重み・評価器
-
-データセット・BEATs重み・公式評価器・正解CSVは同梱していません。取得先と配置は[入力の取得](02-inputs.md)を参照してください。
+データセット・BEATs重み・公式評価器・正解CSVは同梱していません（[入力の取得](02-inputs.md)）。

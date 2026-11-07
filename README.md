@@ -11,10 +11,10 @@ DCASE 2026 Task 2（機械の異常音検知）の2chマイク録音を使い、
 
 ![明示的なノイズ除去の効果と、BEATs追加学習の効果（Evaluation）](results/readme/summary.svg)
 
-- **① 明示的なノイズ除去の効果**（基準：近接マイクそのまま（B0））：W1（重み固定） +3.99、SS（重み固定） −0.52、W1（追加学習） +2.74
-- **② BEATs 追加学習の効果**（基準：BEATs 重み固定）：B0 +5.07、W1 +3.82
+- **① 明示的なノイズ除去の効果**（基準：近接マイクそのまま（B0））：W1 複素減算（重み固定） +3.99、SS 振幅スペクトル減算（重み固定） −0.52、W1 複素減算（追加学習） +2.74
+- **② BEATs 追加学習の効果**（基準：BEATs 重み固定）：B0 近接マイク +5.07、W1 複素減算 +3.82
 
-値は Evaluation の総合スコアの差（処理後 − 基準）で、各条件1回分の結果です。破線は公式ベースライン（BASE）と参考システム（REF）で、モデルが異なります。Developmentの差と全スコアは[結果の詳細](docs/results.md)にあります。
+値は Evaluation の総合スコア（0–100、高いほど良い）の差（処理後 − 基準）で、各条件1回分の結果です。破線は公式ベースライン（BASE）と参考システム（REF）で、モデルが異なります。Developmentの差と全スコアは[結果の詳細](docs/results.md)にあります。
 
 <!-- summary:end -->
 
@@ -31,8 +31,8 @@ DCASE 2026 Task 2（機械の異常音検知）の2chマイク録音を使い、
 
 ## 実行環境
 
-[Dev Container](.devcontainer)で開くと、環境が自動で作られます（GPU版とCPU版）。手動での導入、extraの用途、入力データの取得先は[実行環境](docs/setup.md)にあります。
+[Dev Container](.devcontainer)で開くと、環境が自動で作られます（GPU版とCPU版）。手動での導入とextraの用途は[実行環境](docs/setup.md)、データ・重み・評価器の取得先は[入力の取得](docs/02-inputs.md)にあります。
 
 ## 関連記事
 
-この実験は Zenn の連載で解説しています：[第2回](https://zenn.dev/kasahart/articles/kasahart-20260919-dcase2026-asd-02)（実験1）。
+[実験1の解説記事（Zenn連載 第2回）](https://zenn.dev/kasahart/articles/kasahart-20260919-dcase2026-asd-02)
