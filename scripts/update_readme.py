@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: MIT
 # Copyright (c) 2026 kasahart
-"""Render README methods, score tables and SVG score charts from method metadata and canonical result CSVs."""
+"""Render the README summary, docs/results.md tables and SVG score charts from method metadata and canonical result CSVs."""
 import argparse
 import csv
 import html
@@ -245,11 +245,22 @@ def summary(root, groups, references):
         panels.append({**panel, 'rows': rows_})
     shown = [s for s in references.get('systems', []) if references.get('split') == datasets[0]]
     path = f'{CHART_DIR}/summary.svg'
-    text = [f'![明示的なノイズ除去の効果と、BEATs追加学習の効果（{datasets[0]}）]({path})', '', *lines, '',
-            '値は総合スコアの差（処理後 − 基準）で、各条件1回分の結果です。'
-            + ('図の破線は公式ベースライン（BASE）と参考システム（REF）で、モデルが異なります。' if shown else '')
-            + '各値は[スコア](#スコア)の表から計算しています。']
-    return '\n'.join(text), {path: summary_chart(panels, datasets[0], shown)}
+    headline = []
+    for panel in panels:
+        parts = []
+        for label, note, start, end in panel['rows']:
+            symbol = label.split(' ', 1)[0]
+            parts.append(f"{symbol}{'（' + note + '）' if note else ''} {end - start:+.2f}".replace('-', '−'))
+        headline.append(f"- **{panel['title']}**（基準：{panel['baseline']}）：{'、'.join(parts)}")
+    readme = [f'![明示的なノイズ除去の効果と、BEATs追加学習の効果（{datasets[0]}）]({path})', '', *headline, '',
+              f'値は {datasets[0]} の総合スコアの差（処理後 − 基準）で、各条件1回分の結果です。'
+              + ('破線は公式ベースライン（BASE）と参考システム（REF）で、モデルが異なります。' if shown else '')
+              + f'{"・".join(datasets[1:])}の差と全スコアは[結果の詳細](docs/results.md)にあります。']
+    results = ['## 結果の要点', '', f'![明示的なノイズ除去の効果と、BEATs追加学習の効果（{datasets[0]}）](../{path})', '', *lines, '',
+               '値は総合スコアの差（処理後 − 基準）で、各条件1回分の結果です。'
+               + ('図の破線は公式ベースライン（BASE）と参考システム（REF）で、モデルが異なります。' if shown else '')
+               + '各値は下の[スコア](#スコア)の表から計算しています。']
+    return '\n'.join(readme), '\n'.join(results), {path: summary_chart(panels, datasets[0], shown)}
 
 
 def build(root):
@@ -284,12 +295,12 @@ def build(root):
         lines.append(f"| {group['dataset']} | {first['feature_model']}（{first['model_training']}） | "
                      + ' | '.join(cells) + f" | {'・'.join(sorted(group['experiments']))} |")
     sources = list(dict.fromkeys(path for g in groups for path in g['sources']))
-    lines += ['', '数値の正本：' + '・'.join(f'[{path}]({path})' for path in sources)]
+    lines += ['', '数値の正本：' + '・'.join(f'[{path}](../{path})' for path in sources)]
     if references:
         values = '、'.join(f"{s['symbol']}（{s['role_label']}）{Decimal(s['score']):.3f}" for s in systems)
         lines += ['', f"参考値（{references['split']}、本実験とは異なるモデル）：{values}。"
                       f"出典: [DCASE 2026 Task 2 Results]({references['source_url']}) · "
-                      f"[システム名・参考値]({with_references[0]['references_path']})"]
+                      f"[システム名・参考値](../{with_references[0]['references_path']})"]
 
     for dataset in dict.fromkeys(group['dataset'] for group in groups):
         bars = [(group['scores'][symbol], f"{group['chart_prefix']} {symbol}")
@@ -303,11 +314,11 @@ def build(root):
         path = f'{CHART_DIR}/score-{dataset.lower()}.svg'
         lines += ['', f'### {dataset}', '',
                   '青：本実験（スコア順）' + ('／灰：公式・参考値（異なるモデル）。' if shown else '。'), '',
-                  f'![{dataset}の総合スコア（スコア順）]({path})']
+                  f'![{dataset}の総合スコア（スコア順）](../{path})']
         files[path] = chart(labels, values, len(shown))
-    summary_text, summary_files = summary(root, groups, references)
+    readme_summary, results_summary, summary_files = summary(root, groups, references)
     files.update(summary_files)
-    return '\n'.join(lines), files, summary_text
+    return results_summary + '\n\n' + '\n'.join(lines), files, readme_summary
 
 
 def render(root):
@@ -316,19 +327,20 @@ def render(root):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--check', action='store_true', help='Check README without editing it')
+    parser.add_argument('--check', action='store_true', help='Check README, docs/results.md and charts without editing them')
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
-    path = root / 'README.md'
-    current = path.read_text(encoding='utf-8')
+    readme = root / 'README.md'
+    results_doc = root / 'docs/results.md'
     text, files, summary_text = build(root)
-    updated = replace_block(current, START, END, text)
-    updated = replace_block(updated, SUMMARY_START, SUMMARY_END, summary_text)
-    outputs = {path: updated, **{root / name: content for name, content in files.items()}}
+    updated_readme = replace_block(readme.read_text(encoding='utf-8'), SUMMARY_START, SUMMARY_END, summary_text)
+    updated_results = replace_block(results_doc.read_text(encoding='utf-8'), START, END, text)
+    outputs = {readme: updated_readme, results_doc: updated_results,
+               **{root / name: content for name, content in files.items()}}
     stale = [p for p, content in outputs.items() if not p.exists() or p.read_text(encoding='utf-8') != content]
     if args.check:
         if stale:
-            parser.exit(1, 'README or charts are stale; run python scripts/update_readme.py\n')
+            parser.exit(1, 'README, docs/results.md or charts are stale; run python scripts/update_readme.py\n')
     else:
         for p, content in outputs.items():
             p.parent.mkdir(parents=True, exist_ok=True)

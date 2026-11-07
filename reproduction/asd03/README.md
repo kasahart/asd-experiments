@@ -1,4 +1,4 @@
-# 第3回：BEATs追加学習の再現
+# 実験2：BEATs追加学習の再現
 
 B0（近接ch）とW1（全区間の複素線形減算）を入力に、BEATs_iter3固定と正常12,000音でのLoRA追加学習を比較します。学習には公開ASDKitの固定commitを仮想環境内へ自動取得し、周波数保持frontendなどの小さな接続を`runtime.py`に置いています。W1・BEATs・pooling・BEAMは既存の`src/asd_min/`を共用します。runnerは入出力と検査を担当します。
 
@@ -36,15 +36,16 @@ B0（近接ch）とW1（全区間の複素線形減算）を入力に、BEATs_it
 
 ## 入力の取得と配置
 
-[Development](https://zenodo.org/records/19336329)、[Additional training](https://zenodo.org/records/20151556)、[Evaluation](https://zenodo.org/records/20437238)を配布元から取得します。Developmentの各機種`train/test`を`DEV`配下に、Additionalの`train`とEvaluationの`test`を同じ`EVAL`配下に配置します。どちらも`<ROOT>/<machine>/{train,test}/*.wav`の構成です。
+データ・BEATs重み・公式評価器の取得先とchecksumは[入力の取得](../../docs/02-inputs.md)にあります。配置は次のとおりです。
 
-重みは[BEATsのPre-Trained Model / Iter3](https://github.com/microsoft/unilm/blob/master/beats/README.md)から取得し、`BASE`に指定します。公式評価器は利用者が[公式評価器の固定版ZIP](https://github.com/nttcslab/dcase2026_task2_evaluator/archive/f6a94a2b5e614a9626c9d1ccff6df0705e6aaa75.zip)を別途展開し、そのディレクトリを`EVALUATOR`に指定します。下の例に合わせる場合は、展開先を`inputs/dcase2026/evaluator`に改名します。配布元のデータ・重み・評価器の利用条件（評価器の`LICENSE`と`LICENSEv2.1.pdf`を含む）を確認してください。これらの取得物はリポジトリへ追加しません。[既存の入力取得手順](../../docs/02-inputs.md)も参照できます。teacher特徴と116クラスJSONは下の手順で正常trainから生成します。
+- Developmentの各機種`train/test`を`DEV`配下に、Additional trainingの`train`とEvaluationの`test`を同じ`EVAL`配下に置きます。どちらも`<ROOT>/<machine>/{train,test}/*.wav`の構成です。
+- 重み（BEATs_iter3）を`BASE`に、展開した公式評価器のディレクトリを`EVALUATOR`に指定します。下の例に合わせる場合は、評価器の展開先を`inputs/dcase2026/evaluator`に改名します。
+
+teacher特徴と116クラスJSONは下の手順で正常trainから生成します。
 
 ## 実行環境
 
-リポジトリ共通の[実行環境](../../README.md#実行環境)から`training` extraと固定ASDKitを導入します。公式採点には同じ環境の`evaluation` extraを使います。依存版はrootの`pyproject.toml`、ASDKitのcommit・archive URL・SHA-256は`upstream.lock.json`、取得時にarchiveのSHA-256を確認します。実行時にコード・YAML・入力のSHA一致は要求しません。
-
-`runtime.py install`は[固定ASDKit archive](upstream.lock.json)を仮想環境内へ取得し、editable導入します。upstreamの必須モジュールがwheelに含まれないためこの方式を使い、Git・clone・checkoutの操作を不要にしています。
+環境の作り方は[実行環境](../../docs/setup.md)にあります。学習には`training` extraと固定ASDKit（`runtime.py install`）、公式採点には`evaluation` extraを使います。ASDKitのcommit・archive URL・SHA-256は`upstream.lock.json`で固定し、取得時にarchiveのSHA-256を確認します。実行時にコード・YAML・入力のSHA一致は要求しません。
 
 repoルートから実行します。`inputs/...`は手元の取得先に置き換え、出力先は入力データの外にある新しいディレクトリにします。
 
@@ -81,9 +82,9 @@ $PY reproduction/asd03/metrics.py --run "$OUT" --evaluator "$EVALUATOR" --output
 
 ## 公式評価器による採点
 
-評価器のコード・正解CSVは利用者が別途設置します。第2回と共通の[呼び出し接続](../../src/asd_min/evaluation.py)が公式スクリプトを無改変で実行します。AUC・pAUC・総合値は公式出力から取得し、表示単位を100倍へ変換します。機種スコアも公式の単機種集計を使います。
+評価器のコード・正解CSVは利用者が別途設置します。実験1と共通の[呼び出し接続](../../src/asd_min/evaluation.py)が公式スクリプトを無改変で実行します。AUC・pAUC・総合値は公式出力から取得し、表示単位を100倍へ変換します。機種スコアも公式の単機種集計を使います。
 
-`score`は正常参照スコアの90%点を閾値として、第2回と共通の処理で判定CSVも生成します。これは公式評価器への入力です。Developmentの正解は公開testファイル名から公式形式のCSVに変換し、Evaluationは設置した評価器の正解を使います。評価用の作業ファイルと公式出力は`$OUT/metrics`以下に置き、設置先は書き換えません。`--terms-reviewed`は評価器の利用条件を確認した後に指定します。
+`score`は正常参照スコアの90%点を閾値として、実験1と共通の処理で判定CSVも生成します。これは公式評価器への入力です。Developmentの正解は公開testファイル名から公式形式のCSVに変換し、Evaluationは設置した評価器の正解を使います。評価用の作業ファイルと公式出力は`$OUT/metrics`以下に置き、設置先は書き換えません。`--terms-reviewed`は評価器の利用条件を確認した後に指定します。
 
 ## 設定を変えて試す
 
@@ -106,8 +107,8 @@ $PY reproduction/asd03/run.py --stage all --smoke \
 
 ## 確認結果
 
-[全件集計](../../results/03-beats/README.md)を参照してください。掲載集計は周波数保持BEATsの同等構成で25epoch学習したcheckpointによる結果です。この外部ASDKit接続で確認した範囲はcheckpoint復元・特徴とスコアの一致・2step学習で、25epochの独立再学習は未検証です。
+集計値は[結果の詳細](../../docs/results.md)、CSVの説明は[results/03-beats](../../results/03-beats/README.md)を参照してください。掲載集計は周波数保持BEATsの同等構成で25epoch学習したcheckpointによる結果です。この外部ASDKit接続で確認した範囲はcheckpoint復元・特徴とスコアの一致・2step学習で、25epochの独立再学習は未検証です。
 
 ## 出典とライセンス
 
-[原ASDKitの固定版](https://github.com/TakuyaFujimura/dcase-asd-toolkit/tree/7601d673ef2ed5a2424965cac755365cf7112c5f)を外部依存として取得し、MITの著作権・許諾通知は共通の[research-MIT.txt](../../licenses/research-MIT.txt)に保持しています。BEATsは[Microsoft原実装](https://github.com/microsoft/unilm/tree/master/beats)、MITを[LICENSE](../../src/asd_min/beats/LICENSE)、改変説明を[NOTICE](../../src/asd_min/beats/NOTICE.md)に保持しています。runner・集計・テスト・接続コードはroot MITです。元データ・重みは各配布元の条件に従います。
+ASDKit・BEATs・この再現コードの出典とライセンスは[第三者通知](../../THIRD_PARTY_NOTICES.md#実験2追加学習の再現)にまとめています。
