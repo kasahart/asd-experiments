@@ -162,7 +162,7 @@ def merge_identical(groups):
             same_setup = all(group['entries'][0][k] == earlier['entries'][0][k]
                              for k in ('dataset', 'feature_model', 'model_training', 'chart_prefix'))
             shared = set(group['scores']) & set(earlier['scores'])
-            if same_setup and shared:
+            if same_setup:
                 if any(abs(group['scores'][s] - earlier['scores'][s]) >= Decimal('1e-9') for s in shared):
                     raise ValueError(f"{group['name']}: {'・'.join(sorted(shared))} differ from {earlier['name']} under the same setup")
                 earlier['scores'].update(group['scores'])
