@@ -10,6 +10,14 @@ from pathlib import Path
 
 START = '<!-- experiments:start -->'
 END = '<!-- experiments:end -->'
+SUMMARY_START = '<!-- summary:start -->'
+SUMMARY_END = '<!-- summary:end -->'
+
+
+def replace_block(text, start, end, body):
+    before, rest = text.split(start)
+    _, after = rest.split(end)
+    return before + start + '\n\n' + body + '\n\n' + end + after
 
 
 def rows(path):
@@ -113,11 +121,8 @@ def comparisons(root, methods):
         result.append({'name': group, 'entries': entries, 'scores': scores,
                        'references': references_for(root, entries), 'references_path': references_path,
                        'summary_path': summary_path, 'protocol_path': protocol_path, 'inputs_path': inputs_path,
-                       'round': single(entries, 'round', group), 'dataset': single(entries, 'dataset', group),
+                       'experiments': [single(entries, 'experiment', group)], 'dataset': single(entries, 'dataset', group),
                        'chart_prefix': single(entries, 'chart_prefix', group)})
-    prefixes = [(c['dataset'], c['chart_prefix']) for c in result]
-    if len(set(prefixes)) != len(prefixes) or not all(p for _, p in prefixes):
-        raise ValueError('Each comparison needs its own chart_prefix within a dataset')
     return result
 
 
@@ -126,31 +131,134 @@ def method_table(groups):
     for group in groups:
         for method in group['entries']:
             symbol = method.get('symbol') or method['condition'].upper()
-            info = symbols.setdefault(symbol, {'descriptions': set(), 'references': set(), 'rounds': []})
+            info = symbols.setdefault(symbol, {'descriptions': set(), 'references': set(), 'experiments': []})
             info['descriptions'].add(method['description'])
             if method.get('reference_url'):
                 reference = f"[{method['reference_name']}]({method['reference_url']})"
                 if method.get('reference_note'):
                     reference += f"（{method['reference_note']}）"
                 info['references'].add(reference)
-            if group['round'] not in info['rounds']:
-                info['rounds'].append(group['round'])
-    lines = ['| 手法 | 特徴 | 参考文献 | 使った回 |', '|---|---|---|---|']
+            for experiment in group['experiments']:
+                if experiment not in info['experiments']:
+                    info['experiments'].append(experiment)
+    lines = ['| 手法 | 特徴 | 参考文献 | 使った実験 |', '|---|---|---|---|']
     for symbol, info in symbols.items():
         if len(info['descriptions']) != 1 or len(info['references']) > 1:
             raise ValueError(f'{symbol}: use one description and one reference for the same method symbol')
         feature = info['descriptions'].pop().replace('|', r'\|')
         reference = info['references'].pop() if info['references'] else '—'
-        lines.append(f"| {symbol} | {feature} | {reference} | {'・'.join(info['rounds'])} |")
+        lines.append(f"| {symbol} | {feature} | {reference} | {'・'.join(sorted(info['experiments']))} |")
     return lines, list(symbols)
+
+
+DATASET_ORDER = ['Evaluation', 'Development']
+
+
+def merge_identical(groups):
+    """Fold a comparison into an earlier one with the same setup and identical scores."""
+    merged = []
+    for group in groups:
+        for earlier in merged:
+            same_setup = all(group['entries'][0][k] == earlier['entries'][0][k]
+                             for k in ('dataset', 'feature_model', 'model_training'))
+            shared = set(group['scores']) & set(earlier['scores'])
+            if (same_setup and shared == set(group['scores'])
+                    and all(abs(group['scores'][s] - earlier['scores'][s]) < Decimal('1e-9') for s in shared)):
+                earlier['experiments'] += [e for e in group['experiments'] if e not in earlier['experiments']]
+                earlier['sources'] += [s for s in [group['summary_path']] if s not in earlier['sources']]
+                break
+        else:
+            merged.append({**group, 'experiments': list(group['experiments']), 'sources': [group['summary_path']]})
+    keys = [(g['dataset'], g['chart_prefix']) for g in merged]
+    if len(set(keys)) != len(keys) or not all(prefix for _, prefix in keys):
+        raise ValueError('Each comparison needs its own chart_prefix within a dataset')
+    rank = {name: i for i, name in enumerate(DATASET_ORDER)}
+    return sorted(merged, key=lambda g: rank.get(g['dataset'], len(rank)))
+
+
+def lookup(groups, dataset, prefix, symbol):
+    for group in groups:
+        if group['dataset'] == dataset and group['chart_prefix'] == prefix and symbol in group['scores']:
+            return group['scores'][symbol]
+    return None
+
+
+def summary_chart(panels, dataset, systems):
+    """Two-panel change chart: hollow baseline dot -> filled result dot, coloured by direction."""
+    lo, hi, left, width, row = 55, 75, 250, 440, 42
+    x = lambda value: left + (float(value) - lo) / (hi - lo) * width
+    up, down, base, ink, muted, grid = '#1f4e99', '#b4532a', '#9aa3ad', '#222222', '#5b6470', '#e3e6ea'
+    font = "font-family=\"'Hiragino Sans','Noto Sans CJK JP','Yu Gothic',Meiryo,sans-serif\""
+    out, y0 = [], 20
+    for panel in panels:
+        out.append(f'<text x="16" y="{y0 + 14}" font-size="15" font-weight="bold" fill="{ink}">{html.escape(panel["title"])}</text>')
+        out.append(f'<text x="16" y="{y0 + 34}" font-size="12" fill="{muted}">基準：{html.escape(panel["baseline"])}'
+                   '　○ 基準 → ● 処理後（青：上がった／橙：下がった）</text>')
+        top = y0 + 52
+        bottom = top + row * len(panel['rows'])
+        for tick in range(lo, hi + 1, 5):
+            out.append(f'<line x1="{x(tick):.1f}" y1="{top}" x2="{x(tick):.1f}" y2="{bottom}" stroke="{grid}"/>')
+            out.append(f'<text x="{x(tick):.1f}" y="{bottom + 16}" text-anchor="middle" font-size="12" fill="{muted}">{tick}</text>')
+        for system in systems:
+            value = Decimal(system['score'])
+            out.append(f'<line x1="{x(value):.1f}" y1="{top}" x2="{x(value):.1f}" y2="{bottom}" stroke="#9099a5" stroke-dasharray="4 3"/>')
+            out.append(f'<text x="{x(value) + 3:.1f}" y="{top + 10}" font-size="11" fill="{muted}">{system["symbol"]}</text>')
+        for index, (label, note, start, end) in enumerate(panel['rows']):
+            y = top + row * index + row / 2 + 4
+            color = up if end > start else down
+            note_text = f'<tspan fill="{muted}" font-size="12">（{html.escape(note)}）</tspan>' if note else ''
+            out.append(f'<text x="{left - 12}" y="{y + 4.5}" text-anchor="end" fill="{ink}">{html.escape(label)}{note_text}</text>')
+            out.append(f'<line x1="{x(start):.1f}" y1="{y}" x2="{x(end):.1f}" y2="{y}" stroke="{color}" stroke-width="2.5"/>')
+            out.append(f'<circle cx="{x(start):.1f}" cy="{y}" r="5.5" fill="#ffffff" stroke="{base}" stroke-width="2"/>')
+            out.append(f'<circle cx="{x(end):.1f}" cy="{y}" r="5.5" fill="{color}" stroke="#ffffff" stroke-width="1.5"/>')
+            text_x = max(x(start), x(end)) + 12
+            out.append(f'<text x="{text_x:.1f}" y="{y + 4.5}" fill="{color}" font-weight="bold">{end - start:+.2f}</text>')
+            out.append(f'<text x="{text_x + 46:.1f}" y="{y + 4.5}" fill="{muted}" font-size="12">{start:.1f} → {end:.1f}</text>')
+        y0 = bottom + 40
+    caption = f'{dataset} 総合スコア' + ('（破線は公式ベースライン・参考システム）' if systems else '')
+    out.append(f'<text x="{left + width / 2}" y="{y0 - 6}" text-anchor="middle" font-size="12" fill="{muted}">{caption}</text>')
+    height, total = y0 + 6, left + width + 150
+    return '\n'.join([f'<svg xmlns="http://www.w3.org/2000/svg" width="{total}" height="{height}" '
+                      f'viewBox="0 0 {total} {height}" {font} font-size="13">',
+                      f'<rect width="{total}" height="{height}" fill="#ffffff"/>', *out, '</svg>']) + '\n'
+
+
+def summary(root, groups, references):
+    config = json.loads((root / 'configs/readme-summary.json').read_text(encoding='utf-8'))
+    datasets = config['datasets']
+    lines = ['| 観点 | 比較 | ' + ' | '.join(datasets) + ' |', '|---|---|' + '---|' * len(datasets)]
+    panels = []
+    for panel in config['panels']:
+        rows_ = []
+        for i, pair in enumerate(panel['pairs']):
+            deltas = []
+            for dataset in datasets:
+                start, end = lookup(groups, dataset, *pair['from']), lookup(groups, dataset, *pair['to'])
+                deltas.append(None if start is None or end is None else (start, end))
+            if deltas[0] is None:
+                raise ValueError(f"summary: {pair['label']} has no {datasets[0]} score")
+            rows_.append((pair['label'], pair['note'], *deltas[0]))
+            title = panel['title'] if i == 0 else ''
+            compared = f"{pair['from'][1]}（{pair['from'][0]}）→ {pair['to'][1]}（{pair['to'][0]}）"
+            cells = [f'{d[1] - d[0]:+.2f}'.replace('-', '−') if d else '—' for d in deltas]
+            lines.append(f'| {title} | {compared} | ' + ' | '.join(cells) + ' |')
+        panels.append({**panel, 'rows': rows_})
+    shown = [s for s in references.get('systems', []) if references.get('split') == datasets[0]]
+    path = f'{CHART_DIR}/summary.svg'
+    text = [f'![明示的なノイズ除去の効果と、BEATs追加学習の効果（{datasets[0]}）]({path})', '', *lines, '',
+            '値は総合スコアの差（処理後 − 基準）で、各条件1回分の結果です。'
+            + ('図の破線は公式ベースライン（BASE）と参考システム（REF）で、モデルが異なります。' if shown else '')
+            + '各値は[スコア](#スコア)の表から計算しています。']
+    return '\n'.join(text), {path: summary_chart(panels, datasets[0], shown)}
 
 
 def build(root):
     files = {}
-    groups = comparisons(root, rows(root / 'configs/readme-methods.csv'))
-    table, symbols = method_table(groups)
+    raw = comparisons(root, rows(root / 'configs/readme-methods.csv'))
+    table, symbols = method_table(raw)
+    groups = merge_identical(raw)
     lines = ['## 手法', '', *table]
-    with_references = [g for g in groups if g['references']]
+    with_references = [g for g in raw if g['references']]
     if len({g['references_path'] for g in with_references}) > 1:
         raise ValueError('Use one challenge reference source')
     references = with_references[0]['references'] if with_references else {}
@@ -167,23 +275,16 @@ def build(root):
     if len(set(reference_symbols)) != len(reference_symbols) or set(reference_symbols) & set(symbols):
         raise ValueError('duplicate chart symbol')
 
-    lines += ['', '## スコア', '', '公式評価器の総合スコア（0–100、高いほど良い）です。回・データ・特徴抽出の組み合わせごとに1行です。', '',
-              '| 回 | データ | 特徴抽出モデル | モデルの追加学習 | ' + ' | '.join(symbols) + ' | 資料 |',
-              '|---|---|---|---|' + '---|' * len(symbols) + '---|']
+    lines += ['', '## スコア', '', '公式評価器の総合スコア（0–100、高いほど良い）です。データ・特徴抽出の組み合わせごとに1行です。', '',
+              '| データ | 特徴抽出 | ' + ' | '.join(symbols) + ' | 実験 |',
+              '|---|---|' + '---|' * len(symbols) + '---|']
     for group in groups:
         first = group['entries'][0]
         cells = [f"{group['scores'][s]:.3f}" if s in group['scores'] else '—' for s in symbols]
-        links = (f"[条件]({group['protocol_path']}) · [入力]({group['inputs_path']}) · "
-                 f"[CSV]({group['summary_path']})")
-        lines.append(f"| {group['round']} | {group['dataset']} | {first['feature_model']} | "
-                     f"{first['model_training']} | " + ' | '.join(cells) + f' | {links} |')
-    for i, group in enumerate(groups):
-        for earlier in groups[:i]:
-            shared = [s for s in symbols if s in group['scores'] and s in earlier['scores']]
-            same_setup = all(group['entries'][0][k] == earlier['entries'][0][k]
-                             for k in ('dataset', 'feature_model', 'model_training'))
-            if same_setup and shared and all(abs(group['scores'][s] - earlier['scores'][s]) < Decimal('1e-9') for s in shared):
-                lines += ['', f"{group['dataset']}の{group['chart_prefix']}の{'・'.join(shared)}は、{earlier['chart_prefix']}と同じ処理・同じ結果です。"]
+        lines.append(f"| {group['dataset']} | {first['feature_model']}（{first['model_training']}） | "
+                     + ' | '.join(cells) + f" | {'・'.join(sorted(group['experiments']))} |")
+    sources = list(dict.fromkeys(path for g in groups for path in g['sources']))
+    lines += ['', '数値の正本：' + '・'.join(f'[{path}]({path})' for path in sources)]
     if references:
         values = '、'.join(f"{s['symbol']}（{s['role_label']}）{Decimal(s['score']):.3f}" for s in systems)
         lines += ['', f"参考値（{references['split']}、本実験とは異なるモデル）：{values}。"
@@ -204,7 +305,9 @@ def build(root):
                   '青：本実験（スコア順）' + ('／灰：公式・参考値（異なるモデル）。' if shown else '。'), '',
                   f'![{dataset}の総合スコア（スコア順）]({path})']
         files[path] = chart(labels, values, len(shown))
-    return '\n'.join(lines), files
+    summary_text, summary_files = summary(root, groups, references)
+    files.update(summary_files)
+    return '\n'.join(lines), files, summary_text
 
 
 def render(root):
@@ -218,10 +321,9 @@ def main():
     root = Path(__file__).resolve().parents[1]
     path = root / 'README.md'
     current = path.read_text(encoding='utf-8')
-    before, rest = current.split(START)
-    _, after = rest.split(END)
-    text, files = build(root)
-    updated = before + START + '\n\n' + text + '\n\n' + END + after
+    text, files, summary_text = build(root)
+    updated = replace_block(current, START, END, text)
+    updated = replace_block(updated, SUMMARY_START, SUMMARY_END, summary_text)
     outputs = {path: updated, **{root / name: content for name, content in files.items()}}
     stale = [p for p, content in outputs.items() if not p.exists() or p.read_text(encoding='utf-8') != content]
     if args.check:

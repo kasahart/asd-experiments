@@ -11,30 +11,34 @@ renderer = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(renderer)
 
 
-def test_score_table_and_single_chart_use_canonical_scores():
-    rendered = renderer.render(ROOT)
-    scores = rendered.split('## スコア', 1)[1]
-    rows = [line for line in scores.splitlines() if line.startswith('| 第')]
-    expected = [
-        ['第2回', 'Evaluation', '62.841', '58.362', '66.835', '62.325'],
-        ['第3回', 'Development', '61.325', '—', '67.480', '—'],
-        ['第3回', 'Development', '63.048', '—', '69.528', '—'],
-        ['第3回', 'Evaluation', '62.841', '—', '66.835', '—'],
-        ['第3回', 'Evaluation', '67.916', '—', '70.659', '—'],
-    ]
+def test_score_table_and_charts_use_canonical_scores():
+    text, files, _ = renderer.build(ROOT)
+    scores = text.split('## スコア', 1)[1]
+    rows = [line for line in scores.splitlines() if line.startswith(('| Evaluation', '| Development'))]
     cells = [[c.strip() for c in row.strip('|').split('|')] for row in rows]
-    assert [c[:2] + c[4:8] for c in cells] == expected
-    text, files = renderer.build(ROOT)
+    assert [[c[0]] + c[2:] for c in cells] == [
+        ['Evaluation', '62.841', '58.362', '66.835', '62.325', '実験1・実験2'],
+        ['Evaluation', '67.916', '—', '70.659', '—', '実験2'],
+        ['Development', '61.325', '—', '67.480', '—', '実験2'],
+        ['Development', '63.048', '—', '69.528', '—', '実験2'],
+    ]
     assert '```mermaid' not in text
     charts = {name: [float(v) for v in re.findall(r'>(\d+\.\d{3})</text>', files[f'results/readme/score-{name}.svg'])]
               for name in ('evaluation', 'development')}
-    assert charts['evaluation'] == [
-        70.659, 67.916, 66.835, 66.835, 62.841, 62.841, 62.325, 58.362, 59.803, 70.241]
+    assert charts['evaluation'] == [70.659, 67.916, 66.835, 62.841, 62.325, 58.362, 59.803, 70.241]
     assert charts['development'] == [69.528, 67.480, 63.048, 61.325]
-    for name in charts:
-        assert f'](results/readme/score-{name}.svg)' in scores
-        assert (ROOT / f'results/readme/score-{name}.svg').read_text(encoding='utf-8') == files[f'results/readme/score-{name}.svg']
-    assert 'Evaluationの第3回 固定のB0・W1は、第2回 固定と同じ処理・同じ結果です。' in scores
+    for name, content in files.items():
+        assert (ROOT / name).read_text(encoding='utf-8') == content
+
+
+def test_summary_shows_both_effects_as_differences():
+    _, files, summary = renderer.build(ROOT)
+    rows = [[c.strip() for c in line.strip('|').split('|')] for line in summary.splitlines() if line.startswith('|  ') or line.startswith('| ①') or line.startswith('| ②')]
+    assert [r[2:] for r in rows] == [
+        ['+3.99', '+6.16'], ['−0.52', '—'], ['+2.74', '+6.48'], ['+5.07', '+1.72'], ['+3.82', '+2.05']]
+    svg = files['results/readme/summary.svg']
+    assert re.findall(r'>([+-]\d+\.\d{2})</text>', svg) == ['+3.99', '-0.52', '+2.74', '+5.07', '+3.82']
+    assert '](results/readme/summary.svg)' in summary
 
 
 def test_method_symbols_are_defined_once():
