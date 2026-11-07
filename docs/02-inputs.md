@@ -24,7 +24,7 @@ ch0近接/ch1遠方、16 kHz stereo。各機種train1000/test200。正常参照�
 <INPUT>/{ToyCar,ToyCarEmu,bearingEmu,fan,gearboxEmu,sliderEmu,valveEmu}/{train,test}/*.wav
 ```
 
-各機種train1000（source990/target10）・test200で、Evaluationと同じch0近接/ch1遠方、16 kHz stereoです。testのファイル名には`section_00_target_test_anomaly_0005_noAttribute.wav`のようにdomainと正常・異常が入っており、採点（`score-dev`）だけがこの情報を使います。DevelopmentのZIPのMD5は下表に含めていません。
+各機種train1000（source990/target10）・test200で、Evaluationと同じch0近接/ch1遠方、16 kHz stereoです。testのファイル名には`section_00_target_test_anomaly_0005_noAttribute.wav`のようにdomainと正常・異常が入っており、採点（`score-dev`）だけがこの情報を使います。ToyCarは4月8日修正版`dev_ToyCar_r2.zip`（MD5 `353201db217e25377a7e7eccf9c1c8a7`）を使います。他のDevelopment ZIPのMD5は下表に含めていません。
 
 ## Checksum
 

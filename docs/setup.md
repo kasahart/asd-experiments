@@ -18,7 +18,7 @@ GPU版はCUDAが使えないと作成時に止まるので、その場合はCPU�
 | やりたいこと | 入れるもの |
 |---|---|
 | marimoアプリを読むだけ | marimoだけ（[アプリの説明](../apps/README.md#ローカルで読む編集する)） |
-| 実験1の推論（CPUでも可） | 下の2行目（配布先を`cpu`に）と`pip install -e .` |
+| 実験1の推論（CPUでも可） | 下の1〜2行目（CPUなら配布先を`cpu`に）と`.venv/bin/python -m pip install -e .` |
 | 実験2の学習・公式採点・テストまで | 下の全部 |
 
 ```bash

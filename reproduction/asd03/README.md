@@ -30,7 +30,7 @@ B0（近接ch）とW1（全区間の複素線形減算）を入力に、BEATs_it
 - batch8、10秒クロップ、25epoch／37,500step、seed1234。条件ごとに同じ初期モデルから学習。
 - 推論は分類射影前の周波数保持特徴、時間方向RDP gamma4、BEAM-VarMin4（per-band・TrainAllは採用した再現仮定）。各条件・各機種1,000正常音から正常参照を再構築。
 
-データは[公式DCASE Task 2](https://dcase.community/challenge2026/task-first-shot-unsupervised-anomalous-sound-detection-for-machine-condition-monitoring)から取得します。ToyCarは4月8日修正版`dev_ToyCar_r2.zip`（MD5 `353201db217e25377a7e7eccf9c1c8a7`）を使い、`DEV/ToyCar`に配置します。公開属性対応と正解の取得先は下の「入力の取得と配置」に示します。音声・重み・個票・属性辞書・疑似ラベルJSONは同梱しません。
+音声・重み・個票・属性辞書・疑似ラベルJSONは同梱しません。取得と配置は下の「入力の取得と配置」のとおりです。
 
 クラス番号を一貫して振るため、`attributes`はDevelopmentのtestファイル名とEvaluationの公式test属性対応表から属性・domain情報も参照します。正常/異常欄は分類キーに含めません。学習・teacher・クラスタリングは正常trainの波形と特徴だけを使い、test波形・test特徴・正常/異常ラベルを学習目的に用いません。trainのみから別の番号を振るとクラスの列順が変わるため、この手順と同じ学習結果を前提にできません。
 
@@ -40,6 +40,7 @@ B0（近接ch）とW1（全区間の複素線形減算）を入力に、BEATs_it
 
 - Developmentの各機種`train/test`を`DEV`配下に、Additional trainingの`train`とEvaluationの`test`を同じ`EVAL`配下に置きます。どちらも`<ROOT>/<machine>/{train,test}/*.wav`の構成です。
 - 重み（BEATs_iter3）を`BASE`に、展開した公式評価器のディレクトリを`EVALUATOR`に指定します。下の例に合わせる場合は、評価器の展開先を`inputs/dcase2026/evaluator`に改名します。
+- Evaluationの公開属性対応（`ground_truth_attributes/`）と正解CSVは、公式評価器に同梱されています。別途の取得は不要です。
 
 teacher特徴と116クラスJSONは下の手順で正常trainから生成します。
 
