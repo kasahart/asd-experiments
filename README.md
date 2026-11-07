@@ -121,13 +121,13 @@ python3.11 -m venv .venv
 | extra | 用途 |
 |---|---|
 | （なし） | 推論だけ（`pip install -e .`） |
-| `training` | 第3回の追加学習 |
+| `training` | 実験2の追加学習 |
 | `app` | marimoアプリ |
 | `visualization` | 図の表示 |
 | `evaluation` | 公式評価器の実行 |
 | `test` | テスト |
 
-CPU環境では、PyTorchの配布先を`https://download.pytorch.org/whl/cpu`に変えます。Torch・TorchAudio・TorchVisionは[公式PyTorch 2.7.1構成](https://pytorch.org/get-started/previous-versions/)に合わせて同じ配布先から導入します。`runtime.py install`は第3回の学習で使う固定ASDKitを導入します（詳細は[第3回の実行環境](reproduction/asd03/README.md#実行環境)）。
+CPU環境では、PyTorchの配布先を`https://download.pytorch.org/whl/cpu`に変えます。Torch・TorchAudio・TorchVisionは[公式PyTorch 2.7.1構成](https://pytorch.org/get-started/previous-versions/)に合わせて同じ配布先から導入します。`runtime.py install`は実験2の学習で使う固定ASDKitを導入します（詳細は[実験2の実行環境](reproduction/asd03/README.md#実行環境)）。
 
 データセット全体・重み・評価器・正解CSVは同梱していません。結果一覧とグラフを更新する手順は[保守手順](docs/maintaining.md)にあります。
 
