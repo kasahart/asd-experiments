@@ -23,7 +23,7 @@ GPU版はCUDAが使えないと作成時に止まるので、その場合はCPU�
 
 ```bash
 python3.11 -m venv .venv
-.venv/bin/python -m pip install torch==2.7.1 torchaudio==2.7.1 torchvision==0.22.1 --index-url https://download.pytorch.org/whl/cu128
+.venv/bin/python -m pip install torch==2.13.0 torchaudio==2.11.1 torchvision==0.28.0 --index-url https://download.pytorch.org/whl/cu130
 .venv/bin/python -m pip install -e '.[training,app,visualization,evaluation,test]'
 .venv/bin/python reproduction/asd03/runtime.py install
 .venv/bin/python -m pip check
@@ -38,6 +38,6 @@ python3.11 -m venv .venv
 | `evaluation` | 公式評価器の実行 |
 | `test` | テスト |
 
-CPU環境では、PyTorchの配布先を`https://download.pytorch.org/whl/cpu`に変えます。Torch・TorchAudio・TorchVisionは[公式PyTorch 2.7.1構成](https://pytorch.org/get-started/previous-versions/)に合わせて同じ配布先から導入します。`runtime.py install`は実験2の学習で使う固定ASDKitを仮想環境内へ取得してeditable導入します。upstreamの必須モジュールがwheelに含まれないためこの方式を使い、Git・clone・checkoutの操作を不要にしています（取得元は[upstream.lock.json](../reproduction/asd03/upstream.lock.json)）。
+CPU環境では、PyTorchの配布先を`https://download.pytorch.org/whl/cpu`に変えます。Torch・TorchAudio・TorchVisionは[公式PyTorch 2.13.0構成](https://pytorch.org/get-started/previous-versions/)に合わせて同じ配布先から導入します。`runtime.py install`は実験2の学習で使う固定ASDKitを仮想環境内へ取得してeditable導入します。upstreamの必須モジュールがwheelに含まれないためこの方式を使い、Git・clone・checkoutの操作を不要にしています（取得元は[upstream.lock.json](../reproduction/asd03/upstream.lock.json)）。
 
 データセット・BEATs重み・公式評価器・正解CSVは同梱していません（[入力の取得](02-inputs.md)）。
