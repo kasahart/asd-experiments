@@ -1,66 +1,70 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="860" height="420" viewBox="0 0 860 420" font-family="'Hiragino Sans','Noto Sans CJK JP','Yu Gothic',Meiryo,sans-serif" font-size="13">
-<rect width="860" height="420" fill="#ffffff"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="927" height="424" viewBox="0 0 927 424" font-family="'Hiragino Sans','Noto Sans CJK JP','Yu Gothic',Meiryo,sans-serif" font-size="13">
+<rect width="927" height="424" fill="#ffffff"/>
 <text x="16" y="34" font-size="15" font-weight="bold" fill="#222222">① 明示的なノイズ除去の効果</text>
-<text x="16" y="54" font-size="12" fill="#5b6470">基準：近接マイクそのまま（B0）　○ 基準 → ● 処理後（青：上がった／橙：下がった）</text>
-<line x1="250.0" y1="72" x2="250.0" y2="198" stroke="#e3e6ea"/>
-<text x="250.0" y="214" text-anchor="middle" font-size="12" fill="#5b6470">55</text>
-<line x1="360.0" y1="72" x2="360.0" y2="198" stroke="#e3e6ea"/>
-<text x="360.0" y="214" text-anchor="middle" font-size="12" fill="#5b6470">60</text>
-<line x1="470.0" y1="72" x2="470.0" y2="198" stroke="#e3e6ea"/>
-<text x="470.0" y="214" text-anchor="middle" font-size="12" fill="#5b6470">65</text>
-<line x1="580.0" y1="72" x2="580.0" y2="198" stroke="#e3e6ea"/>
-<text x="580.0" y="214" text-anchor="middle" font-size="12" fill="#5b6470">70</text>
-<line x1="690.0" y1="72" x2="690.0" y2="198" stroke="#e3e6ea"/>
-<text x="690.0" y="214" text-anchor="middle" font-size="12" fill="#5b6470">75</text>
-<line x1="355.7" y1="72" x2="355.7" y2="198" stroke="#9099a5" stroke-dasharray="4 3"/>
-<text x="358.7" y="82" font-size="11" fill="#5b6470">BASE</text>
-<line x1="585.3" y1="72" x2="585.3" y2="198" stroke="#9099a5" stroke-dasharray="4 3"/>
-<text x="588.3" y="82" font-size="11" fill="#5b6470">REF</text>
-<text x="238" y="101.5" text-anchor="end" fill="#222222">W1 複素減算<tspan fill="#5b6470" font-size="12">（重み固定）</tspan></text>
-<line x1="422.5" y1="97.0" x2="510.4" y2="97.0" stroke="#1f4e99" stroke-width="2.5"/>
-<circle cx="422.5" cy="97.0" r="5.5" fill="#ffffff" stroke="#9aa3ad" stroke-width="2"/>
-<circle cx="510.4" cy="97.0" r="5.5" fill="#1f4e99" stroke="#ffffff" stroke-width="1.5"/>
-<text x="522.4" y="101.5" fill="#1f4e99" font-weight="bold">+3.99</text>
-<text x="570.4" y="101.5" fill="#5b6470" font-size="12">62.841 → 66.835</text>
-<text x="238" y="143.5" text-anchor="end" fill="#222222">SS 振幅スペクトル減算<tspan fill="#5b6470" font-size="12">（重み固定）</tspan></text>
-<line x1="422.5" y1="139.0" x2="411.2" y2="139.0" stroke="#b4532a" stroke-width="2.5"/>
-<circle cx="422.5" cy="139.0" r="5.5" fill="#ffffff" stroke="#9aa3ad" stroke-width="2"/>
-<circle cx="411.2" cy="139.0" r="5.5" fill="#b4532a" stroke="#ffffff" stroke-width="1.5"/>
-<text x="434.5" y="143.5" fill="#b4532a" font-weight="bold">−0.52</text>
-<text x="482.5" y="143.5" fill="#5b6470" font-size="12">62.841 → 62.325</text>
-<text x="238" y="185.5" text-anchor="end" fill="#222222">W1 複素減算<tspan fill="#5b6470" font-size="12">（追加学習）</tspan></text>
-<line x1="534.2" y1="181.0" x2="594.5" y2="181.0" stroke="#1f4e99" stroke-width="2.5"/>
-<circle cx="534.2" cy="181.0" r="5.5" fill="#ffffff" stroke="#9aa3ad" stroke-width="2"/>
-<circle cx="594.5" cy="181.0" r="5.5" fill="#1f4e99" stroke="#ffffff" stroke-width="1.5"/>
-<text x="606.5" y="185.5" fill="#1f4e99" font-weight="bold">+2.74</text>
-<text x="654.5" y="185.5" fill="#5b6470" font-size="12">67.916 → 70.659</text>
+<text x="16" y="54" font-size="12" fill="#5b6470">基準：同じBEATs設定で近接マイクそのまま（B0）　○ B0 → ● ノイズ除去後（青：上がった／橙：下がった）</text>
+<text x="347.1" y="78" text-anchor="middle" font-size="11" fill="#5b6470">BASE 59.8</text>
+<text x="660.2" y="78" text-anchor="middle" font-size="11" fill="#5b6470">REF 70.2</text>
+<text x="783" y="78" text-anchor="end" font-size="11" fill="#5b6470">差</text>
+<text x="797" y="78" font-size="11" fill="#5b6470">基準 → 結果</text>
+<line x1="293" y1="198" x2="713" y2="198" stroke="#9aa3ad"/>
+<line x1="353.0" y1="84" x2="353.0" y2="198" stroke="#eef0f3"/>
+<line x1="353.0" y1="198" x2="353.0" y2="202" stroke="#9aa3ad"/>
+<text x="353.0" y="214" text-anchor="middle" font-size="12" fill="#5b6470">60</text>
+<line x1="503.0" y1="84" x2="503.0" y2="198" stroke="#eef0f3"/>
+<line x1="503.0" y1="198" x2="503.0" y2="202" stroke="#9aa3ad"/>
+<text x="503.0" y="214" text-anchor="middle" font-size="12" fill="#5b6470">65</text>
+<line x1="653.0" y1="84" x2="653.0" y2="198" stroke="#eef0f3"/>
+<line x1="653.0" y1="198" x2="653.0" y2="202" stroke="#9aa3ad"/>
+<text x="653.0" y="214" text-anchor="middle" font-size="12" fill="#5b6470">70</text>
+<line x1="347.1" y1="84" x2="347.1" y2="198" stroke="#9099a5" stroke-dasharray="4 3"/>
+<line x1="660.2" y1="84" x2="660.2" y2="198" stroke="#9099a5" stroke-dasharray="4 3"/>
+<text x="279" y="107.5" text-anchor="end" fill="#222222">W1 複素減算<tspan fill="#5b6470" font-size="12">（BEATs 重み固定）</tspan></text>
+<line x1="438.2" y1="103.0" x2="558.0" y2="103.0" stroke="#1f4e99" stroke-width="2.5"/>
+<circle cx="438.2" cy="103.0" r="5" fill="#ffffff" stroke="#9aa3ad" stroke-width="2"/>
+<circle cx="558.0" cy="103.0" r="5" fill="#1f4e99" stroke="#ffffff" stroke-width="1.5"/>
+<text x="783" y="107.5" text-anchor="end" fill="#1f4e99" font-weight="bold">+3.99</text>
+<text x="797" y="107.5" fill="#5b6470" font-size="12">62.84 → 66.83</text>
+<text x="279" y="145.5" text-anchor="end" fill="#222222">SS 振幅スペクトル減算<tspan fill="#5b6470" font-size="12">（BEATs 重み固定）</tspan></text>
+<line x1="438.2" y1="141.0" x2="422.8" y2="141.0" stroke="#b4532a" stroke-width="2.5"/>
+<circle cx="438.2" cy="141.0" r="5" fill="#ffffff" stroke="#9aa3ad" stroke-width="2"/>
+<circle cx="422.8" cy="141.0" r="5" fill="#b4532a" stroke="#ffffff" stroke-width="1.5"/>
+<text x="783" y="145.5" text-anchor="end" fill="#b4532a" font-weight="bold">−0.52</text>
+<text x="797" y="145.5" fill="#5b6470" font-size="12">62.84 → 62.33</text>
+<text x="279" y="183.5" text-anchor="end" fill="#222222">W1 複素減算<tspan fill="#5b6470" font-size="12">（BEATs 追加学習）</tspan></text>
+<line x1="590.5" y1="179.0" x2="672.8" y2="179.0" stroke="#1f4e99" stroke-width="2.5"/>
+<circle cx="590.5" cy="179.0" r="5" fill="#ffffff" stroke="#9aa3ad" stroke-width="2"/>
+<circle cx="672.8" cy="179.0" r="5" fill="#1f4e99" stroke="#ffffff" stroke-width="1.5"/>
+<text x="783" y="183.5" text-anchor="end" fill="#1f4e99" font-weight="bold">+2.74</text>
+<text x="797" y="183.5" fill="#5b6470" font-size="12">67.92 → 70.66</text>
 <text x="16" y="252" font-size="15" font-weight="bold" fill="#222222">② BEATs 追加学習の効果</text>
-<text x="16" y="272" font-size="12" fill="#5b6470">基準：BEATs 重み固定　○ 基準 → ● 処理後（青：上がった／橙：下がった）</text>
-<line x1="250.0" y1="290" x2="250.0" y2="374" stroke="#e3e6ea"/>
-<text x="250.0" y="390" text-anchor="middle" font-size="12" fill="#5b6470">55</text>
-<line x1="360.0" y1="290" x2="360.0" y2="374" stroke="#e3e6ea"/>
-<text x="360.0" y="390" text-anchor="middle" font-size="12" fill="#5b6470">60</text>
-<line x1="470.0" y1="290" x2="470.0" y2="374" stroke="#e3e6ea"/>
-<text x="470.0" y="390" text-anchor="middle" font-size="12" fill="#5b6470">65</text>
-<line x1="580.0" y1="290" x2="580.0" y2="374" stroke="#e3e6ea"/>
-<text x="580.0" y="390" text-anchor="middle" font-size="12" fill="#5b6470">70</text>
-<line x1="690.0" y1="290" x2="690.0" y2="374" stroke="#e3e6ea"/>
-<text x="690.0" y="390" text-anchor="middle" font-size="12" fill="#5b6470">75</text>
-<line x1="355.7" y1="290" x2="355.7" y2="374" stroke="#9099a5" stroke-dasharray="4 3"/>
-<text x="358.7" y="300" font-size="11" fill="#5b6470">BASE</text>
-<line x1="585.3" y1="290" x2="585.3" y2="374" stroke="#9099a5" stroke-dasharray="4 3"/>
-<text x="588.3" y="300" font-size="11" fill="#5b6470">REF</text>
-<text x="238" y="319.5" text-anchor="end" fill="#222222">B0 近接マイク</text>
-<line x1="422.5" y1="315.0" x2="534.2" y2="315.0" stroke="#1f4e99" stroke-width="2.5"/>
-<circle cx="422.5" cy="315.0" r="5.5" fill="#ffffff" stroke="#9aa3ad" stroke-width="2"/>
-<circle cx="534.2" cy="315.0" r="5.5" fill="#1f4e99" stroke="#ffffff" stroke-width="1.5"/>
-<text x="546.2" y="319.5" fill="#1f4e99" font-weight="bold">+5.07</text>
-<text x="594.2" y="319.5" fill="#5b6470" font-size="12">62.841 → 67.916</text>
-<text x="238" y="361.5" text-anchor="end" fill="#222222">W1 複素減算</text>
-<line x1="510.4" y1="357.0" x2="594.5" y2="357.0" stroke="#1f4e99" stroke-width="2.5"/>
-<circle cx="510.4" cy="357.0" r="5.5" fill="#ffffff" stroke="#9aa3ad" stroke-width="2"/>
-<circle cx="594.5" cy="357.0" r="5.5" fill="#1f4e99" stroke="#ffffff" stroke-width="1.5"/>
-<text x="606.5" y="361.5" fill="#1f4e99" font-weight="bold">+3.82</text>
-<text x="654.5" y="361.5" fill="#5b6470" font-size="12">66.835 → 70.659</text>
-<text x="470.0" y="408" text-anchor="middle" font-size="12" fill="#5b6470">Evaluation 総合スコア（破線は公式ベースライン・参考システム）</text>
+<text x="16" y="272" font-size="12" fill="#5b6470">基準：同じ入力でBEATs重み固定　○ 重み固定 → ● 追加学習（青：上がった）</text>
+<text x="347.1" y="296" text-anchor="middle" font-size="11" fill="#5b6470">BASE 59.8</text>
+<text x="660.2" y="296" text-anchor="middle" font-size="11" fill="#5b6470">REF 70.2</text>
+<text x="783" y="296" text-anchor="end" font-size="11" fill="#5b6470">差</text>
+<text x="797" y="296" font-size="11" fill="#5b6470">基準 → 結果</text>
+<line x1="293" y1="378" x2="713" y2="378" stroke="#9aa3ad"/>
+<line x1="353.0" y1="302" x2="353.0" y2="378" stroke="#eef0f3"/>
+<line x1="353.0" y1="378" x2="353.0" y2="382" stroke="#9aa3ad"/>
+<text x="353.0" y="394" text-anchor="middle" font-size="12" fill="#5b6470">60</text>
+<line x1="503.0" y1="302" x2="503.0" y2="378" stroke="#eef0f3"/>
+<line x1="503.0" y1="378" x2="503.0" y2="382" stroke="#9aa3ad"/>
+<text x="503.0" y="394" text-anchor="middle" font-size="12" fill="#5b6470">65</text>
+<line x1="653.0" y1="302" x2="653.0" y2="378" stroke="#eef0f3"/>
+<line x1="653.0" y1="378" x2="653.0" y2="382" stroke="#9aa3ad"/>
+<text x="653.0" y="394" text-anchor="middle" font-size="12" fill="#5b6470">70</text>
+<line x1="347.1" y1="302" x2="347.1" y2="378" stroke="#9099a5" stroke-dasharray="4 3"/>
+<line x1="660.2" y1="302" x2="660.2" y2="378" stroke="#9099a5" stroke-dasharray="4 3"/>
+<text x="279" y="325.5" text-anchor="end" fill="#222222">B0 近接マイク</text>
+<line x1="438.2" y1="321.0" x2="590.5" y2="321.0" stroke="#1f4e99" stroke-width="2.5"/>
+<circle cx="438.2" cy="321.0" r="5" fill="#ffffff" stroke="#9aa3ad" stroke-width="2"/>
+<circle cx="590.5" cy="321.0" r="5" fill="#1f4e99" stroke="#ffffff" stroke-width="1.5"/>
+<text x="783" y="325.5" text-anchor="end" fill="#1f4e99" font-weight="bold">+5.07</text>
+<text x="797" y="325.5" fill="#5b6470" font-size="12">62.84 → 67.92</text>
+<text x="279" y="363.5" text-anchor="end" fill="#222222">W1 複素減算</text>
+<line x1="558.0" y1="359.0" x2="672.8" y2="359.0" stroke="#1f4e99" stroke-width="2.5"/>
+<circle cx="558.0" cy="359.0" r="5" fill="#ffffff" stroke="#9aa3ad" stroke-width="2"/>
+<circle cx="672.8" cy="359.0" r="5" fill="#1f4e99" stroke="#ffffff" stroke-width="1.5"/>
+<text x="783" y="363.5" text-anchor="end" fill="#1f4e99" font-weight="bold">+3.82</text>
+<text x="797" y="363.5" fill="#5b6470" font-size="12">66.83 → 70.66</text>
+<text x="503.0" y="412" text-anchor="middle" font-size="12" fill="#5b6470">Evaluation 総合スコア（0–100、高いほど良い）　破線は公式ベースライン BASE・参考システム REF</text>
 </svg>

@@ -43,7 +43,7 @@ def test_summary_shows_both_effects_as_differences():
     svg = files['results/readme/summary.svg']
     assert re.findall(r'>([+−]\d+\.\d{2})</text>', svg) == ['+3.99', '−0.52', '+2.74', '+5.07', '+3.82']
     assert '](results/readme/summary.svg)' in summary
-    assert 'W1 複素減算（重み固定） +3.99、SS 振幅スペクトル減算（重み固定） −0.52' in summary and 'B0 近接マイク +5.07、W1 複素減算 +3.82' in summary
+    assert 'W1 複素減算（BEATs 重み固定） +3.99、SS 振幅スペクトル減算（BEATs 重み固定） −0.52' in summary and 'B0 近接マイク +5.07、W1 複素減算 +3.82' in summary
     assert summary in (ROOT / 'README.md').read_text(encoding='utf-8')
 
 
@@ -98,3 +98,9 @@ def test_new_method_under_same_setup_merges_into_existing_row(tmp_path):
     rendered, _, _ = renderer.build(tmp_path)
     rows = [line for line in rendered.splitlines() if line.startswith('| Evaluation | BEATs_iter3（重み固定）')]
     assert len(rows) == 1 and '60.000' in rows[0] and '実験1・実験2・実験3' in rows[0]
+
+
+def test_summary_chart_axis_follows_data():
+    assert renderer.axis_range([62.3, 70.7])[:2] == (61, 72)
+    lo, hi, ticks = renderer.axis_range([40.2, 84.9])
+    assert (lo, hi) == (39, 86) and ticks == [40, 45, 50, 55, 60, 65, 70, 75, 80, 85]

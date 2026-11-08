@@ -5,6 +5,7 @@ import argparse
 import csv
 import html
 import json
+import math
 from decimal import Decimal
 from pathlib import Path
 
@@ -186,44 +187,65 @@ def lookup(groups, dataset, prefix, symbol):
     return None
 
 
+def axis_range(values):
+    """Pad the data by one point and round to whole points, so small changes stay visible."""
+    lo, hi = math.floor(min(values)) - 1, math.ceil(max(values)) + 1
+    step = 5 if hi - lo > 12 else 2
+    return lo, hi, [t for t in range(lo, hi + 1) if t % step == 0]
+
+
 def summary_chart(panels, dataset, systems):
-    """Two-panel change chart: hollow baseline dot -> filled result dot, coloured by direction."""
-    lo, hi, left, width, row = 55, 75, 250, 440, 42
+    """Change chart per panel: hollow baseline dot -> filled result dot, values in fixed right-hand columns."""
+    size, row, width = 13, 38, 420
+    up, down, base, ink, muted = '#1f4e99', '#b4532a', '#9aa3ad', '#222222', '#5b6470'
+    labels = [label + (f'（{note}）' if note else '') for p in panels for label, note, _, _ in p['rows']]
+    left = max(200, int(max(text_width(t, size) for t in labels)) + 28)
+    values = [v for p in panels for _, _, a, b in p['rows'] for v in (a, b)] + [Decimal(s['score']) for s in systems]
+    lo, hi, ticks = axis_range(values)
     x = lambda value: left + (float(value) - lo) / (hi - lo) * width
-    up, down, base, ink, muted, grid = '#1f4e99', '#b4532a', '#9aa3ad', '#222222', '#5b6470', '#e3e6ea'
+    delta_x, pair_x = left + width + 70, left + width + 84
     font = "font-family=\"'Hiragino Sans','Noto Sans CJK JP','Yu Gothic',Meiryo,sans-serif\""
     out, y0 = [], 20
     for panel in panels:
+        downs = any(end < start for _, _, start, end in panel['rows'])
+        colors = '青：上がった' + ('／橙：下がった' if downs else '')
         out.append(f'<text x="16" y="{y0 + 14}" font-size="15" font-weight="bold" fill="{ink}">{html.escape(panel["title"])}</text>')
         out.append(f'<text x="16" y="{y0 + 34}" font-size="12" fill="{muted}">基準：{html.escape(panel["baseline"])}'
-                   '　○ 基準 → ● 処理後（青：上がった／橙：下がった）</text>')
-        top = y0 + 52
+                   f'　○ {html.escape(panel["from_label"])} → ● {html.escape(panel["to_label"])}（{colors}）</text>')
+        head = y0 + 58
+        for system in systems:
+            value = Decimal(system['score'])
+            out.append(f'<text x="{x(value):.1f}" y="{head}" text-anchor="middle" font-size="11" fill="{muted}">'
+                       f'{system["symbol"]} {value:.1f}</text>')
+        out.append(f'<text x="{delta_x}" y="{head}" text-anchor="end" font-size="11" fill="{muted}">差</text>')
+        out.append(f'<text x="{pair_x}" y="{head}" font-size="11" fill="{muted}">基準 → 結果</text>')
+        top = head + 6
         bottom = top + row * len(panel['rows'])
-        for tick in range(lo, hi + 1, 5):
-            out.append(f'<line x1="{x(tick):.1f}" y1="{top}" x2="{x(tick):.1f}" y2="{bottom}" stroke="{grid}"/>')
+        out.append(f'<line x1="{left}" y1="{bottom}" x2="{left + width}" y2="{bottom}" stroke="{base}"/>')
+        for tick in ticks:
+            out.append(f'<line x1="{x(tick):.1f}" y1="{top}" x2="{x(tick):.1f}" y2="{bottom}" stroke="#eef0f3"/>')
+            out.append(f'<line x1="{x(tick):.1f}" y1="{bottom}" x2="{x(tick):.1f}" y2="{bottom + 4}" stroke="{base}"/>')
             out.append(f'<text x="{x(tick):.1f}" y="{bottom + 16}" text-anchor="middle" font-size="12" fill="{muted}">{tick}</text>')
         for system in systems:
             value = Decimal(system['score'])
             out.append(f'<line x1="{x(value):.1f}" y1="{top}" x2="{x(value):.1f}" y2="{bottom}" stroke="#9099a5" stroke-dasharray="4 3"/>')
-            out.append(f'<text x="{x(value) + 3:.1f}" y="{top + 10}" font-size="11" fill="{muted}">{system["symbol"]}</text>')
         for index, (label, note, start, end) in enumerate(panel['rows']):
-            y = top + row * index + row / 2 + 4
+            y = top + row * index + row / 2
             color = up if end > start else down
             note_text = f'<tspan fill="{muted}" font-size="12">（{html.escape(note)}）</tspan>' if note else ''
-            out.append(f'<text x="{left - 12}" y="{y + 4.5}" text-anchor="end" fill="{ink}">{html.escape(label)}{note_text}</text>')
+            out.append(f'<text x="{left - 14}" y="{y + 4.5}" text-anchor="end" fill="{ink}">{html.escape(label)}{note_text}</text>')
             out.append(f'<line x1="{x(start):.1f}" y1="{y}" x2="{x(end):.1f}" y2="{y}" stroke="{color}" stroke-width="2.5"/>')
-            out.append(f'<circle cx="{x(start):.1f}" cy="{y}" r="5.5" fill="#ffffff" stroke="{base}" stroke-width="2"/>')
-            out.append(f'<circle cx="{x(end):.1f}" cy="{y}" r="5.5" fill="{color}" stroke="#ffffff" stroke-width="1.5"/>')
-            text_x = max(x(start), x(end)) + 12
+            out.append(f'<circle cx="{x(start):.1f}" cy="{y}" r="5" fill="#ffffff" stroke="{base}" stroke-width="2"/>')
+            out.append(f'<circle cx="{x(end):.1f}" cy="{y}" r="5" fill="{color}" stroke="#ffffff" stroke-width="1.5"/>')
             delta = f'{end - start:+.2f}'.replace('-', '−')
-            out.append(f'<text x="{text_x:.1f}" y="{y + 4.5}" fill="{color}" font-weight="bold">{delta}</text>')
-            out.append(f'<text x="{text_x + 48:.1f}" y="{y + 4.5}" fill="{muted}" font-size="12">{start:.3f} → {end:.3f}</text>')
+            out.append(f'<text x="{delta_x}" y="{y + 4.5}" text-anchor="end" fill="{color}" font-weight="bold">{delta}</text>')
+            out.append(f'<text x="{pair_x}" y="{y + 4.5}" fill="{muted}" font-size="12">{start:.2f} → {end:.2f}</text>')
         y0 = bottom + 40
-    caption = f'{dataset} 総合スコア' + ('（破線は公式ベースライン・参考システム）' if systems else '')
+    caption = f'{dataset} 総合スコア（0–100、高いほど良い）' + ('　破線は公式ベースライン BASE・参考システム REF' if systems else '')
     out.append(f'<text x="{left + width / 2}" y="{y0 - 6}" text-anchor="middle" font-size="12" fill="{muted}">{caption}</text>')
-    height, total = y0 + 6, left + width + 170
+    height, total = y0 + 6, pair_x + 130
     return '\n'.join([f'<svg xmlns="http://www.w3.org/2000/svg" width="{total}" height="{height}" '
-                      f'viewBox="0 0 {total} {height}" {font} font-size="13">',
+                      f'viewBox="0 0 {total} {height}" {font} font-size="{size}">',
                       f'<rect width="{total}" height="{height}" fill="#ffffff"/>', *out, '</svg>']) + '\n'
 
 
