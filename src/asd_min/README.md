@@ -1,6 +1,6 @@
 # 実装案内
 
-処理の解説は対応するコードと同じ階層に置いています。各解説には、式とそれを計算する関数の対応表があります。手法ごとの結果は[結果の詳細](../../docs/results.md)、固定条件は[実験1の固定条件](../../docs/02-protocol.md)を参照してください。
+処理の解説は対応するコードと同じ階層に置いています。各解説には、式とそれを計算する関数の対応表があります。手法ごとの結果は[結果の詳細](../../docs/results.md)、採点方法は[評価の共通条件](../../docs/evaluation.md)を参照してください。
 
 | 処理 | 解説 | コード |
 |---|---|---|
@@ -9,7 +9,7 @@
 | BEAM＋VarMin採点 | [beam.md](beam.md) | [beam.py](beam.py)・[varmin.py](varmin.py)・[band_distance.py](band_distance.py) |
 | 波形処理 | [waveform.md](waveform.md) | [waveform.py](waveform.py) |
 | 条件比較の実行 | [runner.md](runner.md) | [runner.py](runner.py)・[cli.py](cli.py) |
-| Developmentの採点 | [実験1の固定条件（Development）](../../docs/02-protocol.md#development構成の選択) | [development.py](development.py) |
+| Developmentの採点 | [評価の共通条件](../../docs/evaluation.md) | [development.py](development.py) |
 | 固定条件の値 | [実験1の固定条件](../../docs/02-protocol.md) | [protocol.py](protocol.py) |
 
 出典は[第三者通知](../../THIRD_PARTY_NOTICES.md)を参照してください。

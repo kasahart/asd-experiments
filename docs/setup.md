@@ -18,8 +18,8 @@ GPU版はCUDAが使えないと作成時に止まるので、その場合はCPU�
 | やりたいこと | 入れるもの |
 |---|---|
 | marimoアプリを読むだけ | marimoだけ（[アプリの説明](../apps/README.md#ローカルで読む編集する)） |
-| 実験1の推論（CPUでも可） | 下の1〜2行目と`.venv/bin/python -m pip install -e .` |
-| 実験2の学習・公式採点・テストまで | 下の全部 |
+| 推論だけ（CPUでも可） | 下の1〜2行目と`.venv/bin/python -m pip install -e .` |
+| 追加学習・公式採点・テストまで | 下の全部 |
 
 ```bash
 python3.11 -m venv .venv
@@ -32,12 +32,12 @@ python3.11 -m venv .venv
 | extra | 用途 |
 |---|---|
 | （なし） | 推論だけ（`pip install -e .`） |
-| `training` | 実験2の追加学習 |
+| `training` | 追加学習 |
 | `app` | marimoアプリ |
 | `visualization` | 図の表示 |
 | `evaluation` | 公式評価器の実行 |
 | `test` | テスト |
 
-CPU環境では、PyTorchの配布先を`https://download.pytorch.org/whl/cpu`に変えます。Torch・TorchAudio・TorchVisionは[公式PyTorch 2.7.1構成](https://pytorch.org/get-started/previous-versions/)に合わせて同じ配布先から導入します。`runtime.py install`は実験2用の固定ASDKitを仮想環境内へ導入します（取得元は[upstream.lock.json](../reproduction/asd03/upstream.lock.json)）。
+CPU環境では、PyTorchの配布先を`https://download.pytorch.org/whl/cpu`に変えます。Torch・TorchAudio・TorchVisionは[公式PyTorch 2.7.1構成](https://pytorch.org/get-started/previous-versions/)に合わせて同じ配布先から導入します。`runtime.py install`は追加学習用の固定ASDKitを仮想環境内へ導入します（取得元は[upstream.lock.json](../reproduction/asd03/upstream.lock.json)）。
 
 データセット・BEATs重み・公式評価器・正解CSVは同梱していません（[入力の取得](02-inputs.md)）。

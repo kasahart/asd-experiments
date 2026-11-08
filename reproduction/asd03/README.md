@@ -65,7 +65,7 @@ $PY reproduction/asd03/run.py --stage all \
 $PY reproduction/asd03/metrics.py --run "$OUT" --evaluator "$EVALUATOR" --output "$OUT/metrics" --terms-reviewed
 ```
 
-学習subprocessはPyTorch 2.7.1の既定の精度設定を明示します（float32行列積は`highest`、行列積TF32は無効、cuDNN TF32は許可）。teacher・推論では行列積とcuDNNのTF32を両方無効にします。
+学習subprocessは固定したPyTorch版の既定の精度設定を明示します（float32行列積は`highest`、行列積TF32は無効、cuDNN TF32は許可）。teacher・推論では行列積とcuDNNのTF32を両方無効にします。
 
 `all`と`score`の入口は、スコア計算の間だけBLASを1スレッドに固定します（`OPENBLAS_NUM_THREADS=1`相当）。保存スコアとの完全一致を確認した設定で、学習・ラベル生成には適用しません。
 
@@ -75,7 +75,7 @@ $PY reproduction/asd03/metrics.py --run "$OUT" --evaluator "$EVALUATOR" --output
 - 生成済みのラベル・teacherは`--labels`・`--teacher-dir`で再利用できます（`--conditions raw`だけで実行する場合は必須）。
 - 保存済みモデルの推論は`--trained-root`、中断した学習の再開は`--stage train --resume-training`です。その他は`--help`を参照してください。
 
-`metrics.py`は[実験1と共通の接続](../../src/asd_min/evaluation.py)で公式評価器を無改変で実行し、公式出力を100倍して保存します。`--terms-reviewed`は評価器の利用条件を確認した後に指定します。指標の定義は[固定条件](../../docs/02-protocol.md#評価指標)を参照してください。
+`metrics.py`は[共通の接続](../../src/asd_min/evaluation.py)で公式評価器を無改変で実行し、公式出力を100倍して保存します。`--terms-reviewed`は評価器の利用条件を確認した後に指定します。指標の定義は[評価の共通条件](../../docs/evaluation.md)を参照してください。
 
 ## 設定を変えて試す
 

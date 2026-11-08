@@ -1,6 +1,6 @@
 # 入力の取得（DCASE 2026 Task 2）
 
-実験1はEvaluation（Additional trainingのtrainとEvaluationのtest）を使い、配置はこのページのとおりです。実験2はDevelopmentも使い、配置は[実験2の手順](../reproduction/asd03/README.md#入力の取得と配置)に従います。
+全実験で使うデータ・重み・評価器の取得先です。下の配置は共通CLI（[runner](../src/asd_min/runner.md#cliを使う)）向けで、別の配置を使う実験はその実験の手順に書いています。
 
 1. [DCASE 2026 Challenge Task 2 Additional Training Dataset](https://zenodo.org/records/20151556)の5機種train ZIPと[DCASE 2026 Challenge Task 2 Evaluation Dataset](https://zenodo.org/records/20437238)の5機種test ZIPを取得し、同じ `eval_data/raw` に展開します。このパスを `--input` に指定します。
 2. [BEATs README](https://github.com/microsoft/unilm/blob/master/beats/README.md)の **Pre-Trained Model / Iter3** を取得し、`--checkpoint` に指定します。

@@ -37,4 +37,4 @@ The browser app is exported with [marimo 0.25.1](https://github.com/marimo-team/
 
 ## 公式DCASE評価器
 
-[DCASE2026 Task 2の公式評価器](https://github.com/nttcslab/dcase2026_task2_evaluator)は利用者が別途設置し、実験1・実験2で共通の接続から無改変で実行します。評価器のコード・正解は同梱しません。利用条件は配布元の`LICENSE`と`LICENSEv2.1.pdf`を参照してください。
+[DCASE2026 Task 2の公式評価器](https://github.com/nttcslab/dcase2026_task2_evaluator)は利用者が別途設置し、全実験で共通の接続から無改変で実行します。評価器のコード・正解は同梱しません。利用条件は配布元の`LICENSE`と`LICENSEv2.1.pdf`を参照してください。
