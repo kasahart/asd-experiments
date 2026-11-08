@@ -4,14 +4,16 @@
 
 READMEの`<!-- summary:start -->`〜`<!-- summary:end -->`、[結果の詳細](results.md)の`<!-- experiments:start -->`〜`<!-- experiments:end -->`、グラフ`results/readme/*.svg`は`scripts/update_readme.py`が生成します。手で編集しません。
 
+- 結果の要点は基準からの差を示す図と表で、比べる組は`configs/readme-summary.json`で決めます。
+- スコアのグラフはデータ（Evaluation・Development）ごとに1枚、スコア順、10点刻みのグリッドと値つき。軸は特徴抽出の短い組と記号だけにし、特徴・モデル・追加学習・正式システム名は表に置きます。
+
 1. [手法一覧](../configs/readme-methods.csv)に行を追加します。
    - 列：実験（`experiment`）・データ（`dataset`）・グラフの軸に出す短い組名（`chart_prefix`、例：`追加学習`）・特徴抽出モデル・モデルの追加学習・保存結果CSV。
    - 同じ記号の手法は、どの実験でも同じ特徴と参考文献にします。
    - データ・特徴抽出・組名が既存の比較と同じ行は、スコアが一致すれば表とグラフで1行・1本にまとめられます。
 2. 結果の要点で比べる組（基準→処理後）は[要点の設定](../configs/readme-summary.json)に`[chart_prefix, 記号]`で指定します。
-3. 新しい実験やmarimoアプリは、READMEの「入口」表へ手で行を追加します。
-4. 結果CSVにスコア行を追加します。異なる比較条件には別の`comparison`を付けます。
-5. `python scripts/update_readme.py`を実行します。`--check`で更新漏れを確認できます（CIでも実行します）。
+3. 結果CSVにスコア行を追加します。異なる比較条件には別の`comparison`を付けます。
+4. `python scripts/update_readme.py`を実行します。`--check`で更新漏れを確認できます（CIでも実行します）。
 
 ## 説明文の置き場所
 

@@ -22,8 +22,6 @@ s^{\mathrm{raw}} &= \frac{1}{F}\sum_{f=1}^{F} s^{\mathrm{raw}}_f
 
 **直感：** 低い帯域は正常録音A、高い帯域は正常録音Bと似ている場合があります。一つの正常録音に全帯域が同時に似ていることを要求せず、帯域ごとに参照を選びます。正常な成分の組み合わせが変わっただけで距離が大きくなる問題を抑える、という[BEAM論文](https://arxiv.org/html/2603.13749)の設計に基づきます。
 
-正常メモリは、source990件とtarget10件を一緒に使います。メモリは条件ごとに、その条件で加工した正常音から構築します。
-
 CSVの異常度には、次節のVarMin補正後の $`s`$（`main`）を使います。
 
 ## VarMin — 正常音でも生じる距離の偏りを補正する
@@ -54,11 +52,8 @@ $`\mathcal{N}_4(i,f)`$ は帯域 $`f`$ で参照 $`i`$ に近い、自己を除�
 | $`D - \alpha_f b_{i,f}`$ | `rescaled_distance()` |
 | $`s_f`$、$`s`$ | `band_distance.nearest_reference()`・`beam.band_mean()`（[`beam.py`](beam.py)の`BEAMVarianceMin`が両者をまとめます） |
 
-`BEAMVarianceMin`は[ASDKit](https://github.com/TakuyaFujimura/dcase-asd-toolkit)のbackend形式（`fit()`・`anomaly_score()`）を保ちます。`anomaly_score_details()`は帯域ごとのスコアと、選ばれた参照のindex・特徴・密度・`alpha`を返す診断出力です。
+`BEAMVarianceMin`は[ASDKit](https://github.com/TakuyaFujimura/dcase-asd-toolkit)のbackend形式（`fit()`・`anomaly_score()`）です。
 
-正常train全件を一つずつ仮の検証音にするのが`train_all`、自己を比較相手から外すのがleave-one-out、帯域ごとに係数を求めるのが`per_band`です。`alpha`の分母が`eps=1e-12`以下なら0とし、係数や最終スコアを0以上にclipしません。したがって異常度は負になることもあります。補正後に全参照から最小値を選び直します。
+$`\alpha_f`$ は正常train全件をleave-one-outで使い、帯域ごとに求めます。補正後のスコアは0以上にclipしないので、負になることもあります。
 
-係数の分散最小化は[VarMin論文](https://dcase.community/documents/workshop2025/proceedings/DCASE2025Workshop_Matsumoto_12.pdf)に由来します。近傍4件は[NA-SSL論文](https://arxiv.org/html/2608.00447v1)に合わせています。この実装では、共有正常メモリ・train_all・per_bandを使い、帯域平均の前に補正します。
-
-
-[公開コード：beam.py](beam.py)・[varmin.py](varmin.py)・[band_distance.py](band_distance.py) / [前：RDP](pooling.md) / [次：波形処理（W1/SS）](waveform.md)
+係数の分散最小化は[VarMin論文](https://dcase.community/documents/workshop2025/proceedings/DCASE2025Workshop_Matsumoto_12.pdf)に由来します。近傍4件は[NA-SSL論文](https://arxiv.org/html/2608.00447v1)に合わせています。

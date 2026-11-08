@@ -24,7 +24,7 @@ DCASE 2026 Task 2（機械の異常音検知）の2chマイク録音を使い、
 |---|---|---|
 | 結果・図・音声をブラウザで見る | [アプリ一覧](https://kasahart.github.io/asd-experiments/) | なし |
 | 手法・全スコア・グラフを読む | [結果の詳細](docs/results.md)・[評価の共通条件](docs/evaluation.md) | — |
-| 実験1（入力の比較）を再現する | [固定条件](docs/02-protocol.md)・[CLIの実行](src/asd_min/runner.md#cliを使う) | データ・BEATs重み・公式評価器（CPUでも可） |
+| 実験1（入力の比較）を再現する | [固定条件](docs/02-protocol.md)・[CLIの実行](docs/02-protocol.md#実行する) | データ・BEATs重み・公式評価器（CPUでも可） |
 | 実験2（BEATs追加学習）を再現する | [固定条件と手順](reproduction/asd03/README.md) | NVIDIA GPU・データ・BEATs重み・公式評価器 |
 | 計算の仕組みを読む | [実装案内](src/asd_min/README.md) | — |
 | 利用条件を確かめる | [出典と利用条件](docs/rights.md) | — |
