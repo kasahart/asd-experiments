@@ -29,6 +29,6 @@
       "symbol": "REF"
     }
   ],
-  "note": "本実験はBEATs_iter3を使用。REFはNA-BEATsを使うシステムで、RDPなど一部の処理を参考にしています。",
+  "note": "本実験はBEATs_iter3を使います。REFはNA-BEATsを使うシステムで、本実験はその一部の処理（RDPなど）を参考にしています。",
   "group_label": "公式ベースライン・参考システム"
 }

@@ -1,4 +1,4 @@
-# 第2回の固定条件
+# 実験1の固定条件
 
 Evaluationの5機種。正常参照はAdditional Trainingの各1000正常音（source990/target10）。匿名Evaluationの各200テスト音を採点。Developmentへの流用やtest正解による学習・閾値選択はしません。
 

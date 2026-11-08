@@ -20,21 +20,11 @@ BEATs重みのSHA-256、train/test件数と匿名テスト名を確認し、既�
 
 条件名・機種・件数・RDPの`gamma`・VarMinの近傍数・閾値の分位点・重みのSHA-256は[`protocol.py`](protocol.py)にまとめています。CLIの`results`は保存表の閲覧、`infer`は生音声からの再推論、`evaluate`は指定した固定版の評価器による保存異常度の採点です。
 
-[公開コード：runner.py](runner.py) / [cli.py](cli.py) / [README](../../README.md)
+[公開コード：runner.py](runner.py) / [cli.py](cli.py) / [固定条件](../../docs/02-protocol.md)
 
 ## CLIを使う
 
-以下は第2回の実行例です。
-
-リポジトリのルートで、Python 3.12の環境を準備します。
-
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-python -m pip install torch==2.7.1 torchaudio==2.7.1 --index-url https://download.pytorch.org/whl/cpu
-python -m pip install -e .
-python -m asd_min.cli results
-```
+以下は実験1の実行例です。環境は[実行環境](../../docs/setup.md)のとおり作り（推論だけなら`pip install -e .`で足ります）、入力は[入力の取得](../../docs/02-inputs.md)のとおり取得・配置します。`python -m asd_min.cli results`で保存結果の表を確認できます。
 
 保存結果・実録音の比較・手動試聴は[marimoアプリ](../../apps/README.md)で提供します。実データの推論・再採点には、以下のCLIを使います。
 

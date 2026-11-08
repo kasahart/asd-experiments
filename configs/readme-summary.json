@@ -1,0 +1,22 @@
+{
+  "datasets": ["Evaluation", "Development"],
+  "panels": [
+    {
+      "title": "① 明示的なノイズ除去の効果",
+      "baseline": "近接マイクそのまま（B0）",
+      "pairs": [
+        {"label": "W1 複素減算", "note": "重み固定", "from": ["重み固定", "B0"], "to": ["重み固定", "W1"]},
+        {"label": "SS 振幅スペクトル減算", "note": "重み固定", "from": ["重み固定", "B0"], "to": ["重み固定", "SS"]},
+        {"label": "W1 複素減算", "note": "追加学習", "from": ["追加学習", "B0"], "to": ["追加学習", "W1"]}
+      ]
+    },
+    {
+      "title": "② BEATs 追加学習の効果",
+      "baseline": "BEATs 重み固定",
+      "pairs": [
+        {"label": "B0 近接マイク", "note": "", "from": ["重み固定", "B0"], "to": ["追加学習", "B0"]},
+        {"label": "W1 複素減算", "note": "", "from": ["重み固定", "W1"], "to": ["追加学習", "W1"]}
+      ]
+    }
+  ]
+}

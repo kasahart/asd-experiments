@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="591" height="346" viewBox="0 0 591 346" font-family="'Hiragino Sans','Noto Sans CJK JP','Yu Gothic',Meiryo,sans-serif" font-size="13">
+<rect width="591" height="346" fill="#ffffff"/>
+<line x1="91.0" y1="34" x2="91.0" y2="306" stroke="#888888" stroke-width="1"/>
+<text x="91.0" y="322" text-anchor="middle" fill="#333333">0</text>
+<line x1="135.0" y1="34" x2="135.0" y2="306" stroke="#d5d9de" stroke-width="1"/>
+<text x="135.0" y="322" text-anchor="middle" fill="#333333">10</text>
+<line x1="179.0" y1="34" x2="179.0" y2="306" stroke="#d5d9de" stroke-width="1"/>
+<text x="179.0" y="322" text-anchor="middle" fill="#333333">20</text>
+<line x1="223.0" y1="34" x2="223.0" y2="306" stroke="#d5d9de" stroke-width="1"/>
+<text x="223.0" y="322" text-anchor="middle" fill="#333333">30</text>
+<line x1="267.0" y1="34" x2="267.0" y2="306" stroke="#d5d9de" stroke-width="1"/>
+<text x="267.0" y="322" text-anchor="middle" fill="#333333">40</text>
+<line x1="311.0" y1="34" x2="311.0" y2="306" stroke="#d5d9de" stroke-width="1"/>
+<text x="311.0" y="322" text-anchor="middle" fill="#333333">50</text>
+<line x1="355.0" y1="34" x2="355.0" y2="306" stroke="#d5d9de" stroke-width="1"/>
+<text x="355.0" y="322" text-anchor="middle" fill="#333333">60</text>
+<line x1="399.0" y1="34" x2="399.0" y2="306" stroke="#d5d9de" stroke-width="1"/>
+<text x="399.0" y="322" text-anchor="middle" fill="#333333">70</text>
+<line x1="443.0" y1="34" x2="443.0" y2="306" stroke="#d5d9de" stroke-width="1"/>
+<text x="443.0" y="322" text-anchor="middle" fill="#333333">80</text>
+<line x1="487.0" y1="34" x2="487.0" y2="306" stroke="#d5d9de" stroke-width="1"/>
+<text x="487.0" y="322" text-anchor="middle" fill="#333333">90</text>
+<line x1="531.0" y1="34" x2="531.0" y2="306" stroke="#d5d9de" stroke-width="1"/>
+<text x="531.0" y="322" text-anchor="middle" fill="#333333">100</text>
+<text x="311.0" y="340" text-anchor="middle" fill="#333333">Official score</text>
+<text x="83" y="55.5" text-anchor="end" fill="#222222">追加学習 W1</text>
+<rect x="91" y="40.0" width="310.9" height="22" fill="#2458a6"/>
+<text x="406.9" y="55.5" fill="#222222">70.659</text>
+<text x="83" y="89.5" text-anchor="end" fill="#222222">追加学習 B0</text>
+<rect x="91" y="74.0" width="298.8" height="22" fill="#2458a6"/>
+<text x="394.8" y="89.5" fill="#222222">67.916</text>
+<text x="83" y="123.5" text-anchor="end" fill="#222222">重み固定 W1</text>
+<rect x="91" y="108.0" width="294.1" height="22" fill="#2458a6"/>
+<text x="390.1" y="123.5" fill="#222222">66.835</text>
+<text x="83" y="157.5" text-anchor="end" fill="#222222">重み固定 B0</text>
+<rect x="91" y="142.0" width="276.5" height="22" fill="#2458a6"/>
+<text x="372.5" y="157.5" fill="#222222">62.841</text>
+<text x="83" y="191.5" text-anchor="end" fill="#222222">重み固定 SS</text>
+<rect x="91" y="176.0" width="274.2" height="22" fill="#2458a6"/>
+<text x="370.2" y="191.5" fill="#222222">62.325</text>
+<text x="83" y="225.5" text-anchor="end" fill="#222222">重み固定 B1</text>
+<rect x="91" y="210.0" width="256.8" height="22" fill="#2458a6"/>
+<text x="352.8" y="225.5" fill="#222222">58.362</text>
+<text x="83" y="259.5" text-anchor="end" fill="#222222">BASE</text>
+<rect x="91" y="244.0" width="263.1" height="22" fill="#9099a5"/>
+<text x="359.1" y="259.5" fill="#222222">59.803</text>
+<text x="83" y="293.5" text-anchor="end" fill="#222222">REF</text>
+<rect x="91" y="278.0" width="309.1" height="22" fill="#9099a5"/>
+<text x="405.1" y="293.5" fill="#222222">70.241</text>
+</svg>

@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: MIT
 # Copyright (c) 2026 kasahart
-"""Fixed values of the article 2 protocol (docs/02-protocol.md).
+"""Fixed values of the experiment 1 protocol (docs/02-protocol.md).
 
 Method parameters stay next to their method (W1/SS in waveform.py). This module
 holds what the runner, CLI and evaluation must agree on.
