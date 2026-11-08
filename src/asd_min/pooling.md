@@ -6,26 +6,28 @@ RDPの原論文は[Temporal Pooling Strategies論文](https://arxiv.org/html/260
 
 **入出力：** 関数は`[B,T,F,D]`を受け取り、時間方向へ集約した`[B,F,D]`を返します。runnerは録音1件を`B=1`で処理し、`[0]`を取り出して`[F,D]`を保持します。下の式は録音1件の特徴を表します。
 
-周波数`f`の時点`t`の特徴を`x[t,f]`とすると、計算の中心は次の重み付き平均です。
+周波数 $`f`$ の時点 $`t`$ の特徴を $`x_{t,f}`$ とすると、計算の中心は次の重み付き平均です。
 
-```text
-mu[f] = 時間方向の平均特徴
-r[t,f] = ||x[t,f] - mu[f]|| / max_t ||x[t,f] - mu[f]||
-w[t,f] = (1 + r[t,f])^gamma / sum_t (1 + r[t,f])^gamma
-q[f] = sum_t w[t,f] x[t,f]
+```math
+\begin{aligned}
+\mu_f &= \frac{1}{T}\sum_{t=1}^{T} x_{t,f} \\
+r_{t,f} &= \frac{\lVert x_{t,f} - \mu_f \rVert}{\max_{t'} \lVert x_{t',f} - \mu_f \rVert} \\
+w_{t,f} &= \frac{(1 + r_{t,f})^{\gamma}}{\sum_{t'} (1 + r_{t',f})^{\gamma}} \\
+q_f &= \sum_{t} w_{t,f}\, x_{t,f}
+\end{aligned}
 ```
 
 | 式 | 関数（[`pooling.py`](pooling.py)） |
 |---|---|
-| `mu[f]` | `time_mean()` |
-| `r[t,f]` | `relative_deviation()` |
-| `w[t,f]` | `deviation_weights()` |
-| `q[f]` | `weighted_time_sum()` |
+| $`\mu_f`$ | `time_mean()` |
+| $`r_{t,f}`$ | `relative_deviation()` |
+| $`w_{t,f}`$ | `deviation_weights()` |
+| $`q_f`$ | `weighted_time_sum()` |
 | 全体 | `relative_deviation_pooling()`（`frequency_pooling(mode="rdp")`から呼ばれます） |
 
 **直感：** ずっと似た音が続く中で、短い区間だけ特徴が変わると、普通の平均では薄まります。RDPは平均から離れた区間を重くし、その変化を集約後にも残しやすくします。
 
-`gamma=4`は[NA-SSL論文](https://arxiv.org/html/2608.00447v1)に沿った固定値で、最大偏差が`eps=1e-8`以下なら均等な時間平均になります。公開実装は、任意の有効時間mask、有限値検査、数値overflowを避ける内部scaleとlog/softmaxによる重み計算も備えます。これらは基本式を安定に計算する実装上の工夫です。
+$`\gamma=4`$ は[NA-SSL論文](https://arxiv.org/html/2608.00447v1)に沿った固定値で、最大偏差が`eps=1e-8`以下なら均等な時間平均になります。公開実装は、任意の有効時間mask、有限値検査、数値overflowを避ける内部scaleとlog/softmaxによる重み計算も備えます。これらは基本式を安定に計算する実装上の工夫です。
 
 論文ではbackendの集約として扱う処理を、この実装では特徴抽出時に行います。runnerは`[F,D]`だけを保持し、全パッチ列を全録音分保存しません。
 
