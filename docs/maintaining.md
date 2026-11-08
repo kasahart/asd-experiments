@@ -4,7 +4,7 @@
 
 READMEの`<!-- summary:start -->`〜`<!-- summary:end -->`、[結果の詳細](results.md)の`<!-- experiments:start -->`〜`<!-- experiments:end -->`、グラフ`results/readme/*.svg`は`scripts/update_readme.py`が生成します。手で編集しません。
 
-- 結果の要点は基準からの差を示す図と表で、比べる組は`configs/readme-summary.json`で決めます。
+- 結果の要点は基準からの差を示す図と表で、比べる組は`configs/readme-summary.json`で決めます。段ごとに見出し・基準・凡例の語（`from_label`→`to_label`）を書き、組を足すと行が増えます。横軸の範囲はデータから自動で決まり、差と前後の値は図の右端の列に出ます。
 - スコアのグラフはデータ（Evaluation・Development）ごとに1枚、スコア順、10点刻みのグリッドと値つき。軸は特徴抽出の短い組と記号だけにし、特徴・モデル・追加学習・正式システム名は表に置きます。
 
 1. [手法一覧](../configs/readme-methods.csv)に行を追加します。
