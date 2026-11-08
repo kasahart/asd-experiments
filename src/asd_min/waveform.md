@@ -46,7 +46,7 @@ SSの固定値も[実験1の固定条件](../../docs/02-protocol.md#追加条件
 
 ## 実録音の表示
 
-[marimoアプリ](../../apps/README.md)は保存済みの図と全長6秒の音声を表示します。図はWandas 0.8.0で作成しています。全条件で軸と色範囲を揃え、音声の個別正規化は追加していません。機械音だけの正解波形はないため、保持率は算出しません。[図・音声の出典と利用条件](../../docs/DATA_ATTRIBUTION.md)
+[marimoアプリ](../../apps/README.md)の図はWandas 0.8.0で作成し、全条件で軸と色範囲を揃えています。機械音だけの正解波形はないため、保持率は算出しません。
 
 元データから再描画するには、[公式データと録音checksum](../../docs/02-inputs.md)を確認し、`ASD_DATA_ROOT`を`ToothBrush`があるディレクトリに設定します。重みは不要です。
 
@@ -55,7 +55,7 @@ python -m pip install -e '.[visualization]'
 ASD_DATA_ROOT=/path/to/eval_data/raw python scripts/render_recording.py
 ```
 
-図は`outputs/recording-figures`へ保存します。保存先は`ASD_FIGURE_OUTPUT`で変更できます。スクリプトはSHA-256を確認してから`wd.read()`で全6秒を読み込み、B0・B1はチャンネル選択、W1・SSはWandasの`apply()`から共通の`condition_audio()`を呼びます。2chを保って処理した後に近接側を取り出します。W1の係数を表示区間だけで推定し直しません。`describe()`で波形・スペクトログラム・スペクトルを描き、`welch().plot(overlay=True)`で重ね描きします。表示用STFTと計算用STFTは別です。
+図は`outputs/recording-figures`へ保存します。保存先は`ASD_FIGURE_OUTPUT`で変更できます。スクリプトは2ch波形に共通の`condition_audio()`を適用してから近接側を取り出し、波形・STFT・Welchスペクトルを描きます（W1の係数は全6秒で推定）。
 
 
 `tests/synthetic.py`の`synthetic()`は波形処理の単体テスト用入力です。

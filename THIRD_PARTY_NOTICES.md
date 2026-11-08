@@ -33,8 +33,8 @@ The browser app is exported with [marimo 0.25.1](https://github.com/marimo-team/
 
 ## 実験2：追加学習の再現
 
-公開ASDKit commit `7601d673ef2ed5a2424965cac755365cf7112c5f`を `upstream.lock.json` に定義した公式archiveから仮想環境内へ取得し、editable依存として利用します。リポジトリにASDKit本体を同梱せず、原LICENSEを含むarchiveを仮想環境内に展開します。取得先のsourceは書き換えません。ASDKitと研究由来部分の原MIT通知は共通の [licenses/research-MIT.txt](licenses/research-MIT.txt) に保持しています。`runtime.py`のfrontend・学習設定は外部ASDKitを継承し、通常名のcollationも親実装に委譲します。匿名Evaluation名だけを接続側で補い、BEATsの復元は既存Encoderを共用します。BEATs・pooling・BEAM・W1は既存の `src/asd_min/` を共用し、Microsoft MIT/NOTICEと帰属は上の節を参照してください。外部依存の取得先・既定版・archive整合確認は `upstream.lock.json` にまとめています。新しいrunner・集計・テスト・説明文はroot MITです。データ・学習済み重み・ラベル個票は同梱しません。
+公開ASDKit commit `7601d673ef2ed5a2424965cac755365cf7112c5f`を `upstream.lock.json` に定義した公式archiveから仮想環境内へ取得し、editable依存として利用します。リポジトリにASDKit本体を同梱せず、原LICENSEを含むarchiveを仮想環境内に展開します。取得先のsourceは書き換えません。ASDKitと研究由来部分の原MIT通知は共通の [licenses/research-MIT.txt](licenses/research-MIT.txt) に保持しています。BEATs・pooling・BEAM・W1の帰属は上の節のとおりです。新しいrunner・集計・テスト・説明文はroot MITです。データ・学習済み重み・ラベル個票は同梱しません。
 
 ## 公式DCASE評価器
 
-[DCASE2026 Task 2の公式評価器](https://github.com/nttcslab/dcase2026_task2_evaluator)は利用者が別途設置し、実験1・実験2で共通の接続から無改変で実行します。評価器のコード・正解は同梱しません。利用条件は配布元の`LICENSE`と`LICENSEv2.1.pdf`を参照してください。こちらには予測の形式変換・Developmentの公開ファイル名からの正解CSV生成・公式出力の読み取りだけを置き、公式の指標計算を再実装しません。
+[DCASE2026 Task 2の公式評価器](https://github.com/nttcslab/dcase2026_task2_evaluator)は利用者が別途設置し、実験1・実験2で共通の接続から無改変で実行します。評価器のコード・正解は同梱しません。利用条件は配布元の`LICENSE`と`LICENSEv2.1.pdf`を参照してください。

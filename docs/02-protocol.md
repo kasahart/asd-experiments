@@ -6,11 +6,11 @@ Evaluationの5機種。正常参照はAdditional Trainingの各1000正常音（s
 - frozen **BEATs_iter3**、FP32、AMPなし、TF32なし。音声全体をbatch1で特徴抽出。周波数パッチを保持し、時間方向のRDP gamma=4、eps=1e-8。
 - BEAM VarMin4、scaled cosine `0.5*(1-cos)`、正常train_all参照、密度は自身を除く近傍4件、alphaはtrain_allのleave-one-outで周波数別に推定。補正後に参照最小値、周波数の一様平均。条件ごとに参照を新規構築。
 - 正常train再採点でも自身を除外。条件・機種ごとの正常trainスコア90%点（linear）、判定は厳密な `score > threshold`。
-- W1: 共同peakを0.9へ正規化（peak<=1e-12ならscale1）、float32。TorchHann periodic、STFT1024/window1024/hop512、center=True、reflect、normalized=False、onesided=True。録音の端も含めた全フレームで `H=sum(C*conj(F))/(sum(abs(F)^2)+1e-12)`、`Y=C-HF`。同じ窓でISTFT、元の長さ・共同scaleを復元。
+- W1: 共同peakを0.9へ正規化（peak<=1e-12ならscale1）、float32。TorchHann periodic、STFT1024/window1024/hop512、center=True、reflect、normalized=False、onesided=True。係数は録音の端も含めた全フレームで推定（式は[W1の解説](../src/asd_min/waveform.md)）。同じ窓でISTFT、元の長さ・共同scaleを復元。
 
 ## 追加条件SS
 
-近接/遠方の**大きさ**をbeta1で減算し、`near_abs > far_abs`なら差、それ以外はgamma0.1×near_absを使い、近接位相で復元します。Hann512/hop256。periodic Hann・center=True・reflect・入力正規化なしは、報告が未指定の詳細を固定したローカル選択です。[SS config](../configs/02_ss.json)。正常参照はSS処理した音から再構築します。
+beta1、gamma0.1、近接位相で復元（式は[SSの解説](../src/asd_min/waveform.md#ss--調整係数を求めず成分の大きさを引く)）。Hann512/hop256。periodic Hann・center=True・reflect・入力正規化なしは、報告が未指定の詳細を固定したローカル選択です。[SS config](../configs/02_ss.json)。正常参照はSS処理した音から再構築します。
 
 ## Development（構成の選択）
 

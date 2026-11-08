@@ -20,7 +20,7 @@ raw_score = 周波数方向の一様平均(raw_band)
 
 **直感：** 低い帯域は正常録音A、高い帯域は正常録音Bと似ている場合があります。一つの正常録音に全帯域が同時に似ていることを要求せず、帯域ごとに参照を選びます。正常な成分の組み合わせが変わっただけで距離が大きくなる問題を抑える、という[BEAM論文](https://arxiv.org/html/2603.13749)の設計に基づきます。
 
-正常メモリは、source990件とtarget10件を一緒に使います。domain別に二つのメモリを作る方法や、帯域の音量による重み付けは使いません。条件ごとにメモリを構築し、各条件で加工した正常音から構築します。
+正常メモリは、source990件とtarget10件を一緒に使います。メモリは条件ごとに、その条件で加工した正常音から構築します。
 
 CSVの異常度には、次節のVarMin補正後の`main`を使います。
 
@@ -54,8 +54,6 @@ main_score = 周波数方向の一様平均(main_band)
 正常train全件を一つずつ仮の検証音にするのが`train_all`、自己を比較相手から外すのがleave-one-out、帯域ごとに係数を求めるのが`per_band`です。`alpha`の分母が`eps=1e-12`以下なら0とし、係数や最終スコアを0以上にclipしません。したがって異常度は負になることもあります。補正後に全参照から最小値を選び直します。
 
 係数の分散最小化は[VarMin論文](https://dcase.community/documents/workshop2025/proceedings/DCASE2025Workshop_Matsumoto_12.pdf)に由来します。近傍4件は[NA-SSL論文](https://arxiv.org/html/2608.00447v1)に合わせています。この実装では、共有正常メモリ・train_all・per_bandを使い、帯域平均の前に補正します。
-
-条件比較では同じ検知器を使います。
 
 
 [公開コード：beam.py](beam.py)・[varmin.py](varmin.py)・[band_distance.py](band_distance.py) / [前：RDP](pooling.md) / [次：波形処理（W1/SS）](waveform.md)

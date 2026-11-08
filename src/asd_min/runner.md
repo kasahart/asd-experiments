@@ -4,10 +4,9 @@
 
 ## 共通runner — 条件の比較を同じ手順に保つ
 
-`run()`は各条件・機種で、train/testの波形処理→特徴抽出→正常参照構築→異常度出力を同じ順序で行います。正常trainの再採点では同一pathの自己参照を除き、その異常度の90%点を閾値として、厳密に`score > threshold`なら異常判定を出します。閾値はAUC/pAUCの順位比較とは別の、判定CSVを作るための設定です。
+`run()`は各条件・機種で、train/testの波形処理→特徴抽出→正常参照構築→異常度出力を同じ順序で行います。判定CSVの閾値（正常trainスコアの90%点）は[固定条件](../../docs/02-protocol.md)のとおりで、AUC/pAUCには影響しません。
 
-BEATs重みのSHA-256、train/test件数と匿名テスト名を確認し、既存出力を上書きしません。時間・正常trainスコア・閾値をローカルに記録します。実録音の再描画も同じ`condition_audio()`を呼び、Wandasで図を作ります。
-
+BEATs重みのSHA-256、train/test件数と匿名テスト名を確認し、既存出力を上書きしません。時間・正常trainスコア・閾値をローカルに記録します。
 
 | 手順 | 関数（[`runner.py`](runner.py)） |
 |---|---|
@@ -18,15 +17,13 @@ BEATs重みのSHA-256、train/test件数と匿名テスト名を確認し、既�
 | 条件・機種の順に上の手順を実行し、実行記録を残す | `run()` |
 | Developmentの採点（Dev7・Dev5） | [`development.py`](development.py)の`score_development()` |
 
-条件名・機種・件数・RDPの`gamma`・VarMinの近傍数・閾値の分位点・重みのSHA-256は[`protocol.py`](protocol.py)にまとめています。CLIの`results`は保存表の閲覧、`infer`は生音声からの再推論、`evaluate`は指定した固定版の評価器による保存異常度の採点です。
+条件名・機種・件数・RDPの`gamma`・VarMinの近傍数・閾値の分位点・重みのSHA-256は[`protocol.py`](protocol.py)にまとめています。
 
 [公開コード：runner.py](runner.py) / [cli.py](cli.py) / [固定条件](../../docs/02-protocol.md)
 
 ## CLIを使う
 
-以下は実験1の実行例です。環境は[実行環境](../../docs/setup.md)のとおり作り（推論だけなら`pip install -e .`で足ります）、入力は[入力の取得](../../docs/02-inputs.md)のとおり取得・配置します。`python -m asd_min.cli results`で保存結果の表を確認できます。
-
-保存結果・実録音の比較・手動試聴は[marimoアプリ](../../apps/README.md)で提供します。実データの推論・再採点には、以下のCLIを使います。
+以下は実験1の実行例です。環境は[実行環境](../../docs/setup.md)のとおり作り（推論だけなら`pip install -e .`で足ります）、入力は[入力の取得](../../docs/02-inputs.md)のとおり取得・配置します。サブコマンドは`results`（保存表の閲覧）、`infer`（生音声からの再推論）、`score-dev`（Developmentの採点）、`evaluate`（公式評価器による採点）です。保存結果の閲覧と試聴は[marimoアプリ](../../apps/README.md)でもできます。
 
 ```bash
 # パスは取得先に置き換える。dry-runは件数確認で重みをロードしない。

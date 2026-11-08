@@ -24,7 +24,7 @@ ch0近接/ch1遠方、16 kHz stereo。各機種train1000/test200。正常参照�
 <INPUT>/{ToyCar,ToyCarEmu,bearingEmu,fan,gearboxEmu,sliderEmu,valveEmu}/{train,test}/*.wav
 ```
 
-各機種train1000（source990/target10）・test200で、Evaluationと同じch0近接/ch1遠方、16 kHz stereoです。testのファイル名には`section_00_target_test_anomaly_0005_noAttribute.wav`のようにdomainと正常・異常が入っており、採点（`score-dev`）だけがこの情報を使います。ToyCarは4月8日修正版`dev_ToyCar_r2.zip`（MD5 `353201db217e25377a7e7eccf9c1c8a7`）を使います。他のDevelopment ZIPのMD5は下表に含めていません。
+録音形式と件数はEvaluationと同じです（train1000はsource990/target10）。testのファイル名には`section_00_target_test_anomaly_0005_noAttribute.wav`のようにdomainと正常・異常が入っており、採点（`score-dev`）だけがこの情報を使います。ToyCarは4月8日修正版`dev_ToyCar_r2.zip`（MD5 `353201db217e25377a7e7eccf9c1c8a7`）を使います。他のDevelopment ZIPのMD5は下表に含めていません。
 
 ## Checksum
 
@@ -48,8 +48,8 @@ CLIが使用するBEATs_iter3.ptのSHA-256は `8d1b234032a9ccff353612dc6c2098234
 
 ## 容量と計算資源
 
-Zenodo表示のダウンロード容量はtrain約2.8 GB、test 558.7 MB。ZIPと展開音声を同時保持するなら両方の空き容量が必要です。WAV headerの件数・長さから、PCM16 stereoの音声payloadは合計約3.99 GB（3600×10秒、1200×6秒、1200×16秒、16kHz×2ch×2bytes）と算出できます。Python環境・重み・生成物の容量は別途必要です。
+Zenodo表示のダウンロード容量はtrain約2.8 GB、test 558.7 MB。展開後の音声は約4 GBです。ZIPと展開音声を同時に置くなら両方の空き容量が必要です。
 
-重みは約345 MiB。CLIは機種・条件ごとの特徴をメモリに保持します。RAM/VRAMの必要最小値は未測定です。CPUまたはGPUで実行できます（[実行環境](setup.md)）。
+重みは約345 MiB。CPUまたはGPUで実行できます（[実行環境](setup.md)）。
 
 まず `--machine ToothBrush --limit 5` で小規模に実行できます。
