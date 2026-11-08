@@ -39,11 +39,11 @@ def test_summary_shows_both_effects_as_differences():
     table = text.split('## 結果の要点', 1)[1].split('## スコア', 1)[0]
     rows = [[c.strip() for c in line.strip('|').split('|')] for line in table.splitlines() if line.startswith('|  ') or line.startswith('| ①') or line.startswith('| ②')]
     assert [r[2:] for r in rows] == [
-        ['+3.99', '+6.16'], ['−0.52', '—'], ['+2.74', '+6.48'], ['+5.07', '+1.72'], ['+3.82', '+2.05']]
+        ['+3.99', '+6.16'], ['−0.52', '—'], ['+5.07', '+1.72'], ['+3.82', '+2.05']]
     svg = files['results/readme/summary.svg']
-    assert re.findall(r'>([+−]\d+\.\d{2})</text>', svg) == ['+3.99', '−0.52', '+2.74', '+5.07', '+3.82']
+    assert re.findall(r'>([+−]\d+\.\d{2})</text>', svg) == ['+3.99', '−0.52', '+5.07', '+3.82']
     assert '](results/readme/summary.svg)' in summary
-    assert 'W1 複素減算（BEATs 重み固定） +3.99、SS 振幅スペクトル減算（BEATs 重み固定） −0.52' in summary and 'B0 近接マイク +5.07、W1 複素減算 +3.82' in summary
+    assert 'W1 複素減算 +3.99、SS 振幅スペクトル減算 −0.52' in summary and 'B0 近接マイク +5.07、W1 複素減算 +3.82' in summary
     assert summary in (ROOT / 'README.md').read_text(encoding='utf-8')
 
 
