@@ -35,7 +35,7 @@ CSVの異常度には、次節のVarMin補正後の $`s`$（`main`）を使い�
 ```math
 \begin{aligned}
 b_{i,f} &= \frac{1}{4}\sum_{k \in \mathcal{N}_4(i,f)} D(y_{i,f}, y_{k,f}) \\
-j(z,f) &= \operatorname*{arg\,min}_{i \neq z} D(y_{z,f}, y_{i,f}) \\
+j(z,f) &= \mathop{\mathrm{arg\,min}}\limits_{i \neq z} D(y_{z,f}, y_{i,f}) \\
 u_{z,f} &= D(y_{z,f}, y_{j(z,f),f}), \qquad v_{z,f} = b_{j(z,f),f} \\
 \alpha_f &= \frac{\mathrm{Cov}_z(u_{z,f}, v_{z,f})}{\mathrm{Var}_z(v_{z,f})} \\
 s_f &= \min_i \left\{ D(q_f, y_{i,f}) - \alpha_f\, b_{i,f} \right\} \\
