@@ -7,7 +7,7 @@ sudo chown "$(id -u):$(id -g)" .venv
 [ -x .venv/bin/python ] || python3.11 -m venv .venv
 PY=.venv/bin/python
 
-"$PY" -m pip install torch==2.7.1 torchaudio==2.7.1 torchvision==0.22.1 \
+"$PY" -m pip install torch==2.13.0 torchaudio==2.11.1 torchvision==0.28.0 \
     --index-url "${TORCH_INDEX_URL:?}"
 "$PY" -m pip install -e '.[training,app,visualization,evaluation,test]'
 "$PY" reproduction/asd03/runtime.py install
